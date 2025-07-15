@@ -4,6 +4,7 @@ import Header from "./layout/Header.tsx";
 import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider, useRouteError} from "react-router-dom";
 import Products from "./container/Products.tsx";
 import Orders from "./container/Orders.tsx";
+import Departments from "./container/Departments.tsx";
 /*
 
     <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-24 dark:bg-gray-900">
@@ -28,7 +29,7 @@ import Orders from "./container/Orders.tsx";
       <div className="relative flex w-full max-w-5xl flex-col items-center justify-center gap-12">
         <div className="relative flex flex-col items-center gap-6">
           <h1 className="relative text-center text-4xl leading-[125%] font-bold text-gray-900 dark:text-gray-200">
-           <Department />
+           <Departments />
           </h1>
         </div>
       </div>
@@ -83,6 +84,10 @@ const useRouter = () => {
                         path: '/orders/new',
                         element: <span>NUOVO ORDINE</span>
                     },
+                    {
+                      path: '/departments',
+                      element: <Departments/>
+                    },
 /*
                     {
                         path: '/product/:id',
@@ -96,13 +101,10 @@ const useRouter = () => {
                         path: '/orders/:id',
                         element: <Order/>
                     },
-                    {
-                        path: '/departments',
-                        element: <Departments/>
-                    },
+
                     {
                         path: '/departments/:id',
-                        element: <Department/>
+                        element: <Departments/>
                     },
                     {
                         path: '/courses',
