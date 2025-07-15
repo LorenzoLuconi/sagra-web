@@ -1,8 +1,10 @@
-import { DarkThemeToggle } from "flowbite-react";
-import Department from "./Department.tsx";
+import * as React from 'react'
+import MainLayout from "./layout/MainLayout.tsx";
+import Header from "./layout/Header.tsx";
+import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider, useRouteError} from "react-router-dom";
+import Products from "./container/Products.tsx";
+/*
 
-export default function App() {
-  return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-24 dark:bg-gray-900">
       <div className="absolute inset-0 size-full">
         <div className="relative h-full w-full select-none">
@@ -30,5 +32,96 @@ export default function App() {
         </div>
       </div>
     </main>
-  );
+
+ */
+
+/*
+{
+    path: '/',
+        element: <MainLayout header={<Header/>} footer={<span>Footer</span>} body={<Outlet/>}/>,
+    errorElement: <MainLayout header={<Header/>} footer={<span>Footer</span>} body={<Outlet/>}/>,
+    children: [
+    {
+        index: true,
+        element: <Navigate to={'/home'}/>
+    }
+]
+}
+*/
+
+
+const useRouter = () => {
+
+
+    return (
+        createBrowserRouter([
+            {
+                path: "/",
+                element: (
+                    <MainLayout header={<Header/>} body={<Outlet/>} footer={<div>footer</div>}/>
+                ),
+                errorElement: <span>Error</span>,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to={'/home'}/>
+                    },
+                    {
+                        path: '/home',
+                        element: <span>Home</span>
+                    },
+                    {
+                        path: '/products',
+                        element: <Products/>
+                    },
+/*
+                    {
+                        path: '/product/:id',
+                        element: <Product/>
+                    },
+
+ */
+                    /*
+                    {
+                        path: '/orders',
+                        element: <Orders/>
+                    },
+                    {
+                        path: '/orders/:id',
+                        element: <Order/>
+                    },
+                    {
+                        path: '/departments',
+                        element: <Departments/>
+                    },
+                    {
+                        path: '/departments/:id',
+                        element: <Department/>
+                    },
+                    {
+                        path: '/courses',
+                        element: <Courses/>
+                    },
+                    {
+                        path: '/courses/:id',
+                        element: <Course/>
+                    }
+*/
+                ]
+            }
+        ] as RouteObject[])
+    )
+
+
+}
+
+
+
+export default function App() {
+
+    const router = useRouter()
+
+  return (
+      <RouterProvider router={router}/>
+  )
 }

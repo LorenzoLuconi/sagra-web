@@ -2,7 +2,9 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
-import { queryClient } from "./main.tsx";
+import { queryClient } from "../main.tsx";
+import {departmentsSearchQuery} from "../api/sagra/sagraComponents.ts";
+
 
 interface IDepartment {
   id: number
@@ -10,11 +12,13 @@ interface IDepartment {
 }
 
 const Department = () => {
+
+  const departments = departmentsSearchQuery({queryParams: })
+
+
   const departmentsList = useQuery<IDepartment[]>({
-    queryKey: ["departments"], queryFn: async () => {
-      const data = await fetch("http://localhost:8080/v1/departments")
-      return data.json();
-    }
+    queryKey: departments.queryKey,
+    queryFn: departments.queryFn
   });
 
   const departmentDelete = useMutation({
