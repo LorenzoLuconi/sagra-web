@@ -4,7 +4,7 @@ import Header from "./layout/Header.tsx";
 import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider, useRouteError} from "react-router-dom";
 import Products from "./container/Products.tsx";
 import Orders from "./container/Orders.tsx";
-import Departments from "./container/Departments.tsx";
+import DepartmentsContainer from "./container/Departments.tsx";
 /*
 
     <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-24 dark:bg-gray-900">
@@ -86,7 +86,7 @@ const useRouter = () => {
                     },
                     {
                       path: '/departments',
-                      element: <Departments/>
+                      element: <DepartmentsContainer/>
                     },
 /*
                     {
