@@ -15,15 +15,20 @@ import {
 } from "@mui/material";
 import { Department, DepartmentRequest } from "../api/sagra/sagraSchemas.ts";
 import * as React from "react";
-import { DeleteOutlined } from "@mui/icons-material";
+import { AddCircle, DeleteOutlined } from "@mui/icons-material";
 import { queryClient } from "../main.tsx";
 
 const DepartmentEdit = () => {
 
-  const [state, setState] = React.useState('')
+  const [state, setState] = React.useState({name: '', submitDisabled: true})
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-    setState(event.currentTarget.value);
+
+    if ( event.currentTarget.value )
+      setState({ name: event.currentTarget.value, submitDisabled: false });
+    else
+      setState({ name: event.currentTarget.value, submitDisabled: true });
+
   }, [setState])
 
   const departmentCreate = useMutation({
@@ -41,14 +46,18 @@ const DepartmentEdit = () => {
   return (
     <form>
       <TextField required
-                 value={state}
+                 value={state.name}
                  id="outlined-required"
                  label="Nome Reparto"
                  placeholder="Cucina"
                  onChange={handleChange}
       />
-      <Button variant="contained" onClick={ () => {
-        departmentCreate.mutate({name: state} as DepartmentRequest);
+      <Button variant="contained" startIcon={<AddCircle/>} disabled={state.submitDisabled} onClick={ () => {
+        if ( ! state.name ) {
+          setState({...state, error: true})
+        } else {
+          departmentCreate.mutate({ name: state.name } as DepartmentRequest);
+        }
       }}>Crea Reparto</Button>
     </form>
   );
