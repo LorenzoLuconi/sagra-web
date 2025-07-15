@@ -29,7 +29,8 @@ const Department = () => {
       }
     },
     onSuccess: async () => {
-      queryClient.invalidateQueries({queryKey: ["departments"]}).then(() =>
+      queryClient.invalidateQueries({
+        queryKey: ["departments"]}).then(() =>
         console.log("Reparto Cancellato")
       )
     },

@@ -3,6 +3,7 @@ import MainLayout from "./layout/MainLayout.tsx";
 import Header from "./layout/Header.tsx";
 import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider, useRouteError} from "react-router-dom";
 import Products from "./container/Products.tsx";
+import Orders from "./container/Orders.tsx";
 /*
 
     <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-24 dark:bg-gray-900">
@@ -74,6 +75,14 @@ const useRouter = () => {
                         path: '/products',
                         element: <Products/>
                     },
+                    {
+                        path: '/orders',
+                        element: <Orders/>
+                    },
+                    {
+                        path: '/orders/new',
+                        element: <span>NUOVO ORDINE</span>
+                    },
 /*
                     {
                         path: '/product/:id',
@@ -82,10 +91,7 @@ const useRouter = () => {
 
  */
                     /*
-                    {
-                        path: '/orders',
-                        element: <Orders/>
-                    },
+
                     {
                         path: '/orders/:id',
                         element: <Order/>
