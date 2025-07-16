@@ -81,7 +81,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                 </TableCell>
-                <TableCell component="th" scope="row">
+                <TableCell>
                     {order.customer}
                 </TableCell>
                 <TableCell align="right">{convertDate('it',  createdDate)}</TableCell>
