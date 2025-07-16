@@ -13,7 +13,7 @@ const Main = (): React.ReactElement => {
     return (
 
         <QueryClientProvider client={queryClient}>
-          <Box sx={{padding: 2, backgroundColor: grey[100]}}>
+          <Box sx={{padding: 2, paddingRight: 4, paddingLeft: 4, backgroundColor: grey[100], minWidth: '500px'}}>
             <App />
           </Box>
         </QueryClientProvider>

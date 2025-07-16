@@ -4,15 +4,33 @@ import {
   Button,
   ButtonProps,
   Menu,
-  Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   styled,
-  Typography, MenuProps, alpha, Paper
+  Typography,
+  MenuProps,
+  alpha,
+  Paper,
+  Grid,
+  IconButton,
 } from "@mui/material";
 import ReceiptIcon from '@mui/icons-material/Receipt';
-import { red } from "@mui/material/colors";
+import { grey, red } from "@mui/material/colors";
 import {Link, useNavigate} from "react-router";
 import {Logo} from "./Logo.tsx";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import {
+  AccountCircle, AccountCircleOutlined, AssessmentOutlined, CalculateOutlined, FormatListNumberedOutlined,
+  LibraryBooks,
+  LibraryBooksOutlined, MonitorOutlined,
+  Receipt,
+  ReceiptOutlined, RestaurantOutlined,
+  Settings, SettingsOutlined, WarehouseOutlined, WorkspacesOutlined
+} from "@mui/icons-material";
 
 const RedButton = styled(Button)<ButtonProps>(({ theme }) => ({
   color: theme.palette.getContrastText(red[700]),
@@ -83,24 +101,26 @@ const Header = (): React.ReactElement => {
         }
     };
     return (
-      <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'center', p: 1, border: '1px solid grey' }}>
+      <Paper sx={{ display: 'flex', p: 1, border: '1px solid grey', position: 'sticky' }}>
           <Logo height="60px"/>
-          <RedButton startIcon={<ReceiptIcon />} variant="contained" onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</RedButton>
-          <Typography sx={{ minWidth: 80 }}><Link to={'/orders'}>Ordini</Link></Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginRight: 1}}>
+            <Button variant="text" startIcon={<ReceiptOutlined/>} sx={{ color: red[500], marginRight: 1}} onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
+            <Button variant="text" startIcon={<LibraryBooksOutlined />} sx={{ color: grey[900], marginRight: 1}} onClick={() => {navigate('/orders')}}>Elenco Ordini</Button>
 
-          <Button
-              id="demo-customized-button"
+            <Button
               aria-controls={open ? 'demo-customized-menu' : undefined}
               aria-haspopup="true"
               aria-expanded={open ? 'true' : undefined}
-              variant="contained"
+              variant="text"
               disableElevation
               onClick={handleClick}
               endIcon={<KeyboardArrowDownIcon/>}
-          >
-              Options
-          </Button>
-          <StyledMenu
+              startIcon={<SettingsOutlined />}
+              sx={{ color: grey[900], marginRight: 1}}
+           >
+              Admin
+           </Button>
+            <StyledMenu
               id="demo-customized-menu"
               slotProps={{
                   list: {
@@ -110,14 +130,43 @@ const Header = (): React.ReactElement => {
               anchorEl={anchorEl}
               open={open}
               onClose={handleClose}
-          >
-              <MenuItem onClick={() => {navigate('/products')}}>Prodotti</MenuItem>
-              <MenuItem onClick={() => {navigate('/departments')}}>Reparti</MenuItem>
-              <MenuItem onClick={() => {navigate('/coarse')}}>Portate</MenuItem>
-          </StyledMenu>
+           >
+                <MenuItem onClick={() => {navigate('/products')}}>
+                  <RestaurantOutlined />
+                  Prodotti
+                </MenuItem>
+                <MenuItem onClick={() => {navigate('/departments')}}>
+                  <WorkspacesOutlined />
+                  Reparti
+                </MenuItem>
+                <MenuItem onClick={() => {navigate('/courses')}}>
+                  <FormatListNumberedOutlined />
+                  Portate
+                </MenuItem>
+                <MenuItem onClick={() => {navigate('/discounts')}}>
+                  <CalculateOutlined/>
+                  Sconti
+                </MenuItem>
 
-
-        <Typography sx={{ minWidth: 80 }}>Admin</Typography>
+                <MenuItem onClick={() => {navigate('/products/init')}}>
+                  <WarehouseOutlined />
+                  Inizializza Magazzino
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={() => {navigate('/stats')}}>
+                  <AssessmentOutlined />
+                  Statistiche
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={() => {navigate('/stats')}}>
+                  <MonitorOutlined/>
+                  Monitor
+                </MenuItem>
+            </StyledMenu>
+            <IconButton disabled={true}>
+              <AccountCircleOutlined />
+            </IconButton>
+          </Box>
       </Paper>
 
         )
