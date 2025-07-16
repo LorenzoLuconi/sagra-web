@@ -47,27 +47,27 @@ export type Product = {
   /**
    * @format int64
    */
-  id?: number;
-  name?: string;
+  id: number;
+  name: string;
   note?: string;
   /**
    * @format int64
    */
-  departmentId?: number;
+  departmentId: number;
   /**
    * @format int64
    */
-  courseId?: number;
-  price?: number;
-  sellLocked?: boolean;
+  courseId: number;
+  price: number;
+  sellLocked: boolean;
   /**
    * @format int32
    */
-  initialQuantity?: number;
+  initialQuantity: number;
   /**
    * @format int32
    */
-  availableQuantity?: number;
+  availableQuantity: number;
   /**
    * @format int64
    */
@@ -75,11 +75,11 @@ export type Product = {
   /**
    * @format date-time
    */
-  created?: string;
+  created: string;
   /**
    * @format date-time
    */
-  lastUpdate?: string;
+  lastUpdate: string;
 };
 
 export type ProductQuantityUpdate = {
@@ -210,9 +210,9 @@ export type Discount = {
   /**
    * @format int64
    */
-  id?: number;
-  name?: string;
-  rate?: number;
+  id: number;
+  name: string;
+  rate: number;
 };
 
 export type DepartmentRequest = {
@@ -229,8 +229,8 @@ export type Department = {
   /**
    * @format int64
    */
-  id?: number;
-  name?: string;
+  id: number;
+  name: string;
 };
 
 export type CourseRequest = {
@@ -247,8 +247,8 @@ export type Course = {
   /**
    * @format int64
    */
-  id?: number;
-  name?: string;
+  id: number;
+  name: string;
 };
 
 export type MonitorProductView = {

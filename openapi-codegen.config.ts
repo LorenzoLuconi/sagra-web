@@ -20,5 +20,56 @@ export default defineConfig({
         schemasFiles,
       });
     },
-  }
+  },
+  sagra: {
+    from: {
+      relativePath: "./sagra-api.json",
+      source: "file",
+    },
+    outputDir: "./src/api/sagra",
+    to: async (context) => {
+      const filenamePrefix = "sagra";
+      const { schemasFiles } = await generateSchemaTypes(context, {
+        filenamePrefix,
+      });
+      await generateReactQueryComponents(context, {
+        filenamePrefix,
+        schemasFiles,
+      });
+    },
+  },
+  sagra: {
+    from: {
+      relativePath: "./sagra-api.json",
+      source: "file",
+    },
+    outputDir: "./src/api/sagra",
+    to: async (context) => {
+      const filenamePrefix = "sagra";
+      const { schemasFiles } = await generateSchemaTypes(context, {
+        filenamePrefix,
+      });
+      await generateReactQueryComponents(context, {
+        filenamePrefix,
+        schemasFiles,
+      });
+    },
+  },
+  sagra: {
+    from: {
+      relativePath: "./sagra-api.json",
+      source: "file",
+    },
+    outputDir: "./src/api/sagra",
+    to: async (context) => {
+      const filenamePrefix = "sagra";
+      const { schemasFiles } = await generateSchemaTypes(context, {
+        filenamePrefix,
+      });
+      await generateReactQueryComponents(context, {
+        filenamePrefix,
+        schemasFiles,
+      });
+    },
+  },
 });
