@@ -53,12 +53,15 @@ const DepartmentEdit = () => {
 
   return (
     <form>
-      <TextField required
-                 value={state.name}
-                 id="outlined-required"
-                 label="Nome Reparto"
-                 placeholder="Cucina"
-                 onChange={handleChange}
+      <Box sx={{display: 'flex', alignItems: 'center', gap: '20px'}}>
+      <TextField
+          size={"small"}
+          required
+          value={state.name}
+          id="outlined-required"
+          label="Nome Reparto"
+          placeholder="Cucina"
+          onChange={handleChange}
       />
       <Button variant="contained" startIcon={<AddCircle/>} disabled={state.submitDisabled} onClick={ () => {
         if ( ! state.name ) {
@@ -67,6 +70,7 @@ const DepartmentEdit = () => {
           departmentCreate.mutate({ name: state.name } as DepartmentRequest);
         }
       }}>Crea Reparto</Button>
+      </Box>
     </form>
   );
 };

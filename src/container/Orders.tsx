@@ -70,75 +70,75 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
     const createdDate = order.created ? new Date(order.created) : new Date()
     let total = 0;
     return (
-    <>
-        <TableRow sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: '#efefef' }}>
-            <TableCell>
-                <IconButton
-                    aria-label="expand row"
-                    size="small"
-                    onClick={() => setOpen(!open)}
-                >
-                    {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                </IconButton>
-            </TableCell>
-            <TableCell component="th" scope="row">
-                {order.customer}
-            </TableCell>
-            <TableCell align="right">{convertDate('it',  createdDate)}</TableCell>
-            <TableCell align="right">{order.note}</TableCell>
-            <TableCell align="right">{order.serviceCost}</TableCell>
-            <TableCell align="right">{order.serviceNumber}</TableCell>
-        </TableRow>
-        <TableRow>
-            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                <Collapse in={open} timeout="auto" unmountOnExit>
-                    <Box sx={{ margin: 1 }}>
-                        <Typography variant="h6" gutterBottom component="div">
-                            Prodotti
-                        </Typography>
-                        <Table size="small" aria-label="purchases">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Prodotto</TableCell>
-                                    <TableCell>Quantità</TableCell>
-                                    <TableCell align="right">Costo</TableCell>
-                                    <TableCell align="right">SubTotale (€)</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {order.products &&order.products.map((product:OrderedProduct, idx: number) => {
-                                    const subTotal = product.price * product.quantity
-                                    total += subTotal
-                                    return (
-
-                                    <TableRow key={idx} sx={{backgroundColor: '#efefef'}}>
-
-
-                                        <TableCell><ProductName productId={product.productId??0}/></TableCell>
-                                        <TableCell>{product.quantity}</TableCell>
-                                        <TableCell component="th" scope="row">
-                                            {product.price}
-                                        </TableCell>
-
-                                        <TableCell align="right">
-                                            {subTotal}
-                                        </TableCell>
+        <>
+            <TableRow sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: '#efefef' }}>
+                <TableCell>
+                    <IconButton
+                        aria-label="expand row"
+                        size="small"
+                        onClick={() => setOpen(!open)}
+                    >
+                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                </TableCell>
+                <TableCell component="th" scope="row">
+                    {order.customer}
+                </TableCell>
+                <TableCell align="right">{convertDate('it',  createdDate)}</TableCell>
+                <TableCell align="right">{order.note}</TableCell>
+                <TableCell align="right">{order.serviceCost}</TableCell>
+                <TableCell align="right">{order.serviceNumber}</TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box sx={{ margin: 1 }}>
+                            <Typography variant="h6" gutterBottom component="div">
+                                Prodotti
+                            </Typography>
+                            <Table size="small" aria-label="purchases">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Prodotto</TableCell>
+                                        <TableCell>Quantità</TableCell>
+                                        <TableCell align="right">Costo</TableCell>
+                                        <TableCell align="right">SubTotale (€)</TableCell>
                                     </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {order.products &&order.products.map((product:OrderedProduct, idx: number) => {
+                                        const subTotal = product.price * product.quantity
+                                        total += subTotal
+                                        return (
+
+                                            <TableRow key={idx} sx={{backgroundColor: '#efefef'}}>
 
 
-                                )})}
+                                                <TableCell><ProductName productId={product.productId??0}/></TableCell>
+                                                <TableCell>{product.quantity}</TableCell>
+                                                <TableCell align="right">
+                                                    {product.price}
+                                                </TableCell>
 
-                                <TableRow>
-                                    <TableCell colSpan={3}><Typography sx={{fontWeight: 700}}>Totale</Typography></TableCell>
-                                    <TableCell align="right"><Typography sx={{fontWeight: 700}}>{total}</Typography></TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </Box>
-                </Collapse>
-            </TableCell>
-        </TableRow>
-    </>
+                                                <TableCell align="right">
+                                                    {subTotal}
+                                                </TableCell>
+                                            </TableRow>
+
+
+                                        )})}
+
+                                    <TableRow>
+                                        <TableCell colSpan={3}><Typography sx={{fontWeight: 700}}>Totale</Typography></TableCell>
+                                        <TableCell align="right"><Typography sx={{fontWeight: 700}}>{total}</Typography></TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        </>
     )
 }
 

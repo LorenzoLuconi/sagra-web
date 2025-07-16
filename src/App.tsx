@@ -168,6 +168,8 @@ export default function App() {
                       icon: <ThumbDownIcon/>,
                       style: {
                           fontWeight: 700,
+                          backgroundColor: '#d32f2f',
+                          color: 'white',
                           width: '100%'
                       },
                   },
