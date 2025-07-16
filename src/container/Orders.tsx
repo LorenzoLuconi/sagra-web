@@ -68,6 +68,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
     const {order} = props
     const [open, setOpen] = React.useState(false)
     const createdDate = order.created ? new Date(order.created) : new Date()
+    let total = 0;
     return (
     <>
         <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -105,7 +106,11 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {order.products &&order.products.map((product:OrderedProduct, idx: number) => (
+                                {order.products &&order.products.map((product:OrderedProduct, idx: number) => {
+                                    const subTotal = product.price * product.quantity
+                                    total += subTotal
+                                    return (
+
                                     <TableRow key={idx}>
 
 
@@ -116,10 +121,17 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                                         </TableCell>
 
                                         <TableCell align="right">
-                                            {product.price * product.quantity}
+                                            {subTotal}
                                         </TableCell>
                                     </TableRow>
-                                ))}
+
+
+                                )})}
+
+                                <TableRow>
+                                    <TableCell colSpan={3}><Typography sx={{fontWeight: 700}}>Totale</Typography></TableCell>
+                                    <TableCell align="right"><Typography sx={{fontWeight: 700}}>{total}</Typography></TableCell>
+                                </TableRow>
                             </TableBody>
                         </Table>
                     </Box>

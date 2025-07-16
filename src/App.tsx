@@ -10,6 +10,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import {CircularProgress} from "@mui/material";
+import UnmanagedPathView from "./view/UnmanagedPathView.tsx";
 
 /*
 
@@ -121,6 +122,14 @@ const useRouter = () => {
                         element: <Course/>
                     }
 */
+
+                    {
+                        path: '*',
+                        element: <UnmanagedPathView/>
+                    }
+
+
+
                 ]
             }
         ] as RouteObject[])
