@@ -74,7 +74,7 @@ const DepartmentEdit = () => {
 
 const DepartmentsContainer = () => {
   return (
-    <Box sx={{margin: 2, padding: 2, background: '#FAFAFA'}}>
+    <Box sx={{margin: 2}}>
       <Typography variant="h3">
         Reparti
       </Typography>

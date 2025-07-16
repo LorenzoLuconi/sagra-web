@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {
-    Box,
-    Button,
-    ButtonProps,
-    Menu,
-    Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent,
-    styled,
-    Typography, MenuProps, alpha,
+  Box,
+  Button,
+  ButtonProps,
+  Menu,
+  Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent,
+  styled,
+  Typography, MenuProps, alpha, Paper
 } from "@mui/material";
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { red } from "@mui/material/colors";
@@ -83,7 +83,7 @@ const Header = (): React.ReactElement => {
         }
     };
     return (
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'center', p: 1, border: '1px solid grey' }}>
+      <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'center', p: 1, border: '1px solid grey' }}>
           <Logo/>
           <RedButton startIcon={<ReceiptIcon />} variant="contained" onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</RedButton>
           <Typography sx={{ minWidth: 80 }}><Link to={'/orders'}>Ordini</Link></Typography>
@@ -118,7 +118,7 @@ const Header = (): React.ReactElement => {
 
 
         <Typography sx={{ minWidth: 80 }}>Admin</Typography>
-      </Box>
+      </Paper>
 
         )
 }
