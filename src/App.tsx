@@ -1,7 +1,7 @@
 import * as React from 'react'
 import MainLayout from "./layout/MainLayout.tsx";
 import Header from "./layout/Header.tsx";
-import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider, useRouteError} from "react-router-dom";
+import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider} from "react-router-dom";
 import Products from "./container/Products.tsx";
 import Orders from "./container/Orders.tsx";
 import DepartmentsContainer from "./container/Departments.tsx";
@@ -9,7 +9,6 @@ import {Toaster} from "react-hot-toast";
 import InfoIcon from '@mui/icons-material/Info';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import {ThumbDown} from "@mui/icons-material";
 import {CircularProgress} from "@mui/material";
 
 /*

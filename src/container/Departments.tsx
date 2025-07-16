@@ -1,31 +1,25 @@
 // import React from 'react'
 
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { departmentsSearchQuery, fetchDepartmentCreate, fetchDepartmentDelete } from "../api/sagra/sagraComponents.ts";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {departmentsSearchQuery, fetchDepartmentCreate, fetchDepartmentDelete} from "../api/sagra/sagraComponents.ts";
 import {
   Box,
-  Button, IconButton,
+  Button,
+  IconButton,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  TextField, Typography
+  TextField,
+  Typography
 } from "@mui/material";
-import { Department, DepartmentRequest } from "../api/sagra/sagraSchemas.ts";
+import {Department, DepartmentRequest} from "../api/sagra/sagraSchemas.ts";
 import * as React from "react";
-import {
-  AddCircle,
-  Check,
-  CheckOutlined,
-  Close,
-  CloseOutlined,
-  DeleteOutlined,
-  EditOutlined
-} from "@mui/icons-material";
-import { queryClient } from "../main.tsx";
-import { green, red } from "@mui/material/colors";
+import {AddCircle, Check, Close, DeleteOutlined, EditOutlined} from "@mui/icons-material";
+import {queryClient} from "../main.tsx";
+import {green, red} from "@mui/material/colors";
 import toast from "react-hot-toast";
 
 const DepartmentEdit = () => {
