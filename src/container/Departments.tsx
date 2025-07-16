@@ -26,6 +26,7 @@ import {
 } from "@mui/icons-material";
 import { queryClient } from "../main.tsx";
 import { green, red } from "@mui/material/colors";
+import toast from "react-hot-toast";
 
 const DepartmentEdit = () => {
 
@@ -48,7 +49,11 @@ const DepartmentEdit = () => {
       const departmentsSearchConf = departmentsSearchQuery({});
       queryClient.invalidateQueries({ queryKey: departmentsSearchConf.queryKey }).then(() => {
       console.log("Reparto creato: " + data.name);
+      toast.success(`Reparto ${data.name} creato con succeso`)
       })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message)
     }
   })
 

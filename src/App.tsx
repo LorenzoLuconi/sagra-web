@@ -5,6 +5,13 @@ import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider, useR
 import Products from "./container/Products.tsx";
 import Orders from "./container/Orders.tsx";
 import DepartmentsContainer from "./container/Departments.tsx";
+import {Toaster} from "react-hot-toast";
+import InfoIcon from '@mui/icons-material/Info';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import {ThumbDown} from "@mui/icons-material";
+import {CircularProgress} from "@mui/material";
+
 /*
 
     <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-24 dark:bg-gray-900">
@@ -130,6 +137,37 @@ export default function App() {
     const router = useRouter()
 
   return (
-      <RouterProvider router={router}/>
+      <React.Suspense fallback={<CircularProgress/>}>
+          <Toaster
+              toastOptions={{
+                  duration: 5000,
+                  loading: {
+                      icon: <InfoIcon/>,
+                      style: {
+                          fontWeight: 700,
+                      }
+                  },
+                  success: {
+                      icon: <ThumbUpIcon/>,
+                      style: {
+                          fontWeight: 700,
+                          maxWidth: '95vw',
+                          backgroundColor: 'green',
+                          color: 'white'
+                      },
+                  },
+                  error: {
+                      icon: <ThumbDownIcon/>,
+                      style: {
+                          fontWeight: 700,
+                          width: '100%'
+                      },
+                  },
+
+
+              }}
+          />
+        <RouterProvider router={router}/>
+      </React.Suspense>
   )
 }

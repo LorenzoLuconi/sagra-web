@@ -12,3 +12,14 @@ export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<str
     }
     return res;
 }
+
+
+export const convertDate = (locale: string, date: Date, dataConversion?: Intl.DateTimeFormatOptions): string => {
+    const o = dataConversion ?? {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+    } as Intl.DateTimeFormatOptions
+    //  console.log('DataConverion?: ', o, locale, date);
+    return new Intl.DateTimeFormat(locale, o).format(date);
+}

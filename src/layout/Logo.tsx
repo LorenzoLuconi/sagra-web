@@ -1,5 +1,5 @@
 export const Logo = () => {
     return (
-        <img src={'/public/sPioX.svg'} alt={'logo'} style={{height: '60px', width: 'auto'}}/>
+        <img src={'/public/Logo-San-Pio.svg'} alt={'logo'} style={{height: '80px', width: 'auto'}}/>
     )
 }
