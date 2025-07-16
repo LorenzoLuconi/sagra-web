@@ -101,7 +101,7 @@ const Header = (): React.ReactElement => {
         }
     };
     return (
-      <Paper sx={{ display: 'flex', p: 1, border: '1px solid grey', position: 'sticky' }}>
+      <Paper sx={{ display: 'flex', p: 1, position: 'sticky' }}>
           <Logo height="60px"/>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginRight: 1}}>
             <Button variant="text" startIcon={<ReceiptOutlined/>} sx={{ color: red[500], marginRight: 1}} onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
@@ -150,7 +150,7 @@ const Header = (): React.ReactElement => {
 
                 <MenuItem onClick={() => {navigate('/products/init')}}>
                   <WarehouseOutlined />
-                  Inizializza Magazzino
+                  Magazzino
                 </MenuItem>
                 <Divider />
                 <MenuItem onClick={() => {navigate('/stats')}}>
