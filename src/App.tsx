@@ -11,6 +11,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import {CircularProgress} from "@mui/material";
 import UnmanagedPathView from "./view/UnmanagedPathView.tsx";
+import { Logo } from "./layout/Logo.tsx";
 
 /*
 
@@ -77,7 +78,7 @@ const useRouter = () => {
                     },
                     {
                         path: '/home',
-                        element: <span>Home</span>
+                        element: <Logo height="50%"/>
                     },
                     {
                         path: '/products',
