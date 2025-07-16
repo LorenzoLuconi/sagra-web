@@ -71,7 +71,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
     let total = 0;
     return (
     <>
-        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableRow sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: '#efefef' }}>
             <TableCell>
                 <IconButton
                     aria-label="expand row"
@@ -111,7 +111,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                                     total += subTotal
                                     return (
 
-                                    <TableRow key={idx}>
+                                    <TableRow key={idx} sx={{backgroundColor: '#efefef'}}>
 
 
                                         <TableCell><ProductName productId={product.productId??0}/></TableCell>
@@ -168,7 +168,7 @@ const Orders = ():React.ReactElement => {
         return (
             <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
-                    <TableHead>
+                    <TableHead >
                         <TableRow>
                             <TableCell />
                             <TableCell>Nome</TableCell>
