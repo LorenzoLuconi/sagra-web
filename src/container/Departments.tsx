@@ -15,8 +15,17 @@ import {
 } from "@mui/material";
 import { Department, DepartmentRequest } from "../api/sagra/sagraSchemas.ts";
 import * as React from "react";
-import { AddCircle, DeleteOutlined } from "@mui/icons-material";
+import {
+  AddCircle,
+  Check,
+  CheckOutlined,
+  Close,
+  CloseOutlined,
+  DeleteOutlined,
+  EditOutlined
+} from "@mui/icons-material";
 import { queryClient } from "../main.tsx";
+import { green, red } from "@mui/material/colors";
 
 const DepartmentEdit = () => {
 
@@ -82,6 +91,9 @@ const DepartmentsContainer = () => {
 const Departments = () => {
   const departmentsSearchConf = departmentsSearchQuery({});
 
+  const [state, setState] = React.useState({selected: -1})
+
+
   const departments = useQuery({
     queryKey: departmentsSearchConf.queryKey,
     queryFn: departmentsSearchConf.queryFn,
@@ -108,6 +120,7 @@ const Departments = () => {
 
     return (
       <>
+        <form>
           <Table>
             <TableHead>
               <TableRow>
@@ -116,17 +129,52 @@ const Departments = () => {
               </TableRow>
             </TableHead>
             <TableBody className="divide-y">
-              {departmentsData?.map((department: Department, idx) => {
+              {departmentsData?.map((department: Department) => {
                 return (
                   <TableRow key={department.id}>
-                    <TableCell>{department.name}</TableCell>
+                    {(() => {
+                      if ( state.selected == department.id){
+                        return (
+                          <>
+                            <TextField required value={department.name} />
+                            <IconButton aria-label="confirm-edit"
+                                        onClick={() => {
+                                          setState({selected: department.id as number})
+                                        }}
+                            >
+                            <Check sx={{ color: green[700] }}/>
+                            </IconButton>
+                            <IconButton aria-label="cancel-edit"
+                                        onClick={() => {
+                                          setState({selected: -1})
+                                        }}
+                            >
+                              <Close sx={{ color: red[700] }}/>
+                            </IconButton>
+                        </>
+
+                        )
+                      } else {
+                        return (
+                          <TableCell>{department.name}</TableCell>
+                        )
+                      }
+                    })()}
                     <TableCell>
                       <IconButton aria-label="delete"
                             onClick={() => {
+                              setState({selected: -1})
                               departmentDelete.mutate(department.id as number)
                             }}
                       >
                         <DeleteOutlined />
+                      </IconButton>
+                        <IconButton aria-label="edit"
+                                    onClick={() => {
+                                      setState({selected: department.id as number})
+                                    }}
+                        >
+                        <EditOutlined />
                       </IconButton>
                     </TableCell>
                   </TableRow>
@@ -134,6 +182,7 @@ const Departments = () => {
               })}
             </TableBody>
           </Table>
+        </form>
       </>
     );
   }
