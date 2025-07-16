@@ -44,6 +44,7 @@ const DepartmentEdit = () => {
       queryClient.invalidateQueries({ queryKey: departmentsSearchConf.queryKey }).then(() => {
       console.log("Reparto creato: " + data.name);
       toast.success(`Reparto ${data.name} creato con succeso`)
+        setState({name: '', submitDisabled: true})
       })
     },
     onError: (error: Error) => {
@@ -138,7 +139,7 @@ const Departments = () => {
                     {(() => {
                       if ( state.selected == department.id){
                         return (
-                          <>
+                          <Box sx={{display: 'flex', alignItems: 'center', marginLeft: '10px', marginTop: '10px'}}>
                             <TextField required value={department.name} />
                             <IconButton aria-label="confirm-edit"
                                         onClick={() => {
@@ -154,7 +155,7 @@ const Departments = () => {
                             >
                               <Close sx={{ color: red[700] }}/>
                             </IconButton>
-                        </>
+                        </Box>
 
                         )
                       } else {
