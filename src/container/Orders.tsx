@@ -20,6 +20,7 @@ import {Order, OrderedProduct} from "../api/sagra/sagraSchemas.ts";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { EditOutlined, PrintOutlined, SettingsOutlined } from "@mui/icons-material";
+import TakeAwayIcon from "../icons/TakeAwayIcon.tsx";
 
 interface ProductNameI {
     productId: number
@@ -84,12 +85,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
           </IconButton>
         </TableCell>
         <TableCell>
-          {(() => {
-            if ( order.takeAway )
-              return ( <TakeAway /> )
-            else
-              return
-          })()}
+          {order.takeAway ? <TakeAwayIcon color={"info"}/> : <></>}
         </TableCell>
         <TableCell align="center">{order.id}</TableCell>
         <TableCell align="center">{convertDate("it", createdDate)}</TableCell>
