@@ -146,16 +146,24 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                         );
                       },
                     )}
-                  <TableRow sx={{ backgroundColor: "#efefef" }}>
-                    <TableCell>Coperti</TableCell>
-                    <TableCell align="center">{order.serviceNumber}</TableCell>
-                    <TableCell align="right">
-                      {currency(order.serviceCost / order.serviceNumber)}
-                    </TableCell>
-                    <TableCell align="right">
-                      {currency(order.serviceCost)}
-                    </TableCell>
-                  </TableRow>
+                  {(() => {
+                    if ( order.serviceNumber > 0 )
+                      return (
+                        <TableRow sx={{ backgroundColor: "#efefef" }}>
+                          <TableCell>Coperti</TableCell>
+                          <TableCell align="center">{order.serviceNumber}</TableCell>
+                          <TableCell align="right">
+                            {currency(order.serviceCost / order.serviceNumber)}
+                          </TableCell>
+                          <TableCell align="right">
+                            {currency(order.serviceCost)}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    else
+                      return
+                  })()}
+
                   <TableRow>
                     <TableCell colSpan={3}>
                       <Typography sx={{ fontWeight: 700 }}>Totale</Typography>
