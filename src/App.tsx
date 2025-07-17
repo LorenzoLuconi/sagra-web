@@ -11,7 +11,9 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import {CircularProgress} from "@mui/material";
 import UnmanagedPathView from "./view/UnmanagedPathView.tsx";
+import MonitorContainer from "./container/MonitorContainer.tsx";
 import { Logo } from "./layout/Logo.tsx";
+
 
 /*
 
@@ -66,6 +68,10 @@ const useRouter = () => {
     return (
         createBrowserRouter([
             {
+                path: '/monitors/:id',
+                element: <MonitorContainer/>
+            },
+            {
                 path: "/",
                 element: (
                     <MainLayout header={<Header/>} body={<Outlet/>} footer={<div>footer</div>}/>
@@ -96,6 +102,7 @@ const useRouter = () => {
                       path: '/departments',
                       element: <DepartmentsContainer/>
                     },
+
 /*
                     {
                         path: '/product/:id',

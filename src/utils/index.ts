@@ -13,6 +13,17 @@ export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<str
     return res;
 }
 
+export const FULL_DATE_CONF: Intl.DateTimeFormatOptions = {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+}
+
+export const TIME_CONF: Intl.DateTimeFormatOptions = {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric"
+}
+
 
 export const convertDate = (locale: string, date: Date, dataConversion?: Intl.DateTimeFormatOptions): string => {
     const o = dataConversion ?? {
