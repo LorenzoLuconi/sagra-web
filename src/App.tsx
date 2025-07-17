@@ -13,6 +13,7 @@ import {CircularProgress} from "@mui/material";
 import UnmanagedPathView from "./view/UnmanagedPathView.tsx";
 import MonitorContainer from "./container/MonitorContainer.tsx";
 import { Logo } from "./layout/Logo.tsx";
+import Monitors from "./container/Monitors.tsx";
 
 
 /*
@@ -71,6 +72,7 @@ const useRouter = () => {
                 path: '/monitors/:id',
                 element: <MonitorContainer/>
             },
+
             {
                 path: "/",
                 element: (
@@ -101,6 +103,10 @@ const useRouter = () => {
                     {
                       path: '/departments',
                       element: <DepartmentsContainer/>
+                    },
+                    {
+                        path: '/monitors',
+                        element: <Monitors/>
                     },
 
 /*

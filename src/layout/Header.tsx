@@ -159,7 +159,7 @@ const Header = (): React.ReactElement => {
                             Statistiche
                         </MenuItem>
                         <Divider />
-                        <MenuItem onClick={() => {navigate('/stats')}}>
+                        <MenuItem onClick={() => {navigate('/monitors')}}>
                             <MonitorOutlined/>
                             Monitor
                         </MenuItem>
