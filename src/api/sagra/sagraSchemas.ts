@@ -140,39 +140,39 @@ export type Order = {
   /**
    * @format int64
    */
-  id?: number;
-  customer?: string;
+  id: number;
+  customer: string;
   note?: string;
-  takeAway?: boolean;
+  takeAway: boolean;
   /**
    * @format int32
    */
-  serviceNumber?: number;
-  serviceCost?: number;
-  totalAmount?: number;
+  serviceNumber: number;
+  serviceCost: number;
+  totalAmount: number;
   discountRate?: number;
-  username?: string;
+  username: string;
   /**
    * @format date-time
    */
-  created?: string;
+  created: string;
   /**
    * @format date-time
    */
-  lastUpdate?: string;
-  products?: OrderedProduct[];
+  lastUpdate: string;
+  products: OrderedProduct[];
 };
 
 export type OrderedProduct = {
   /**
    * @format int64
    */
-  productId?: number;
+  productId: number;
   /**
    * @format int32
    */
-  quantity?: number;
-  price?: number;
+  quantity: number;
+  price: number;
   note?: string;
 };
 
