@@ -23,3 +23,9 @@ export const convertDate = (locale: string, date: Date, dataConversion?: Intl.Da
     //  console.log('DataConverion?: ', o, locale, date);
     return new Intl.DateTimeFormat(locale, o).format(date);
 }
+
+export const currencyEuro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" });
+
+export const currency = (value : number) : string => {
+  return currencyEuro.format(value)
+}

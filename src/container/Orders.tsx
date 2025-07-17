@@ -1,6 +1,6 @@
 import * as React from "react"
 import {ordersSearchQuery, productByIdQuery} from "../api/sagra/sagraComponents.ts";
-import {convertDate, getQueryObj} from "../utils";
+import { convertDate, currency, getQueryObj } from "../utils";
 import {useLocation} from "react-router";
 import {useQuery} from "@tanstack/react-query";
 import {
@@ -117,11 +117,11 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                                                 <TableCell><ProductName productId={product.productId??0}/></TableCell>
                                                 <TableCell>{product.quantity}</TableCell>
                                                 <TableCell align="right">
-                                                    {product.price}
+                                                    {currency(product.price)}
                                                 </TableCell>
 
                                                 <TableCell align="right">
-                                                    {subTotal}
+                                                    {currency(subTotal)}
                                                 </TableCell>
                                             </TableRow>
 
@@ -130,7 +130,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
 
                                     <TableRow>
                                         <TableCell colSpan={3}><Typography sx={{fontWeight: 700}}>Totale</Typography></TableCell>
-                                        <TableCell align="right"><Typography sx={{fontWeight: 700}}>{total}</Typography></TableCell>
+                                        <TableCell align="right"><Typography sx={{fontWeight: 700}}>{currency(total)}</Typography></TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
