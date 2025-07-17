@@ -1,22 +1,22 @@
 import * as React from 'react'
 import {
-  Box,
-  Button,
-  ButtonProps,
-  Menu,
-  Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  styled,
-  Typography,
-  MenuProps,
-  alpha,
-  Paper,
-  Grid,
-  IconButton,
+    Box,
+    Button,
+    ButtonProps,
+    Menu,
+    Divider,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    styled,
+    Typography,
+    MenuProps,
+    alpha,
+    Paper,
+    Grid,
+    IconButton, AppBar,
 } from "@mui/material";
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { grey, red } from "@mui/material/colors";
@@ -24,20 +24,20 @@ import {Link, useNavigate} from "react-router";
 import {Logo} from "./Logo.tsx";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
-  AccountCircle, AccountCircleOutlined, AssessmentOutlined, CalculateOutlined, FormatListNumberedOutlined,
-  LibraryBooks,
-  LibraryBooksOutlined, MonitorOutlined,
-  Receipt,
-  ReceiptOutlined, RestaurantOutlined,
-  Settings, SettingsOutlined, WarehouseOutlined, WorkspacesOutlined
+    AccountCircle, AccountCircleOutlined, AssessmentOutlined, CalculateOutlined, FormatListNumberedOutlined,
+    LibraryBooks,
+    LibraryBooksOutlined, MonitorOutlined,
+    Receipt,
+    ReceiptOutlined, RestaurantOutlined,
+    Settings, SettingsOutlined, WarehouseOutlined, WorkspacesOutlined
 } from "@mui/icons-material";
 
 const RedButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  color: theme.palette.getContrastText(red[700]),
-  backgroundColor: red[700],
-  '&:hover': {
-    backgroundColor: red[900],
-  },
+    color: theme.palette.getContrastText(red[700]),
+    backgroundColor: red[700],
+    '&:hover': {
+        backgroundColor: red[900],
+    },
 }));
 
 const StyledMenu = styled((props: MenuProps) => (
@@ -101,74 +101,75 @@ const Header = (): React.ReactElement => {
         }
     };
     return (
-      <Paper sx={{ display: 'flex', p: 1, position: 'sticky' }}>
-          <Logo height="60px"/>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginRight: 1}}>
-            <Button variant="text" startIcon={<ReceiptOutlined/>} sx={{ color: red[500], marginRight: 1}} onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
-            <Button variant="text" startIcon={<LibraryBooksOutlined />} sx={{ color: grey[900], marginRight: 1}} onClick={() => {navigate('/orders')}}>Elenco Ordini</Button>
+        <AppBar  position={'sticky'} sx={{backgroundColor: 'transparent'}}>
+            <Paper elevation={2} sx={{ display: 'flex', p: 1, }}>
+                <Logo height="60px"/>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginRight: 1}}>
+                    <Button variant="text" startIcon={<ReceiptOutlined/>} sx={{ color: red[500], marginRight: 1}} onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
+                    <Button variant="text" startIcon={<LibraryBooksOutlined />} sx={{ color: grey[900], marginRight: 1}} onClick={() => {navigate('/orders')}}>Elenco Ordini</Button>
 
-            <Button
-              aria-controls={open ? 'demo-customized-menu' : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? 'true' : undefined}
-              variant="text"
-              disableElevation
-              onClick={handleClick}
-              endIcon={<KeyboardArrowDownIcon/>}
-              startIcon={<SettingsOutlined />}
-              sx={{ color: grey[900], marginRight: 1}}
-           >
-              Admin
-           </Button>
-            <StyledMenu
-              id="demo-customized-menu"
-              slotProps={{
-                  list: {
-                      'aria-labelledby': 'demo-customized-button',
-                  },
-              }}
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-           >
-                <MenuItem onClick={() => {navigate('/products')}}>
-                  <RestaurantOutlined />
-                  Prodotti
-                </MenuItem>
-                <MenuItem onClick={() => {navigate('/departments')}}>
-                  <WorkspacesOutlined />
-                  Reparti
-                </MenuItem>
-                <MenuItem onClick={() => {navigate('/courses')}}>
-                  <FormatListNumberedOutlined />
-                  Portate
-                </MenuItem>
-                <MenuItem onClick={() => {navigate('/discounts')}}>
-                  <CalculateOutlined/>
-                  Sconti
-                </MenuItem>
+                    <Button
+                        aria-controls={open ? 'demo-customized-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        variant="text"
+                        disableElevation
+                        onClick={handleClick}
+                        endIcon={<KeyboardArrowDownIcon/>}
+                        startIcon={<SettingsOutlined />}
+                        sx={{ color: grey[900], marginRight: 1}}
+                    >
+                        Admin
+                    </Button>
+                    <StyledMenu
+                        id="demo-customized-menu"
+                        slotProps={{
+                            list: {
+                                'aria-labelledby': 'demo-customized-button',
+                            },
+                        }}
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                    >
+                        <MenuItem onClick={() => {navigate('/products')}}>
+                            <RestaurantOutlined />
+                            Prodotti
+                        </MenuItem>
+                        <MenuItem onClick={() => {navigate('/departments')}}>
+                            <WorkspacesOutlined />
+                            Reparti
+                        </MenuItem>
+                        <MenuItem onClick={() => {navigate('/courses')}}>
+                            <FormatListNumberedOutlined />
+                            Portate
+                        </MenuItem>
+                        <MenuItem onClick={() => {navigate('/discounts')}}>
+                            <CalculateOutlined/>
+                            Sconti
+                        </MenuItem>
 
-                <MenuItem onClick={() => {navigate('/products/init')}}>
-                  <WarehouseOutlined />
-                  Magazzino
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={() => {navigate('/stats')}}>
-                  <AssessmentOutlined />
-                  Statistiche
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={() => {navigate('/stats')}}>
-                  <MonitorOutlined/>
-                  Monitor
-                </MenuItem>
-            </StyledMenu>
-            <IconButton disabled={true}>
-              <AccountCircleOutlined />
-            </IconButton>
-          </Box>
-      </Paper>
-
-        )
+                        <MenuItem onClick={() => {navigate('/products/init')}}>
+                            <WarehouseOutlined />
+                            Magazzino
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem onClick={() => {navigate('/stats')}}>
+                            <AssessmentOutlined />
+                            Statistiche
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem onClick={() => {navigate('/stats')}}>
+                            <MonitorOutlined/>
+                            Monitor
+                        </MenuItem>
+                    </StyledMenu>
+                    <IconButton disabled={true}>
+                        <AccountCircleOutlined />
+                    </IconButton>
+                </Box>
+            </Paper>
+        </AppBar>
+    )
 }
 export default Header
