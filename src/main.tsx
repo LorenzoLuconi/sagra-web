@@ -7,13 +7,13 @@ import '@fontsource/roboto/700.css';
 import "./index.css";
 
 import {QueryClient} from '@tanstack/react-query'
-import Main from "./Main.tsx";
+import MainComponent from "./MainComponent.tsx";
 
 export const queryClient = new QueryClient()
 
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-        <Main/>
+        <MainComponent/>
   </React.StrictMode>,
 );

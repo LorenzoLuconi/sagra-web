@@ -5,7 +5,7 @@ import {grey} from "@mui/material/colors";
 import App from "./App.tsx";
 import {queryClient} from "./main.tsx";
 
-const Main = (): React.ReactElement => {
+const MainComponent = (): React.ReactElement => {
     return (
 
         <QueryClientProvider client={queryClient}>
@@ -16,4 +16,4 @@ const Main = (): React.ReactElement => {
 
     )
 }
-export default Main
+export default MainComponent
