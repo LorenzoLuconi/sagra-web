@@ -1,36 +1,37 @@
 import * as React from 'react'
 import {
+    alpha,
+    AppBar,
     Box,
     Button,
     ButtonProps,
-    Menu,
     Divider,
-    FormControl,
-    InputLabel,
+    IconButton,
+    Menu,
     MenuItem,
-    Select,
+    MenuProps,
+    Paper,
     SelectChangeEvent,
     styled,
-    Typography,
-    MenuProps,
-    alpha,
-    Paper,
-    Grid,
-    IconButton, AppBar,
 } from "@mui/material";
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import { grey, red } from "@mui/material/colors";
-import {Link, useNavigate} from "react-router";
+import {red} from "@mui/material/colors";
+import {useNavigate} from "react-router";
 import {Logo} from "./Logo.tsx";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
-    AccountCircle, AccountCircleOutlined, AssessmentOutlined, CalculateOutlined, FormatListNumberedOutlined,
-    LibraryBooks,
-    LibraryBooksOutlined, MonitorOutlined,
-    Receipt,
-    ReceiptOutlined, RestaurantOutlined,
-    Settings, SettingsOutlined, WarehouseOutlined, WorkspacesOutlined
+    AccountCircleOutlined,
+    AssessmentOutlined,
+    CalculateOutlined,
+    FormatListNumberedOutlined,
+    LibraryBooksOutlined,
+    MonitorOutlined,
+    ReceiptOutlined,
+    RestaurantOutlined,
+    SettingsOutlined,
+    WarehouseOutlined,
+    WorkspacesOutlined
 } from "@mui/icons-material";
+import MaterialUISwitch from "../view/MaterialUISwitch.tsx";
 
 const RedButton = styled(Button)<ButtonProps>(({ theme }) => ({
     color: theme.palette.getContrastText(red[700]),
@@ -82,7 +83,14 @@ const StyledMenu = styled((props: MenuProps) => (
         }),
     },
 }));
-const Header = (): React.ReactElement => {
+
+interface HeaderI {
+    changeTheme: (theme: string) => void
+}
+
+
+const Header: React.FC<HeaderI> = (props): React.ReactElement => {
+
     const [selection, setSelection] = React.useState(undefined);
     const navigate = useNavigate()
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -102,11 +110,11 @@ const Header = (): React.ReactElement => {
     };
     return (
         <AppBar  position={'sticky'} sx={{backgroundColor: 'transparent'}}>
-            <Paper elevation={2} sx={{ display: 'flex', p: 1, }}>
-                <Logo height="60px"/>
+            <Paper elevation={2} sx={{ display: 'flex', p: 1, alignItems: 'center'}}>
+                <Logo sx={{fontSize: '3rem'}} color={'text.primary'}/>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginRight: 1}}>
-                    <Button variant="text" startIcon={<ReceiptOutlined/>} sx={{ color: red[500], marginRight: 1}} onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
-                    <Button variant="text" startIcon={<LibraryBooksOutlined />} sx={{ color: grey[900], marginRight: 1}} onClick={() => {navigate('/orders')}}>Elenco Ordini</Button>
+                    <Button variant="text" color={'error'} startIcon={<ReceiptOutlined/>} sx={{  marginRight: 1}} onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
+                    <Button variant="text"  startIcon={<LibraryBooksOutlined />} sx={{ color: 'text.primary', marginRight: 1}} onClick={() => {navigate('/orders')}}>Elenco Ordini</Button>
 
                     <Button
                         aria-controls={open ? 'demo-customized-menu' : undefined}
@@ -117,7 +125,7 @@ const Header = (): React.ReactElement => {
                         onClick={handleClick}
                         endIcon={<KeyboardArrowDownIcon/>}
                         startIcon={<SettingsOutlined />}
-                        sx={{ color: grey[900], marginRight: 1}}
+                        sx={{ color: 'text.primary', marginRight: 1}}
                     >
                         Admin
                     </Button>
@@ -167,6 +175,11 @@ const Header = (): React.ReactElement => {
                     <IconButton disabled={true}>
                         <AccountCircleOutlined />
                     </IconButton>
+                    <MaterialUISwitch onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+                        console.log('event: ', event)
+                        console.log('checked: ', checked)
+                        props.changeTheme(checked?'dark': 'light')
+                    }}/>
                 </Box>
             </Paper>
         </AppBar>

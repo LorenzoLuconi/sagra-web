@@ -9,7 +9,7 @@ import {Toaster} from "react-hot-toast";
 import InfoIcon from '@mui/icons-material/Info';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import {CircularProgress} from "@mui/material";
+import {Box, CircularProgress, createTheme, Theme} from "@mui/material";
 import UnmanagedPathView from "./view/UnmanagedPathView.tsx";
 import MonitorContainer from "./container/MonitorContainer.tsx";
 import { Logo } from "./layout/Logo.tsx";
@@ -63,9 +63,25 @@ import OrderEdit from "./container/OrderEdit.tsx";
 }
 */
 
+const lightTheme: Theme = createTheme({
+    palette: {
+        mode: 'light'
+    }
+})
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+    },
+});
+const sagraTheme: Record<string, Theme> = {
+    'light': lightTheme,
+    'dark': darkTheme
+}
+
+
 
 const useRouter = () => {
-
+    const [currentTheme, setCurrentTheme] = React.useState('light')
 
     return (
         createBrowserRouter([
@@ -76,7 +92,7 @@ const useRouter = () => {
             {
                 path: "/",
                 element: (
-                    <MainLayout header={<Header/>} body={<Outlet/>} footer={<div>footer</div>}/>
+                    <MainLayout theme={sagraTheme[currentTheme]} header={<Header changeTheme={(theme: string) => {setCurrentTheme(theme)}}/>} body={<Outlet/>} footer={<div>footer</div>}/>
                 ),
                 errorElement: <span>Error</span>,
                 children: [
@@ -86,7 +102,11 @@ const useRouter = () => {
                     },
                     {
                         path: '/home',
-                        element: <Logo height="50%"/>
+                        element: (
+                            <Box sx={{display: 'flex', justifyContent: 'center', height: '100%'}}>
+                                <Logo sx={{fontSize: '50vh', color: 'text.primary'}}/>
+                            </Box>
+                        )
                     },
                     {
                         path: '/products',
