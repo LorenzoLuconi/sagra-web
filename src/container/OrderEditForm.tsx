@@ -5,12 +5,15 @@ import {
   Box,
   Button,
   FormControlLabel,
-  Grid,
+  Grid, IconButton,
   Paper,
+  Stack,
   Switch,
   TextField
 } from "@mui/material";
-import { PrintOutlined, SaveOutlined } from "@mui/icons-material";
+import { AddCircle, PrintOutlined, RemoveCircle, SaveOutlined } from "@mui/icons-material";
+import { NumberInput } from "./NumberInput.tsx";
+import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
 
 
 export interface IOrderEdit {
@@ -118,44 +121,56 @@ const OrderEditForm = (props : IOrderEdit) => {
     }, [setTakeAway]
   );
 
+  const printDisabled  = () : boolean  => {
+    // Non abbiamo un ordine salvato oppure è modificato e quindi non ancora salvato
+    return ! order || changed;
+  }
+
   const handleChangeCoperti =
     React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
         if ( ! event.currentTarget.value ) {
           setCoperti(0)
         } else {
           // FIXME non c'e' un controllo se il valore è numerico
-          setCoperti(Number.parseInt(event.currentTarget.value));
+          const number = Number.parseInt(event.currentTarget.value);
+          if ( number >=  0)
+            setCoperti(number);
+          else
+            setCoperti(0)
         }
       }, [setCoperti]
-    );
+    )
 
-  return (
-      <form>
+    return (
+        <Paper sx={{padding: 2 }}>
         <TextField fullWidth required
           value={customer}
           label="Nome cliente"
           onChange={handleChangeCustomer}
         />
         <Box sx={{ display: "flex", marginTop: 2 }}>
+
+          <TextField type="number" size='small'
+            value={coperti}
+            label="N. Coperti"
+            onChange={handleChangeCoperti}
+            disabled={takeAway}
+            slotProps={{ htmlInput: { size: 4 } }}
+                     sx={{ ml: 0, mr: 2}}
+          />
           <FormControlLabel
             label="Asporto"
             control={
               <Switch checked={takeAway} onChange={handleChangeTakeAway} />
             }
           />
-          <TextField
-            value={coperti}
-            label="Numero Coperti"
-            onChange={handleChangeCoperti}
-            disabled={takeAway}
-          />
         </Box>
-        <Box sx={{ display: 'flex', marginTop: 1, justifyContent: 'center' }}>
+        <Stack direction="row" spacing={1} sx={{marginTop: 1, justifyContent: 'center'}}>
           <Button variant="contained" startIcon={<SaveOutlined/>}>Salva</Button>
-          <Button variant="contained" disabled={!order} startIcon={<PrintOutlined/>}>Stampa</Button>
-        </Box>
-      </form>
-  );
-};
+          <Button disabled={printDisabled()} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+        </Stack>
+        </Paper>
+    );
+}
 
 export default OrderEditForm;

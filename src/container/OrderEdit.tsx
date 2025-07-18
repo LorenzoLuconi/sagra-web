@@ -3,10 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import OrderEditForm from "./OrderEditForm.tsx";
 import { Grid, Paper } from "@mui/material";
+import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
+import { useState } from "react";
+import { Order, OrderedProductRequest } from "../api/sagra/sagraSchemas.ts";
+import OrderTotal from "./OrderTotal.tsx";
 
 const OrderEdit = () => {
   const params = useParams();
-  const orderId: number = params.orderId ? +params.orderId : 0;
+  const orderId: number = params.orderId ? + params.orderId : 0;
 
   const orderConf = orderByIdQuery({
     pathParams: { orderId: orderId },
@@ -21,16 +25,20 @@ const OrderEdit = () => {
   if (orderData.isFetched) {
     const order = orderData.data;
 
-    return (
-      <Grid container spacing={2}>
-        <Grid size={8}>Elenco Prodotti</Grid>
-        <Grid size={4}>
-          <Paper sx={{padding: 2, }}>
-            <OrderEditForm order={order} />
-          </Paper>
-        </Grid>
-      </Grid>
-    );
+    if ( order ) {
+      return (
+        <form>
+          <Grid container spacing={2}>
+            <Grid size={7}>Elenco Prodotti</Grid>
+            <Grid size={5}>
+              <OrderEditForm order={order} />
+              <OrderTotal order={order} />
+              <OrderedProductsEdit products={order?.products} />
+            </Grid>
+          </Grid>
+        </form>
+      );
+    }
 
     return <></>;
   }
