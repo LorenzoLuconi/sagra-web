@@ -3,16 +3,18 @@ import * as React from "react";
 import { useState } from "react";
 import {
   Box,
+  Button,
   FormControlLabel,
   Grid,
   Paper,
   Switch,
   TextField
 } from "@mui/material";
+import { PrintOutlined, SaveOutlined } from "@mui/icons-material";
 
 
 export interface IOrderEdit {
-  order: Order;
+  order?: Order;
 }
 
 
@@ -128,35 +130,31 @@ const OrderEditForm = (props : IOrderEdit) => {
     );
 
   return (
-    <form>
-      <Grid container spacing={2}>
-        <Grid size={4}>Elenco Prodotti</Grid>
-        <Grid size={3}>
-          <Paper>
-            <TextField
-              value={customer}
-              label="Nome cliente"
-              onChange={handleChangeCustomer}
-            />
-            <Box sx={{ display: "flex" }}>
-              <FormControlLabel
-                label="Asporto"
-                control={
-                  <Switch checked={takeAway} onChange={handleChangeTakeAway} />
-                }
-              />
-              <TextField
-                value={coperti}
-                label="Numero Coperti"
-                onChange={handleChangeCoperti}
-                disabled={takeAway}
-              />
-            </Box>
-          </Paper>
-          Ordine
-        </Grid>
-      </Grid>
-    </form>
+      <form>
+        <TextField fullWidth required
+          value={customer}
+          label="Nome cliente"
+          onChange={handleChangeCustomer}
+        />
+        <Box sx={{ display: "flex", marginTop: 2 }}>
+          <FormControlLabel
+            label="Asporto"
+            control={
+              <Switch checked={takeAway} onChange={handleChangeTakeAway} />
+            }
+          />
+          <TextField
+            value={coperti}
+            label="Numero Coperti"
+            onChange={handleChangeCoperti}
+            disabled={takeAway}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', marginTop: 1, justifyContent: 'center' }}>
+          <Button variant="contained" startIcon={<SaveOutlined/>}>Salva</Button>
+          <Button variant="contained" disabled={!order} startIcon={<PrintOutlined/>}>Stampa</Button>
+        </Box>
+      </form>
   );
 };
 

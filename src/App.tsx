@@ -73,11 +73,6 @@ const useRouter = () => {
                 path: '/monitors/:id',
                 element: <MonitorContainer/>
             },
-          {
-            path: '/orders/:orderId',
-            element: <OrderEdit/>
-          },
-
             {
                 path: "/",
                 element: (
@@ -104,6 +99,10 @@ const useRouter = () => {
                     {
                         path: '/orders/new',
                         element: <span>NUOVO ORDINE</span>
+                    },
+                    {
+                      path: '/orders/:orderId',
+                      element: <OrderEdit/>
                     },
                     {
                       path: '/departments',
