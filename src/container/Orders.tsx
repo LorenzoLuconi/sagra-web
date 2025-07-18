@@ -40,7 +40,6 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
   return (
     <>
       <TableRow
-        sx={{ "& > *": { borderBottom: "unset" }, backgroundColor: "#efefef" }}
       >
         <TableCell>
           <IconButton
@@ -80,7 +79,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
               <Typography variant="h6" gutterBottom component="div">
                 Prodotti Ordinati
               </Typography>
-              <Table size="small" aria-label="purchases">
+              <Table size="small" aria-label="purchases" >
                 <TableHead>
                   <TableRow>
                     <TableCell>Prodotto</TableCell>
@@ -89,12 +88,12 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                     <TableCell align="right">SubTotale</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody sx={{ borderBottom: 'unset' }}>
                   {order.products.map(
                     (product: OrderedProduct, idx: number) => {
                       const subTotal = product.price * product.quantity;
                       return (
-                        <TableRow key={idx} sx={{ backgroundColor: "#efefef" }}>
+                        <TableRow key={idx} sx={{ backgroundColor: 'background.default' }}>
                           <TableCell>
                             <ProductName productId={product.productId} />
                           </TableCell>
@@ -115,7 +114,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                   {(() => {
                     if (order.serviceNumber > 0)
                       return (
-                        <TableRow sx={{ backgroundColor: "#efefef" }}>
+                        <TableRow sx={{ backgroundColor: 'background.default' }}>
                           <TableCell>Coperti</TableCell>
                           <TableCell align="center">
                             {order.serviceNumber}
