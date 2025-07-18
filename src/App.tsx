@@ -65,12 +65,20 @@ import OrderEdit from "./container/OrderEdit.tsx";
 
 const lightTheme: Theme = createTheme({
     palette: {
-        mode: 'light'
+        mode: 'light',
+        background: {
+            paper: '#f5f5f5',
+            default: '#fff'
+        }
     }
 })
 const darkTheme = createTheme({
     palette: {
         mode: 'dark',
+        background: {
+            paper: '#181818',
+            default: '#181818'
+        }
     },
 });
 const sagraTheme: Record<string, Theme> = {
