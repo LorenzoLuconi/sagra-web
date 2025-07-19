@@ -160,19 +160,10 @@ const DepartmentsList = () => {
                         </TableCell>
                       );
                     } else {
-                      return <TableCell sx={{fontSize: '1.0em'}}>{department.name}</TableCell>;
+                      return <TableCell sx={{fontSize: '1.2em'}}>{department.name}</TableCell>;
                     }
                   })()}
                   <TableCell>
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => {
-                        resetState();
-                        departmentDelete.mutate(department.id as number);
-                      }}
-                    >
-                      <DeleteOutlined />
-                    </IconButton>
                     <IconButton
                       aria-label="edit"
                       onClick={() => {
@@ -182,6 +173,17 @@ const DepartmentsList = () => {
                     >
                       <EditOutlined />
                     </IconButton>
+
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => {
+                        resetState();
+                        departmentDelete.mutate(department.id as number);
+                      }}
+                    >
+                      <DeleteOutlined />
+                    </IconButton>
+
                   </TableCell>
                 </TableRow>
               );

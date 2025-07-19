@@ -14,10 +14,11 @@ export const DepartmentEdit = () => {
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
 
-    if (event.currentTarget.value) {
-      setName(event.currentTarget.value);
+    setName(event.currentTarget.value);
+
+    if (event.currentTarget.value && event.currentTarget.value.trim().length > 0)
       setSubmitDisabled(false);
-    } else
+    else
       setSubmitDisabled(true);
 
   }, [setName, setSubmitDisabled]);
