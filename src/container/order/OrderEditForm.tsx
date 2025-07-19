@@ -1,4 +1,4 @@
-import { Order, OrderedProductRequest } from "../api/sagra/sagraSchemas.ts";
+import { Order, OrderedProductRequest } from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
 import { useState } from "react";
 import {
@@ -12,7 +12,7 @@ import {
   TextField
 } from "@mui/material";
 import { AddCircle, PrintOutlined, RemoveCircle, SaveOutlined } from "@mui/icons-material";
-import { NumberInput } from "./NumberInput.tsx";
+import { NumberInput } from "../NumberInput.tsx";
 import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
 
 
@@ -155,7 +155,7 @@ const OrderEditForm = (props : IOrderEdit) => {
             label="N. Coperti"
             onChange={handleChangeCoperti}
             disabled={takeAway}
-            slotProps={{ htmlInput: { size: 4 } }}
+            slotProps={{ htmlInput: { size: 8 } }}
                      sx={{ ml: 0, mr: 2}}
           />
           <FormControlLabel

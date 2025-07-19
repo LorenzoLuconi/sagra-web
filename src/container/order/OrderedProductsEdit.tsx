@@ -1,9 +1,9 @@
 import { Grid, IconButton, Paper, TextField, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { DeleteOutlined } from "@mui/icons-material";
-import { currency } from "../utils/index.ts";
-import Product from "./Product.tsx";
-import { productByIdQuery } from "../api/sagra/sagraComponents.ts";
+import { currency } from "../../utils";
+import Product from "../Product.tsx";
+import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
 
 interface IOrderedProductsEdit {
   products?: OrderedProduct[]
@@ -11,15 +11,26 @@ interface IOrderedProductsEdit {
 
 const OrderedProductsEdit  = (props:IOrderedProductsEdit) => {
   const products = props.products ? props.products : [];
+
+
+  let prodElements;
+  if (products.length > 0) {
+          prodElements = products.map((op: OrderedProduct) => {
+            return (
+              <OrderedProduct productId={op.productId} quantity={op.quantity} price={op.price} />
+            )
+          });
+  } else {
+    prodElements = (
+      <Typography sx={{textAlign: 'center'}}>Nessun prodotto in ordine</Typography>
+    )
+  }
+
   return (
-    <Paper sx={{mt: 1, p: 0.5}}>
-      {products.map((op: OrderedProduct) => {
-        return (
-          <OrderedProduct productId={op.productId} quantity={op.quantity} price={op.price} />
-        )})
-      }
+    <Paper sx={{ mt: 1, p: 0.5 }}>
+      {prodElements}
     </Paper>
-  );
+  )
 }
 
 interface IOrderedProduct {

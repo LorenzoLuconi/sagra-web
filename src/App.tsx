@@ -3,7 +3,7 @@ import MainLayout from "./layout/MainLayout.tsx";
 import Header from "./layout/Header.tsx";
 import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider} from "react-router-dom";
 import Products from "./container/Products.tsx";
-import Orders from "./container/Orders.tsx";
+import Orders from "./container/order/Orders.tsx";
 import DepartmentsContainer from "./container/Departments.tsx";
 import {Toaster} from "react-hot-toast";
 import InfoIcon from '@mui/icons-material/Info';
@@ -14,7 +14,7 @@ import UnmanagedPathView from "./view/UnmanagedPathView.tsx";
 import MonitorContainer from "./container/MonitorContainer.tsx";
 import { Logo } from "./layout/Logo.tsx";
 import Monitors from "./container/Monitors.tsx";
-import OrderEdit from "./container/OrderEdit.tsx";
+import OrderEdit from "./container/order/OrderEdit.tsx";
 
 
 /*

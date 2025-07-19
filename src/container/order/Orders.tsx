@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ordersSearchQuery } from "../api/sagra/sagraComponents.ts";
-import { convertDate, currency, getQueryObj, TIME_CONF } from "../utils";
-import { useLocation } from "react-router";
+import { ordersSearchQuery } from "../../api/sagra/sagraComponents.ts";
+import { convertDate, currency, getQueryObj, TIME_CONF } from "../../utils";
+import { useLocation, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Box,
@@ -16,7 +16,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { Order, OrderedProduct } from "../api/sagra/sagraSchemas.ts";
+import { Order, OrderedProduct } from "../../api/sagra/sagraSchemas.ts";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
@@ -24,8 +24,8 @@ import {
   PrintOutlined,
   SettingsOutlined,
 } from "@mui/icons-material";
-import TakeAwayIcon from "../icons/TakeAwayIcon.tsx";
-import { ProductName } from "./ProductName.tsx";
+import TakeAwayIcon from "../../icons/TakeAwayIcon.tsx";
+import { ProductName } from "../ProductName.tsx";
 
 
 
@@ -37,6 +37,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
   const { order } = props;
   const [open, setOpen] = React.useState(false);
   const createdDate = order.created ? new Date(order.created) : new Date();
+  const navigate = useNavigate();
   return (
     <>
       <TableRow
@@ -67,7 +68,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
           <IconButton disabled>
             <PrintOutlined />
           </IconButton>
-          <IconButton disabled>
+          <IconButton onClick={() => navigate("/orders/" + order.id)}>
             <EditOutlined />
           </IconButton>
         </TableCell>

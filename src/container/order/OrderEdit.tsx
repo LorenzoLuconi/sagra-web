@@ -1,12 +1,14 @@
-import { orderByIdQuery } from "../api/sagra/sagraComponents.ts";
+import { orderByIdQuery } from "../../api/sagra/sagraComponents.ts";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router";
+import { Form, useParams } from "react-router";
 import OrderEditForm from "./OrderEditForm.tsx";
-import { Grid, Paper } from "@mui/material";
+import { CircularProgress, Grid, Paper } from "@mui/material";
 import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
 import { useState } from "react";
-import { Order, OrderedProductRequest } from "../api/sagra/sagraSchemas.ts";
+import { Order, OrderedProductRequest } from "../../api/sagra/sagraSchemas.ts";
 import OrderTotal from "./OrderTotal.tsx";
+import ProductToOrderDepartments from "./ProductsToOrderDepartments.tsx";
+
 
 const OrderEdit = () => {
   const params = useParams();
@@ -20,32 +22,34 @@ const OrderEdit = () => {
     queryKey: orderConf.queryKey,
     queryFn: orderConf.queryFn,
     staleTime: 1000 * 60,
+    enabled: orderId > 0
   });
 
   if (orderData.isFetched) {
     const order = orderData.data;
 
-    if ( order ) {
+    if (order) {
       return (
         <form>
           <Grid container spacing={2}>
-            <Grid size={7}>Elenco Prodotti</Grid>
+            <Grid size={7}><ProductToOrderDepartments /></Grid>
             <Grid size={5}>
               <OrderEditForm order={order} />
               <OrderTotal order={order} />
-              <OrderedProductsEdit products={order?.products} />
+              <OrderedProductsEdit products={order.products} />
             </Grid>
           </Grid>
         </form>
-      );
+      )
     }
-
-    return <></>;
+    return <>Errore, ordine vuoto</>;
   }
 
   if (orderData.isError) {
-    return <>Error</>;
+    return <>Errore prelevamento ordine</>;
   }
+
+  return <CircularProgress />
 };
 
 export default OrderEdit;
