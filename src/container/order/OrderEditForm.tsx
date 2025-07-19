@@ -62,6 +62,7 @@ const OrderEditForm = (props : IOrderEdit) => {
     setProducts(newOrderedProducts);
   };
 
+  // INUTILE, perchè la quantità o si aggiunge 1 (inc) o si setta per l'attuale form
   const decProduct = (productId: number) => {
     const newOrderedProducts: OrderedProductRequest[] = [];
     let changed: boolean = false;
