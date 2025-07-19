@@ -18,7 +18,6 @@ const MainLayout: React.FC<MainLayoutI> = (props) => {
             <Box sx={{ display: 'flex', margin: '0 10px', flexDirection: 'column', justifyContent: 'flex-start', height: '100%' }}>
                 {props.body}
             </Box>
-            {props.footer}
         </Box>
 
 
