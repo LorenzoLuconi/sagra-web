@@ -115,7 +115,7 @@ const CoursesList = () => {
           <TableBody className="divide-y">
             {courses.map((course: Course) => {
               return (
-                <TableRow key={course.id}>
+                <TableRow key={course.id} selected={selected == course.id}>
                   {(() => {
                     if (selected == course.id) {
                       return (

@@ -122,7 +122,7 @@ const DepartmentsList = () => {
           <TableBody className="divide-y">
             {departments?.map((department: Department) => {
               return (
-                <TableRow key={department.id}>
+                <TableRow key={department.id} selected={selected == department.id}>
                   {(() => {
                     if (selected == department.id) {
                       return (
