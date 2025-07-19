@@ -15,6 +15,7 @@ import { Logo } from "./layout/Logo.tsx";
 import Monitors from "./container/Monitors.tsx";
 import OrderEdit from "./container/order/OrderEdit.tsx";
 import DepartmentContainer from "./container/department/DeparmentContainer.tsx";
+import CourseContainer from "./container/course/CourseContainer.tsx";
 
 
 
@@ -95,6 +96,10 @@ const useRouter = () => {
                         path: '/monitors',
                         element: <Monitors/>
                     },
+                  {
+                    path: '/courses',
+                    element: <CourseContainer/>
+                  },
 
 /*
                     {
