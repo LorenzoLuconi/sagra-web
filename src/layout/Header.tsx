@@ -157,12 +157,12 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             Sconti
                         </MenuItem>
 
-                        <MenuItem onClick={() => {navigate('/products/init')}}>
+                        <MenuItem disabled onClick={() => {navigate('/products/init')}}>
                             <WarehouseOutlined />
                             Magazzino
                         </MenuItem>
                         <Divider />
-                        <MenuItem onClick={() => {navigate('/stats')}}>
+                        <MenuItem disabled onClick={() => {navigate('/stats')}}>
                             <AssessmentOutlined />
                             Statistiche
                         </MenuItem>
@@ -172,7 +172,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             Monitor
                         </MenuItem>
                     </StyledMenu>
-                    <IconButton disabled={true}>
+                    <IconButton disabled>
                         <AccountCircleOutlined />
                     </IconButton>
                     <MaterialUISwitch onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
