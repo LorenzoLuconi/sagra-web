@@ -21,7 +21,12 @@ import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
 import { useConfirm } from "material-ui-confirm";
 
-const DiscountsList = () => {
+
+interface IDiscountsList {
+  selected: Discount | undefined
+  setSelected: (discount: Discount | undefined) => void;
+}
+const DiscountsList = (props : IDiscountsList) => {
   const discountsSearchConf = discountsSearchQuery({});
   const discountsQuery = useQuery({
     queryKey: discountsSearchConf.queryKey,
@@ -49,6 +54,7 @@ const DiscountsList = () => {
   const confirm = useConfirm()
 
   const handleDelete = (discount: Discount) => {
+    props.setSelected(undefined)
     confirm({
       title: "Conferma cancellazione",
       description: `Vuoi procedere con la cancellazione dello sconto: ${discount.name}?`,
@@ -82,16 +88,13 @@ const DiscountsList = () => {
           <TableBody className="divide-y">
             {discounts?.map((discount: Discount) => {
               return (
-                <TableRow key={discount.id}>
+                <TableRow key={discount.id} selected={ props.selected?.id === discount.id}>
                   <TableCell sx={{ fontSize: "1.2em" }}>{discount.name}</TableCell>
                   <TableCell sx={{ fontSize: "1.2em" }}>{discount.rate}%</TableCell>
                   <TableCell>
                     <IconButton
                       aria-label="edit"
-                      onClick={() => {
-                        // setSelected(discount.id);
-                        // setNameEdit(discount.name);
-                      }}
+                      onClick={() => props.setSelected(discount)}
                     >
                       <EditOutlined />
                     </IconButton>
