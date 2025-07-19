@@ -15,7 +15,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TextField,
+  TextField, Typography
 } from "@mui/material";
 import { Department, DepartmentRequest } from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
@@ -107,7 +107,7 @@ const DepartmentsList = () => {
     }
 
     if ( departments.length < 1 ) {
-      return <></>
+      return <Typography>Nessuno reparto presente</Typography>
     }
 
     return (

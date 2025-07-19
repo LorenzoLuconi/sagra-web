@@ -14,6 +14,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Typography,
 } from "@mui/material";
 import { Discount } from "../../api/sagra/sagraSchemas.ts";
 import { DeleteOutlined, EditOutlined } from "@mui/icons-material";
@@ -72,7 +73,7 @@ const DiscountsList = (props : IDiscountsList) => {
     }
 
     if (discounts.length < 1) {
-      return <></>;
+      return <Typography>Nessuno sconto presente</Typography>
     }
 
     return (

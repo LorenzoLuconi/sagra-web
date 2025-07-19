@@ -14,7 +14,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TextField,
+  TextField, Typography
 } from "@mui/material";
 import {
   Course,
@@ -100,7 +100,7 @@ const CoursesList = () => {
     }
 
     if ( courses.length < 1 ) {
-      return <></>
+      return <Typography>Nessuna portata presente</Typography>
     }
 
     return (
