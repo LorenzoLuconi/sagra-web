@@ -71,6 +71,8 @@ export const DiscountEdit = () => {
 
   const isValid = () => {
     let valid = true;
+    setErrorName("")
+    setErrorRate("")
     if (rate === undefined || rate < 1 || rate > 100) {
       setErrorRate("Percentuale di sconto deve essere compresa tra 1 e 100");
       valid = false;
@@ -100,7 +102,7 @@ export const DiscountEdit = () => {
         id="outlined-required"
         label="Nome Sconto"
         onChange={handleChangeName}
-        slotProps={{ htmlInput: { size: 32 } }}
+        slotProps={{ htmlInput: { size: 48 } }}
         error={!!errorName}
         helperText={errorName}
       />

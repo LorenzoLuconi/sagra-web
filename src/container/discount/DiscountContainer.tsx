@@ -1,5 +1,5 @@
 import { Box, Paper, Stack, Typography } from "@mui/material";
-import { WorkspacesOutlined } from "@mui/icons-material";
+import { CalculateOutlined, WorkspacesOutlined } from "@mui/icons-material";
 import { DiscountEdit } from "./DiscountEdit.tsx";
 import DiscountsList from "./DiscountsList.tsx";
 
@@ -7,7 +7,7 @@ const DiscountContainer = () => {
   return (
     <>
       <Stack direction="row" spacing={1} sx={{mb: 1, alignItems: 'center'}}>
-        <WorkspacesOutlined />
+        <CalculateOutlined />
         <Typography sx={{fontWeight: 700, fontSize: '1.5em'}}>Sconti</Typography>
       </Stack>
 
