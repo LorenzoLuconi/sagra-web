@@ -7,7 +7,7 @@ import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
 import { useState } from "react";
 import { Order, OrderedProductRequest } from "../../api/sagra/sagraSchemas.ts";
 import OrderTotal from "./OrderTotal.tsx";
-import ProductToOrderDepartments from "./ProductsToOrderDepartments.tsx";
+import ProductToOrderCourses from "./ProductsToOrderCourses.tsx";
 
 
 const OrderEdit = () => {
@@ -32,7 +32,7 @@ const OrderEdit = () => {
       return (
         <form>
           <Grid container spacing={2}>
-            <Grid size={7}><ProductToOrderDepartments /></Grid>
+            <Grid size={7}><ProductToOrderCourses /></Grid>
             <Grid size={5}>
               <OrderEditForm order={order} />
               <OrderTotal order={order} />
