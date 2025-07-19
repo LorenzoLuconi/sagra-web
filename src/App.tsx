@@ -16,6 +16,7 @@ import Monitors from "./container/Monitors.tsx";
 import OrderEdit from "./container/order/OrderEdit.tsx";
 import DepartmentContainer from "./container/department/DeparmentContainer.tsx";
 import CourseContainer from "./container/course/CourseContainer.tsx";
+import DiscountContainer from "./container/discount/DiscountContainer.tsx";
 
 
 
@@ -100,34 +101,11 @@ const useRouter = () => {
                     path: '/courses',
                     element: <CourseContainer/>
                   },
+                  {
+                    path: '/discounts',
+                    element: <DiscountContainer/>
+                  },
 
-/*
-                    {
-                        path: '/product/:id',
-                        element: <Product/>
-                    },
-
- */
-                    /*
-
-                    {
-                        path: '/orders/:id',
-                        element: <Order/>
-                    },
-
-                    {
-                        path: '/departments/:id',
-                        element: <Departments/>
-                    },
-                    {
-                        path: '/courses',
-                        element: <Courses/>
-                    },
-                    {
-                        path: '/courses/:id',
-                        element: <Course/>
-                    }
-*/
 
                     {
                         path: '*',

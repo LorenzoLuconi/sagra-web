@@ -5,7 +5,7 @@ import CoursesList from "./CoursesList.tsx";
 
 const CourseContainer = () => {
   return (
-    <>
+    <Box sx={{mt :1}}>
       <Stack direction="row" spacing={1} sx={{mb: 1, alignItems: 'center'}}>
         <FormatListNumberedOutlined />
         <Typography sx={{fontWeight: 700, fontSize: '1.5em'}}>Portate</Typography>
@@ -16,7 +16,7 @@ const CourseContainer = () => {
       <Box sx={{mt: 1}}>
         <CoursesList />
       </Box>
-    </>
+    </Box>
   );
 };
 

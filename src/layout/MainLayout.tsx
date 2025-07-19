@@ -13,7 +13,7 @@ const MainLayout: React.FC<MainLayoutI> = (props) => {
 
         <ThemeProvider theme={props.theme}>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '500px', backgroundColor: 'background.default', justifyContent: 'space-between', height: '100vh', gap: '20px' }}>
+        <Box sx={{ m: 1, display: 'flex', flexDirection: 'column', minWidth: '500px', backgroundColor: 'background.default', justifyContent: 'space-between', height: '100vh', gap: '20px' }}>
             <Box sx={{ display: 'flex', margin: '0 8px'}}>{props.header}</Box>
             <Box sx={{ display: 'flex', margin: '0 10px', flexDirection: 'column', justifyContent: 'flex-start', height: '100%' }}>
                 {props.body}

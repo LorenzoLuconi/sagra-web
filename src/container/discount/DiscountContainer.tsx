@@ -1,25 +1,25 @@
 import { Box, Paper, Stack, Typography } from "@mui/material";
-import { DepartmentEdit } from "./DepartmentEdit";
-import DepartmentsList from "./DepartmentsList.tsx";
 import { WorkspacesOutlined } from "@mui/icons-material";
+import { DiscountEdit } from "./DiscountEdit.tsx";
+import DiscountsList from "./DiscountsList.tsx";
 
-const DepartmentContainer = () => {
+const DiscountContainer = () => {
   return (
-    <Box sx={{mt :1}}>
+    <>
       <Stack direction="row" spacing={1} sx={{mb: 1, alignItems: 'center'}}>
         <WorkspacesOutlined />
-        <Typography sx={{fontWeight: 700, fontSize: '1.5em'}}>Reparti</Typography>
+        <Typography sx={{fontWeight: 700, fontSize: '1.5em'}}>Sconti</Typography>
       </Stack>
 
       <Paper variant="outlined" sx={{padding: 2}}>
-        <DepartmentEdit />
+        <DiscountEdit/>
       </Paper>
 
       <Box sx={{mt: 1}}>
-        <DepartmentsList />
+        <DiscountsList />
       </Box>
-    </Box>
+    </>
   );
 };
 
-export default DepartmentContainer
+export default DiscountContainer
