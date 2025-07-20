@@ -7,6 +7,7 @@ import {
   fetchDepartmentUpdate,
 } from "../../api/sagra/sagraComponents.ts";
 import {
+  Alert,
   Box,
   CircularProgress,
   IconButton,
@@ -15,7 +16,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TextField, Typography
+  TextField,
+  Typography,
 } from "@mui/material";
 import { Department, DepartmentRequest } from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
@@ -102,104 +104,102 @@ const DepartmentsList = () => {
 
     const departments = departmentsQuery.data;
 
-    if (departments === undefined) {
-      return <span>Errore inattesa nel prelevamento dei reparti</span>;
+    if (departments) {
+      if (departments.length < 1) {
+        return <Typography>Nessuno reparto presente</Typography>
+      }
+
+      return (
+        <form>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Nome Reparto</TableCell>
+                <TableCell>Azione</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody className="divide-y">
+              {departments?.map((department: Department) => {
+                return (
+                  <TableRow key={department.id} selected={selected == department.id}>
+                    {(() => {
+                      if (selected == department.id) {
+                        return (
+                          <TableCell>
+                            <TextField
+                              required
+                              value={nameEdit}
+                              size="small"
+                              onChange={handleChange}
+                              slotProps={{ htmlInput: { size: 32 } }}
+                            />
+                            <IconButton
+                              aria-label="Salva modifica"
+                              onClick={() => {
+                                const request: DepartmentRequest = {
+                                  name: nameEdit,
+                                };
+                                departmentUpdate.mutate({
+                                  departmentId: department.id,
+                                  departmentRequest: request,
+                                });
+                                resetState();
+                              }}
+                            >
+                              <Check sx={{ color: green[700] }} />
+                            </IconButton>
+                            <IconButton
+                              aria-label="Annulla modifica"
+                              onClick={() => {
+                                resetState();
+                              }}
+                            >
+                              <Close sx={{ color: red[700] }} />
+                            </IconButton>
+                          </TableCell>
+                        );
+                      } else {
+                        return <TableCell sx={{ fontSize: '1.2em' }}>{department.name}</TableCell>;
+                      }
+                    })()}
+                    <TableCell>
+                      <IconButton
+                        aria-label="edit"
+                        onClick={() => {
+                          setSelected(department.id);
+                          setNameEdit(department.name);
+                        }}
+                      >
+                        <EditOutlined />
+                      </IconButton>
+
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => {
+                          resetState();
+                          departmentDelete.mutate(department.id as number);
+                        }}
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </form>
+      );
     }
-
-    if ( departments.length < 1 ) {
-      return <Typography>Nessuno reparto presente</Typography>
-    }
-
-    return (
-      <form>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome Reparto</TableCell>
-              <TableCell>Azione</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="divide-y">
-            {departments?.map((department: Department) => {
-              return (
-                <TableRow key={department.id} selected={selected == department.id}>
-                  {(() => {
-                    if (selected == department.id) {
-                      return (
-                        <TableCell>
-                          <TextField
-                            required
-                            value={nameEdit}
-                            size="small"
-                            onChange={handleChange}
-                            slotProps={{ htmlInput: { size: 32 } }}
-                          />
-                          <IconButton
-                            aria-label="Salva modifica"
-                            onClick={() => {
-                              const request: DepartmentRequest = {
-                                name: nameEdit,
-                              };
-                              departmentUpdate.mutate({
-                                departmentId: department.id,
-                                departmentRequest: request,
-                              });
-                              resetState();
-                            }}
-                          >
-                            <Check sx={{ color: green[700] }} />
-                          </IconButton>
-                          <IconButton
-                            aria-label="Annulla modifica"
-                            onClick={() => {
-                              resetState();
-                            }}
-                          >
-                            <Close sx={{ color: red[700] }} />
-                          </IconButton>
-                        </TableCell>
-                      );
-                    } else {
-                      return <TableCell sx={{fontSize: '1.2em'}}>{department.name}</TableCell>;
-                    }
-                  })()}
-                  <TableCell>
-                    <IconButton
-                      aria-label="edit"
-                      onClick={() => {
-                        setSelected(department.id);
-                        setNameEdit(department.name);
-                      }}
-                    >
-                      <EditOutlined />
-                    </IconButton>
-
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => {
-                        resetState();
-                        departmentDelete.mutate(department.id as number);
-                      }}
-                    >
-                      <DeleteOutlined />
-                    </IconButton>
-
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </form>
-    );
   }
 
   if (departmentsQuery.isError) {
-    return <span>Si è verificato un errore</span>;
+    return <Alert severity="error">Si è verificato un errore prelevando la lista dei reparti: {departmentsQuery.error.message}</Alert>
   }
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{alignItems: 'center', justifyItems: 'center', m: 2 }}>
       <CircularProgress />
     </Box>
   );

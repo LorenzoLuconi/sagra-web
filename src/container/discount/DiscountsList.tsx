@@ -6,6 +6,7 @@ import {
   fetchDiscountDelete,
 } from "../../api/sagra/sagraComponents.ts";
 import {
+  Alert,
   Box,
   CircularProgress,
   IconButton,
@@ -14,7 +15,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Typography,
+  Typography
 } from "@mui/material";
 import { Discount } from "../../api/sagra/sagraSchemas.ts";
 import { DeleteOutlined, EditOutlined } from "@mui/icons-material";
@@ -68,56 +69,54 @@ const DiscountsList = (props : IDiscountsList) => {
   if (discountsQuery.isFetched) {
     const discounts = discountsQuery.data;
 
-    if (discounts === undefined) {
-      return <span>Errore inatteso nel prelevamento degli sconti</span>;
+    if (discounts) {
+      if (discounts.length < 1) {
+        return <Typography>Nessuno sconto presente</Typography>
+      }
+
+      return (
+        <form>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Nome Sconto</TableCell>
+                <TableCell>Percentuale</TableCell>
+                <TableCell>Azione</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody className="divide-y">
+              {discounts?.map((discount: Discount) => {
+                return (
+                  <TableRow key={discount.id} selected={props.selected?.id === discount.id}>
+                    <TableCell sx={{ fontSize: "1.2em" }}>{discount.name}</TableCell>
+                    <TableCell sx={{ fontSize: "1.2em" }}>{discount.rate}%</TableCell>
+                    <TableCell>
+                      <IconButton
+                        aria-label="edit"
+                        onClick={() => props.setSelected(discount)}
+                      >
+                        <EditOutlined />
+                      </IconButton>
+
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleDelete(discount)}
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </form>
+      );
     }
-
-    if (discounts.length < 1) {
-      return <Typography>Nessuno sconto presente</Typography>
-    }
-
-    return (
-      <form>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome Sconto</TableCell>
-              <TableCell>Percentuale</TableCell>
-              <TableCell>Azione</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="divide-y">
-            {discounts?.map((discount: Discount) => {
-              return (
-                <TableRow key={discount.id} selected={ props.selected?.id === discount.id}>
-                  <TableCell sx={{ fontSize: "1.2em" }}>{discount.name}</TableCell>
-                  <TableCell sx={{ fontSize: "1.2em" }}>{discount.rate}%</TableCell>
-                  <TableCell>
-                    <IconButton
-                      aria-label="edit"
-                      onClick={() => props.setSelected(discount)}
-                    >
-                      <EditOutlined />
-                    </IconButton>
-
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => handleDelete(discount)}
-                    >
-                      <DeleteOutlined />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </form>
-    );
   }
 
   if (discountsQuery.isError) {
-    return <span>Si è verificato un errore</span>;
+    return <Alert severity="error">Si è verificato un errore prelevando la lista degli sconti: {discountsQuery.error.message}</Alert>
   }
 
   return (

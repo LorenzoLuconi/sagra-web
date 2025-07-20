@@ -6,6 +6,7 @@ import {
   fetchCourseDelete, fetchCourseUpdate,
 } from "../../api/sagra/sagraComponents.ts";
 import {
+  Alert,
   Box,
   CircularProgress,
   IconButton,
@@ -95,100 +96,98 @@ const CoursesList = () => {
 
     const courses = coursesQuery.data;
 
-    if (courses === undefined) {
-      return <span>Errore inatteso nel prelevamento delle portate</span>;
+    if (courses) {
+      if (courses.length < 1) {
+        return <Typography>Nessuna portata presente</Typography>
+      }
+
+      return (
+        <form>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Nome Portata</TableCell>
+                <TableCell>Azione</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody className="divide-y">
+              {courses.map((course: Course) => {
+                return (
+                  <TableRow key={course.id} selected={selected == course.id}>
+                    {(() => {
+                      if (selected == course.id) {
+                        return (
+                          <TableCell>
+                            <TextField
+                              required
+                              value={nameEdit}
+                              size="small"
+                              onChange={handleChange}
+                              slotProps={{ htmlInput: { size: 32 } }}
+                            />
+                            <IconButton
+                              aria-label="Salva modifica"
+                              onClick={() => {
+                                const request: CourseRequest = {
+                                  name: nameEdit,
+                                };
+                                courseUpdate.mutate({
+                                  courseId: course.id,
+                                  courseRequest: request,
+                                });
+                                resetState();
+                              }}
+                            >
+                              <Check sx={{ color: green[700] }} />
+                            </IconButton>
+                            <IconButton
+                              aria-label="Annulla modifica"
+                              onClick={() => {
+                                resetState();
+                              }}
+                            >
+                              <Close sx={{ color: red[700] }} />
+                            </IconButton>
+                          </TableCell>
+                        );
+                      } else {
+                        return <TableCell sx={{ fontSize: '1.2em' }}>{course.name}</TableCell>;
+                      }
+                    })()}
+                    <TableCell>
+                      <IconButton
+                        aria-label="edit"
+                        onClick={() => {
+                          setSelected(course.id);
+                          setNameEdit(course.name);
+                        }}
+                      >
+                        <EditOutlined />
+                      </IconButton>
+
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => {
+                          resetState();
+                          coursesDelete.mutate(course.id as number);
+                        }}
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </form>
+      );
     }
-
-    if ( courses.length < 1 ) {
-      return <Typography>Nessuna portata presente</Typography>
-    }
-
-    return (
-      <form>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome Portata</TableCell>
-              <TableCell>Azione</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="divide-y">
-            {courses.map((course: Course) => {
-              return (
-                <TableRow key={course.id} selected={selected == course.id}>
-                  {(() => {
-                    if (selected == course.id) {
-                      return (
-                        <TableCell>
-                          <TextField
-                            required
-                            value={nameEdit}
-                            size="small"
-                            onChange={handleChange}
-                            slotProps={{ htmlInput: { size: 32 } }}
-                          />
-                          <IconButton
-                            aria-label="Salva modifica"
-                            onClick={() => {
-                              const request: CourseRequest = {
-                                name: nameEdit,
-                              };
-                              courseUpdate.mutate({
-                                courseId: course.id,
-                                courseRequest: request,
-                              });
-                              resetState();
-                            }}
-                          >
-                            <Check sx={{ color: green[700] }} />
-                          </IconButton>
-                          <IconButton
-                            aria-label="Annulla modifica"
-                            onClick={() => {
-                              resetState();
-                            }}
-                          >
-                            <Close sx={{ color: red[700] }} />
-                          </IconButton>
-                        </TableCell>
-                      );
-                    } else {
-                      return <TableCell sx={{fontSize: '1.2em'}}>{course.name}</TableCell>;
-                    }
-                  })()}
-                  <TableCell>
-                    <IconButton
-                      aria-label="edit"
-                      onClick={() => {
-                        setSelected(course.id);
-                        setNameEdit(course.name);
-                      }}
-                    >
-                      <EditOutlined />
-                    </IconButton>
-
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => {
-                        resetState();
-                        coursesDelete.mutate(course.id as number);
-                      }}
-                    >
-                      <DeleteOutlined />
-                    </IconButton>
-
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </form>
-    );
   }
 
   if (coursesQuery.isError) {
-    return <span>Si è verificato un errore</span>;
+    return <Alert severity="error">Si è verificato un errore prelevando la lista delle portate: {coursesQuery.error.message}</Alert>
   }
 
   return (
