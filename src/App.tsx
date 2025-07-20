@@ -17,6 +17,7 @@ import OrderEdit from "./container/order/OrderEdit.tsx";
 import DepartmentContainer from "./container/department/DeparmentContainer.tsx";
 import CourseContainer from "./container/course/CourseContainer.tsx";
 import DiscountContainer from "./container/discount/DiscountContainer.tsx";
+import ProductContainer from "./container/product/ProductContainer.tsx";
 
 
 
@@ -75,7 +76,7 @@ const useRouter = () => {
                     },
                     {
                         path: '/products',
-                        element: <Products/>
+                        element: <ProductContainer/>
                     },
                     {
                         path: '/orders',

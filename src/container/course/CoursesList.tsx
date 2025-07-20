@@ -33,7 +33,6 @@ import { green, red } from "@mui/material/colors";
 import toast from "react-hot-toast";
 
 const CoursesList = () => {
-  const coursesSearchConf = coursesSearchQuery({});
 
   const [selected, setSelected] = React.useState(-1);
   const [nameEdit, setNameEdit] = React.useState("");
@@ -49,6 +48,7 @@ const CoursesList = () => {
     [setNameEdit],
   );
 
+  const coursesSearchConf = coursesSearchQuery({});
   const coursesQuery = useQuery({
     queryKey: coursesSearchConf.queryKey,
     queryFn: coursesSearchConf.queryFn,
