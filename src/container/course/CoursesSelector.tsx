@@ -35,7 +35,10 @@ const CoursesSelector = (props : ICourseSelector) => {
       sx={{ display: "flex", gap: 1, rowGap: 1, flexWrap: 'wrap', alignContent: 'flex-start' }}
     >
       <Button key={-1} color={!selected ? 'secondary' : 'primary'}
-              onClick={() => props.handleClick(undefined)}
+              onClick={() => {
+                setSelected(undefined);
+                props.handleClick(undefined);
+              }}
               variant="contained" disableElevation >
         Tutte le portate
       </Button>
