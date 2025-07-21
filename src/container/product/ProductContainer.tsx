@@ -3,6 +3,7 @@ import { RestaurantOutlined } from "@mui/icons-material";
 import { useState } from "react";
 import ProductEdit from "./ProductEdit.tsx";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
+import ProductsList from "./ProductsList.tsx";
 
 const ProductContainer = () => {
 
@@ -20,9 +21,9 @@ const ProductContainer = () => {
       </Stack>
 
       <Paper variant="outlined" sx={{padding: 2}}>
-        <ProductEdit selected={selected} setSelected={selectProduct}/>
+        <ProductEdit key={selected?.id} selected={selected} setSelected={selectProduct}/>
       </Paper>
-
+        <ProductsList selected={selected} setSelected={selectProduct}/>
       <Box sx={{mt: 1}}>
       </Box>
     </>

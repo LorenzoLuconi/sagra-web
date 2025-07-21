@@ -1,5 +1,5 @@
 import * as React from "react";
-import { productByIdQuery } from "../api/sagra/sagraComponents.ts";
+import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
 import { useQuery } from "@tanstack/react-query";
 
 export interface ProductNameI {

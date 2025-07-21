@@ -25,7 +25,7 @@ import {
   SettingsOutlined,
 } from "@mui/icons-material";
 import TakeAwayIcon from "../../icons/TakeAwayIcon.tsx";
-import { ProductName } from "../ProductName.tsx";
+import { ProductName } from "../product/ProductName.tsx";
 
 
 

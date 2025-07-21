@@ -14,7 +14,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  TextField,
+  TextField
 } from "@mui/material";
 import {
   AddCircle,
@@ -29,6 +29,7 @@ import {
   fetchProductUpdate,
   productsSearchQuery
 } from "../../api/sagra/sagraComponents.ts";
+import { ProductName } from "./ProductName.tsx";
 
 interface IProductEdit {
   selected?: Product;
@@ -45,13 +46,17 @@ interface ErrorMessages {
 const ProductEdit = (props: IProductEdit) => {
   const [name, setName] = React.useState(props.selected?.name?? "");
   const [price, setPrice] = React.useState<number>(props.selected?.price ?? 0);
-  const [department, setDepartment] = React.useState<number>(props.selected?.departmentId ?? 0);
-  const [course, setCourse] = React.useState<number>(props.selected?.courseId ?? 0);
+  const [departmentId, setDepartmentId] = React.useState<number>(props.selected?.departmentId ?? 0);
+  const [courseId, setCourseId] = React.useState<number>(props.selected?.courseId ?? 0);
+  const [parentId, setParentId] = React.useState<number>(props.selected?.parentId ?? 0);
   const [errorMessage, setErrorMessage] = React.useState<ErrorMessages>({});
 
   const resetState = () => {
     setName("");
     setPrice(0);
+    setDepartmentId(0);
+    setCourseId(0);
+    setParentId(0);
     setErrorMessage({})
     props.setSelected(undefined);
   };
@@ -67,6 +72,13 @@ const ProductEdit = (props: IProductEdit) => {
     queryKey: coursesSearchConf.queryKey,
     queryFn: coursesSearchConf.queryFn,
   });
+
+  const productSearchConf = productsSearchQuery({});
+  const productsQuery = useQuery({
+    queryKey: productSearchConf.queryKey,
+    queryFn: productSearchConf.queryFn,
+  });
+
 
   const handleChangeName =
     React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
@@ -89,11 +101,25 @@ const ProductEdit = (props: IProductEdit) => {
     );
 
   const handleChangeDepartment = (event: SelectChangeEvent) => {
-      setDepartment(+event.target.value )
+      setDepartmentId(+event.target.value )
   }
 
   const handleChangeCourse = (event: SelectChangeEvent) => {
-    setCourse(+event.target.value )
+    setCourseId(+event.target.value )
+  }
+
+  const handleChangeProduct = (event: SelectChangeEvent) => {
+    setParentId(+event.target.value )
+  }
+
+  const createProductRequest = () => {
+    return {
+      name,
+      price,
+      departmentId,
+      courseId,
+      parentId: parentId != 0 ? parentId : undefined,
+    } as ProductRequest;
   }
 
   const productCreate = useMutation({
@@ -153,12 +179,12 @@ const ProductEdit = (props: IProductEdit) => {
       valid = false;
     }
 
-    if ( ! department || department === 0  ) {
+    if ( ! departmentId || departmentId === 0  ) {
       errorMessages.department = "Seleziona un reparto";
       valid = false;
     }
 
-    if ( ! course || course === 0  ) {
+    if ( ! courseId || courseId === 0  ) {
       errorMessages.course = "Seleziona una portata";
       valid = false;
     }
@@ -179,25 +205,27 @@ const ProductEdit = (props: IProductEdit) => {
   };
 
   const handleCreate = () => {
-    isValid()
-    //if (isValid()) productCreate.mutate({ name, rate } as DiscountRequest);
+    if ( isValid() ) {
+      productCreate.mutate(createProductRequest());
+    }
   };
 
   const handleUpdate = () => {
-   // if (props.selected) {
-   //   if (isValid())
-        // productUpdate.mutate({
-        //   discountId: props.selected.id,
-        //   request: { name, rate } as DiscountRequest,
-        // });
-    // }
+   if (props.selected) {
+     if (isValid())
+        productUpdate.mutate({
+          productId: props.selected.id,
+          request: createProductRequest(),
+        });
+    }
   };
 
-  if ( departmentsQuery.isFetched && coursesQuery.isFetched) {
+  if ( departmentsQuery.isFetched && coursesQuery.isFetched && productsQuery.isFetched) {
     const departments = departmentsQuery.data;
     const courses = coursesQuery.data;
+    const products = productsQuery.data;
 
-    if (departments && courses) {
+    if (departments && courses && products) {
       return (
         <Box
           component="form"
@@ -237,7 +265,7 @@ const ProductEdit = (props: IProductEdit) => {
                 labelId="courses-select-label-id"
                 size="small"
                 required
-                value={course}
+                value={courseId}
                 label="Portata"
                 sx={{minWidth: '18em'}}
                 onChange={handleChangeCourse}
@@ -262,12 +290,11 @@ const ProductEdit = (props: IProductEdit) => {
                 labelId="departments-select-label-id"
                 size="small"
                 required
-                value={department}
+                value={departmentId}
                 label="Reparto"
                 sx={{minWidth: '18em'}}
                 onChange={handleChangeDepartment}
                 error={!!errorMessage.department}
-                helperText={errorMessage.department}
               >
                 <MenuItem value="0">
                   <em>Seleziona un reparto</em>
@@ -282,35 +309,33 @@ const ProductEdit = (props: IProductEdit) => {
               })()}
             </FormControl>
           </Box>
+
           <Box sx={{display: 'block', mb: 2}}>
           <LinkOutlined sx={{mr: 1}}/>
           <FormControl >
-            <InputLabel id="linked-select-label-id" required>Prodotto collegato</InputLabel>
+            <InputLabel id="linked-select-label-id">Prodotto collegato</InputLabel>
             <Select
+              disabled={!!props.selected}
               id="linked-select-id"
               labelId="linked-select-label-id"
               size="small"
-              required
-              value={department}
+              value={parentId}
               label="Prodotto collegato"
               sx={{minWidth: '36em'}}
-              onChange={handleChangeDepartment}
-              error={!!errorMessage.department}
-              helperText={errorMessage.department}
+              onChange={handleChangeProduct}
             >
               <MenuItem value="0">
-                <em>Prodotto collegato opzionale</em>
+                <em>Selezione un prodotto collegato</em>
               </MenuItem>
               {
-                departments.map((d) => (<MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>))
+                products.filter((p) => ! p.parentId).map((d) => (<MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>))
               }
             </Select>
-            { ( () => {
-              if ( errorMessage.department)
-                return <FormHelperText error>{errorMessage.department}</FormHelperText>
-            })()}
+            <FormHelperText>Se necessario, selezionare un prodotto collegato con cui condividere la quantità in giacenza</FormHelperText>
           </FormControl>
           </Box>
+
+
           {(() => {
             if (props.selected !== undefined)
               return (
@@ -346,8 +371,8 @@ const ProductEdit = (props: IProductEdit) => {
     }
   }
 
-  if ( departmentsQuery.isError || coursesQuery.isError) {
-    return <Alert severity="error">Si è verificato un errore prelevando la lista reparti o portate</Alert>
+  if ( departmentsQuery.isError || coursesQuery.isError || productsQuery.isError ) {
+    return <Alert severity="error">Si è verificato un errore prelevando reparti, portate o prodotti</Alert>
   }
 
   return (
@@ -356,5 +381,21 @@ const ProductEdit = (props: IProductEdit) => {
     </Box>
   );
 };
+
+interface ILinkedProduct {
+  productId?: number
+}
+
+const ViewLinkedProduct = (props: ILinkedProduct) => {
+
+  if ( props.productId ) {
+    return (
+      <>
+        <LinkOutlined sx={{ mr: 1, verticalAlign: 'middle' }} /><ProductName productId={props.productId} />
+      </>
+    )
+  }
+
+}
 
 export default ProductEdit;
