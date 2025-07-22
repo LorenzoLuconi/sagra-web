@@ -79,11 +79,11 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
                     size="small"
                     variant="standard"
                     type="number"
-                    aria-valuemin={0}
+                    aria-valuemin={1}
 
                     value={quantityValue}
                     onChange={(e) => {console.log('AGGIORNA: ', e.target.value); setProduct(product, +e.target.value)}}
-                    slotProps={{ htmlInput: { size: 2, min: 0 } }}/>
+                    slotProps={{ htmlInput: { size: 2, min: 1 } }}/>
             </Grid>
             <Grid size={6}>
                 <Typography>{product.name}</Typography>

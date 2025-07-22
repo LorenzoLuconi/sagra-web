@@ -69,7 +69,8 @@ const ProductsOrderCard = (props : IProductsOrder) => {
                       cursor: productAvailable(product) ? 'pointer' : 'default',
                       backgroundColor: productAvailable(product) ? theme.palette.background.paper : 'grey.300'
                     })}
-                    onClick={() => {
+                    onClick={(event) => {
+                      event.preventDefault();
                       if ( productAvailable(product) )
                         props.addToOrder(product)}
                     }>
