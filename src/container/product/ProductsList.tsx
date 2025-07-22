@@ -3,6 +3,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchProductDelete, productsSearchQuery, ProductsSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
 import {
+  Accordion, AccordionDetails,
+  AccordionSummary,
   Alert,
   Box,
   CircularProgress,
@@ -15,7 +17,7 @@ import {
   Typography
 } from "@mui/material";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
-import { DeleteOutlined, EditOutlined, LinkOutlined } from "@mui/icons-material";
+import { DeleteOutlined, EditOutlined, ExpandMore, LinkOutlined } from "@mui/icons-material";
 import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
 import { useConfirm } from "material-ui-confirm";
@@ -167,12 +169,17 @@ const ProductsList = (props : IProductList) => {
             if ( prodCourse ) {
 
               return (
-                <Box sx={{ mt: 5}}>
-                  <Typography key={courseId} sx={{ fontWeight: 700}}>
-                    <CourseName courseId={courseId} />
-                    { renderProducts(prodCourse) }
-                  </Typography>
-                </Box>
+                  <Accordion key={courseId} defaultExpanded >
+                    <AccordionSummary expandIcon={<ExpandMore />}>
+                      <Typography key={courseId} sx={{ fontWeight: 700}}>
+                        <CourseName courseId={courseId} />
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      { renderProducts(prodCourse) }
+                    </AccordionDetails>
+                  </Accordion>
+
               )
             }
           })
