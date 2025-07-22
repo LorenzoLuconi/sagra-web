@@ -51,7 +51,7 @@ interface OrderedProductItemViewI {
 
 const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
     const {product, quantity} = props
-    const {setProduct} = useOrderStore()
+    const {setProduct, deleteProduct} = useOrderStore()
     const [quantityValue, setQuantityValue] = React.useState<number>(props.quantity)
 
 
@@ -66,16 +66,24 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
 
         <Grid key={product.id} container sx={{ alignItems: "center" }} spacing={1}>
             <Grid size={1}>
-                <IconButton><DeleteOutlined/></IconButton>
+                <IconButton
+                    onClick={() => {
+                        deleteProduct(product)
+                    }}
+                >
+                    <DeleteOutlined/>
+                </IconButton>
             </Grid>
             <Grid size={2}>
                 <TextField
                     size="small"
                     variant="standard"
                     type="number"
+                    aria-valuemin={0}
+
                     value={quantityValue}
                     onChange={(e) => {console.log('AGGIORNA: ', e.target.value); setProduct(product, +e.target.value)}}
-                    slotProps={{ htmlInput: { size: 2 } }}/>
+                    slotProps={{ htmlInput: { size: 2, min: 0 } }}/>
             </Grid>
             <Grid size={6}>
                 <Typography>{product.name}</Typography>
