@@ -7,6 +7,7 @@ interface OrderContextI {
     updateOrderField: (field: string, value: unknown) => void
     products: Record<number, Product>
     setProduct: (produce: Product, quantity: number) => void
+    deleteProduct: (product: Product) => void
     addProduct: (product: Product, quantity: number) => void
     updateOrder: (order: Order) => void
 }
@@ -15,6 +16,8 @@ export const OrderContext = React.createContext<OrderContextI>({
     products: [],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setProduct: (product: Product, quantity: number) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    deleteProduct: (product: Product) => {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     addProduct: (product: Product, quantity: number) => {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -29,19 +32,18 @@ interface OrderStoreI extends React.PropsWithChildren {
 
 }
 
+const EmptyOrder: Order = {
+    products: [],
+    serviceNumber: 0,
+    serviceCost: 0.5,
+    customer: '',
+    takeAway: false,
+} as Order
+
 export const OrderStore: React.FC<OrderStoreI> = (props) => {
     const {products, order} = props
-    const [storedOrder, setStoredOrder] = React.useState<Order | undefined>(undefined)
+    const [storedOrder, setStoredOrder] = React.useState<Order | undefined>(order??EmptyOrder)
     const [storedProducts, setStoredProducts] = React.useState<Record<number, Product>>({} as Record<number, Product>)
-
-
-
-    React.useEffect(() => {
-
-        if (order !== undefined) {
-            setStoredOrder(order)
-        }
-    }, [order])
 
 
     React.useEffect(() => {
@@ -51,6 +53,26 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         }
         setStoredProducts(_storedProducts)
     }, [products])
+
+
+    const deleteProductHandler = (product: Product) => {
+            setStoredOrder((prev) => {
+                let _order = undefined
+                if (prev !== undefined) {
+                    _order = cloneDeep(prev)
+                    const {products} = _order
+                    const idx = products.findIndex((p) => {
+                        return p.productId === product.id
+                    })
+                    console.log('DELETE Products: ', products, idx)
+                    if (idx > -1) {
+                        const res = products.splice(idx, 1)
+                        console.log('Cancellato: ', res)
+                    }
+                }
+                return _order
+            })
+    }
 
 
     const setProductHandler = (product: Product, quantity: number) => {
@@ -116,19 +138,32 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
     }
 
     const updateOrderHandled = (order: Order) => {
-        const _order = cloneDeep(order)
-        setStoredOrder(_order)
+        setStoredOrder((prev) => {
+            return order
+        })
+
     }
 
 
     const updateOrderFieldHandler = (field: string, value: unknown) => {
-        let _order = cloneDeep(order)
-        if (_order === undefined) {
-            _order = {} as Order
-        }
-        set(_order, field,  value)
 
-        setStoredOrder(_order)
+        setStoredOrder((prev) => {
+
+            let _order = cloneDeep(prev)
+
+
+            console.log('UPDATEORDERHANDLER: ', _order, field, value)
+
+            if (_order === undefined) {
+                _order = EmptyOrder as Order
+            }
+            set(_order, field,  value)
+
+            console.log('PRIMA: ', storedOrder, _order)
+
+            return (_order)
+
+        })
     }
 
 
@@ -139,6 +174,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
                 products: storedProducts??[],
                 addProduct: addProductHandler,
                 setProduct: setProductHandler,
+                deleteProduct: deleteProductHandler,
                 updateOrder: updateOrderHandled,
                 updateOrderField: updateOrderFieldHandler
             }}
@@ -158,6 +194,7 @@ export const useOrderStore = () => {
         updateOrder: storeContext.updateOrder,
         addProduct: storeContext.addProduct,
         setProduct: storeContext.setProduct,
+        deleteProduct: storeContext.deleteProduct,
         updateOrderField: storeContext.updateOrderField
     }
 }
