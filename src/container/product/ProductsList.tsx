@@ -23,6 +23,7 @@ import { currency } from "../../utils";
 import { ProductName } from "./ProductName.tsx";
 import { DepartmentName } from "../department/DepartmentName.tsx";
 import { CourseName } from "../course/CourseName.tsx";
+import { productsGroupBy } from "./productUtils.ts";
 
 
 interface IProductList {
@@ -85,21 +86,7 @@ const ProductsList = (props : IProductList) => {
     });
   }
 
-  if (productsQuery.isLoading) {
-    return (<Box sx={{ display: "flex" }}>
-        <CircularProgress />
-      </Box>
-    )
-  }
-
-  if (productsQuery.isError) {
-    return <Alert severity="error">Si è verificato un errore prelevando la lista degli
-      sconti: {productsQuery.error.message}</Alert>
-  }
-
-  const products = productsQuery.data;
-
-  if (products) {
+  const renderProducts = (products : Product[]) => {
     if (products.length < 1) {
       return <Typography>Nessuno prodotto presente</Typography>
     }
@@ -152,8 +139,50 @@ const ProductsList = (props : IProductList) => {
       </form>
     );
   }
+
+  if (productsQuery.isLoading) {
+    return (<Box sx={{ display: "flex" }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (productsQuery.isError) {
+    return <Alert severity="error">Si è verificato un errore prelevando la lista degli
+      sconti: {productsQuery.error.message}</Alert>
+  }
+
+  const products = productsQuery.data;
+
+  if (products) {
+
+    if ( ! props.courseId ) {
+      const productsMap = productsGroupBy({products});
+      console.log(productsMap);
+      const coursesId = Array.from(productsMap.keys()).sort();
+      return (
+        <>
+        { coursesId.map( (courseId : number) => {
+            const prodCourse = productsMap.get(courseId);
+            if ( prodCourse ) {
+
+              return (
+                <Box sx={{ mt: 5}}>
+                  <Typography key={courseId} sx={{ fontWeight: 700}}>
+                    <CourseName courseId={courseId} />
+                    { renderProducts(prodCourse) }
+                  </Typography>
+                </Box>
+              )
+            }
+          })
+        }
+        </>
+      )
+    }
+
+    return renderProducts(products);
+  }
 }
-
-
 
 export default ProductsList;
