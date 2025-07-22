@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
-import { ErrorOutlined, WarningOutlined } from "@mui/icons-material";
+import { ErrorOutlined, LockOutlined, WarningOutlined } from "@mui/icons-material";
 
 const ProductQuantity = (props) => {
 
@@ -11,6 +11,16 @@ const ProductQuantity = (props) => {
   const product = props.product as Product;
 
   const alertIcon = () => {
+
+    if ( product.sellLocked ) {
+      return <LockOutlined sx={(theme) => ({
+        cursor: "pointer",
+        color: theme.palette.error.light,
+        ml: 1, verticalAlign: "middle"
+      })}
+      />;
+    }
+
     if (product.availableQuantity < 10)
       return <WarningOutlined sx={(theme) => ({
         cursor: "pointer",
@@ -20,7 +30,12 @@ const ProductQuantity = (props) => {
       />;
 
     if (product.availableQuantity < 1)
-      return <ErrorOutlined sx={{ ml: 1, verticalAlign: "middle" }} />;
+      return <ErrorOutlined sx={(theme) => ({
+        cursor: "pointer",
+        color: theme.palette.error.light,
+        ml: 1, verticalAlign: "middle"
+      })}
+      />;
   };
 
   return (

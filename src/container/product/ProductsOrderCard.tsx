@@ -15,9 +15,10 @@ import {
 } from "@mui/material";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
 import { currency } from "../../utils";
-import { IProductsOrder } from "./IProductsOrder.tsx";
+import { IProductsOrder, productAvailable } from "./IProductsOrder.tsx";
+import ProductQuantity from "./ProductQuantity.tsx";
 
-const ProductsList = (props : IProductsOrder) => {
+const ProductsOrderCard = (props : IProductsOrder) => {
 
   const searchParam = () => {
     const params = {} as ProductsSearchQueryParams;
@@ -35,6 +36,7 @@ const ProductsList = (props : IProductsOrder) => {
   const productsQuery = useQuery({
     queryKey: productsSearchConf.queryKey,
     queryFn: productsSearchConf.queryFn,
+    staleTime: 1000 * 10
   });
 
   if (productsQuery.isLoading) {
@@ -61,13 +63,21 @@ const ProductsList = (props : IProductsOrder) => {
           <>
           {
             products.map( (product: Product) =>
-              <Card key={product.id}  sx={{ minWidth: 200, cursor: 'copy'}}
-                    onClick={() => props.addToOrder(product)}>
+              <Card key={product.id}
+                    sx={(theme) => ({
+                      minWidth: 200,
+                      cursor: productAvailable(product) ? 'pointer' : 'default',
+                      backgroundColor: productAvailable(product) ? theme.palette.background.paper : 'grey.300'
+                    })}
+                    onClick={() => {
+                      if ( productAvailable(product) )
+                        props.addToOrder(product)}
+                    }>
                 <CardContent sx={{textAlign: 'center'}}>
                   <Typography sx={{fontWeight: 500}}>{product.name}</Typography>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 5}}>
                     <Typography>{currency(product.price)}</Typography>
-                    <Typography>{product.availableQuantity}</Typography>
+                    <Typography><ProductQuantity product={product}/></Typography>
                   </Box>
                 </CardContent>
               </Card>
@@ -80,6 +90,4 @@ const ProductsList = (props : IProductsOrder) => {
   }
 }
 
-
-
-export default ProductsList;
+export default ProductsOrderCard;

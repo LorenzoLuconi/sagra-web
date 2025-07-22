@@ -7,9 +7,9 @@ import OrderEditForm from "./OrderEditForm.tsx";
 import {CircularProgress, Grid} from "@mui/material";
 import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
 import OrderTotal from "./OrderTotal.tsx";
-import ProductToOrderDepartments from "./ProductsToOrderDepartments.tsx";
 import {OrderStore, useOrderStore} from "../../context/OrderStore.tsx";
 import {Order} from "../../api/sagra/sagraSchemas.ts";
+import ProductsToOrder from "./ProductsToOrder.tsx";
 
 
 interface OrderFormI {
@@ -47,10 +47,12 @@ const OrderForm: React.FC<OrderFormI> = (props) => {
         <OrderStore products={combinedQueries.data} order={order}>
           <form>
             <Grid container spacing={2}>
-              <Grid size={7}><ProductToOrderDepartments/></Grid>
+              <Grid size={7}>
+                <ProductsToOrder/>
+              </Grid>
               <Grid size={5}>
                 <OrderEditForm/>
-                <OrderTotal/>
+                <OrderTotal order={order}/>
                 <OrderedProductsEdit products={order?.products ?? []}/>
               </Grid>
             </Grid>

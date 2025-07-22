@@ -19,9 +19,9 @@ import {
 import { Product } from "../../api/sagra/sagraSchemas.ts";
 import { currency } from "../../utils";
 import ProductQuantity from "./ProductQuantity.tsx";
-import { IProductsOrder } from "./IProductsOrder.tsx";
+import { IProductsOrder, productAvailable } from "./IProductsOrder.tsx";
 
-const ProductsList = (props: IProductsOrder) => {
+const ProductsOrderList = (props: IProductsOrder) => {
   const searchParam = () => {
     const params = {} as ProductsSearchQueryParams;
     if (props.courseId !== undefined) {
@@ -38,6 +38,7 @@ const ProductsList = (props: IProductsOrder) => {
   const productsQuery = useQuery({
     queryKey: productsSearchConf.queryKey,
     queryFn: productsSearchConf.queryFn,
+    staleTime: 1000 * 10
   });
 
   if (productsQuery.isLoading) {
@@ -82,8 +83,15 @@ const ProductsList = (props: IProductsOrder) => {
               return (
                 <TableRow
                   key={product.id}
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => props.addToOrder(product)}
+                  sx={(theme) => ({
+                    minWidth: 200,
+                    cursor: productAvailable(product) ? 'pointer' : 'default',
+                    backgroundColor: productAvailable(product) ? theme.palette.background.paper : 'grey.300'
+                  })}
+                  onClick={() => {
+                    if ( productAvailable(product) )
+                      props.addToOrder(product)
+                  }}
                 >
                   <TableCell sx={{ fontSize: "1.0em" }}>
                     {product.name}
@@ -107,4 +115,6 @@ const ProductsList = (props: IProductsOrder) => {
 
 
 
-export default ProductsList;
+
+
+export default ProductsOrderList;
