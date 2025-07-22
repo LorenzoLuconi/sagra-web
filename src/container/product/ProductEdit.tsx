@@ -14,22 +14,17 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  TextField
+  TextField,
 } from "@mui/material";
-import {
-  AddCircle,
-  LinkOutlined,
-  SaveOutlined,
-} from "@mui/icons-material";
+import { AddCircle, LinkOutlined, SaveOutlined } from "@mui/icons-material";
 import { Product, ProductRequest } from "../../api/sagra/sagraSchemas.ts";
 import {
   coursesSearchQuery,
   departmentsSearchQuery,
   fetchProductCreate,
   fetchProductUpdate,
-  productsSearchQuery
+  productsSearchQuery,
 } from "../../api/sagra/sagraComponents.ts";
-import { ProductName } from "./ProductName.tsx";
 
 interface IProductEdit {
   selected?: Product;
@@ -37,18 +32,24 @@ interface IProductEdit {
 }
 
 interface ErrorMessages {
-  name?: string
-  price?: string
-  department?: string
-  course?: string
+  name?: string;
+  price?: string;
+  department?: string;
+  course?: string;
 }
 
 const ProductEdit = (props: IProductEdit) => {
-  const [name, setName] = React.useState(props.selected?.name?? "");
+  const [name, setName] = React.useState(props.selected?.name ?? "");
   const [price, setPrice] = React.useState<number>(props.selected?.price ?? 0);
-  const [departmentId, setDepartmentId] = React.useState<number>(props.selected?.departmentId ?? 0);
-  const [courseId, setCourseId] = React.useState<number>(props.selected?.courseId ?? 0);
-  const [parentId, setParentId] = React.useState<number>(props.selected?.parentId ?? 0);
+  const [departmentId, setDepartmentId] = React.useState<number>(
+    props.selected?.departmentId ?? 0,
+  );
+  const [courseId, setCourseId] = React.useState<number>(
+    props.selected?.courseId ?? 0,
+  );
+  const [parentId, setParentId] = React.useState<number>(
+    props.selected?.parentId ?? 0,
+  );
   const [errorMessage, setErrorMessage] = React.useState<ErrorMessages>({});
 
   const resetState = () => {
@@ -57,7 +58,7 @@ const ProductEdit = (props: IProductEdit) => {
     setDepartmentId(0);
     setCourseId(0);
     setParentId(0);
-    setErrorMessage({})
+    setErrorMessage({});
     props.setSelected(undefined);
   };
 
@@ -79,17 +80,19 @@ const ProductEdit = (props: IProductEdit) => {
     queryFn: productSearchConf.queryFn,
   });
 
+  const handleChangeName = React.useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >(
+    (event) => {
+      setName(event.currentTarget.value);
+    },
+    [setName],
+  );
 
-  const handleChangeName =
-    React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-        setName(event.currentTarget.value);
-      }, [setName],
-    );
-
-
-
-  const handleChangePrice =
-    React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
+  const handleChangePrice = React.useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >(
+    (event) => {
       if (event.currentTarget.value) {
         console.log(event.currentTarget.value);
         const value = Number.parseFloat(event.currentTarget.value);
@@ -97,20 +100,21 @@ const ProductEdit = (props: IProductEdit) => {
       } else {
         setPrice(0);
       }
-      }, [setPrice],
-    );
+    },
+    [setPrice],
+  );
 
   const handleChangeDepartment = (event: SelectChangeEvent) => {
-      setDepartmentId(+event.target.value )
-  }
+    setDepartmentId(+event.target.value);
+  };
 
   const handleChangeCourse = (event: SelectChangeEvent) => {
-    setCourseId(+event.target.value )
-  }
+    setCourseId(+event.target.value);
+  };
 
   const handleChangeProduct = (event: SelectChangeEvent) => {
-    setParentId(+event.target.value )
-  }
+    setParentId(+event.target.value);
+  };
 
   const createProductRequest = () => {
     return {
@@ -120,7 +124,7 @@ const ProductEdit = (props: IProductEdit) => {
       courseId,
       parentId: parentId != 0 ? parentId : undefined,
     } as ProductRequest;
-  }
+  };
 
   const productCreate = useMutation({
     mutationFn: (request: ProductRequest) => {
@@ -142,7 +146,13 @@ const ProductEdit = (props: IProductEdit) => {
   });
 
   const productUpdate = useMutation({
-    mutationFn: ({ productId, request, }: { productId: number, request: ProductRequest }) => {
+    mutationFn: ({
+      productId,
+      request,
+    }: {
+      productId: number;
+      request: ProductRequest;
+    }) => {
       return fetchProductUpdate({
         body: request,
         pathParams: { productId },
@@ -166,29 +176,28 @@ const ProductEdit = (props: IProductEdit) => {
   const isValid = () => {
     let valid = true;
 
-    const errorMessages: ErrorMessages = {}
+    const errorMessages: ErrorMessages = {};
 
     if (!name || name.trim().length < 1) {
       errorMessages.name = "Nome prodotto obbligatorio";
       valid = false;
     }
 
-    if ( ! price ) {
+    if (!price) {
       // FIXME validazione più accurata
       errorMessages.price = "Prezzo obbligatorio";
       valid = false;
     }
 
-    if ( ! departmentId || departmentId === 0  ) {
+    if (!departmentId || departmentId === 0) {
       errorMessages.department = "Seleziona un reparto";
       valid = false;
     }
 
-    if ( ! courseId || courseId === 0  ) {
+    if (!courseId || courseId === 0) {
       errorMessages.course = "Seleziona una portata";
       valid = false;
     }
-
 
     // setErrorName("");
     // setErrorRate("");
@@ -198,21 +207,20 @@ const ProductEdit = (props: IProductEdit) => {
     // }
     //
 
-
     setErrorMessage(errorMessages);
 
     return valid;
   };
 
   const handleCreate = () => {
-    if ( isValid() ) {
+    if (isValid()) {
       productCreate.mutate(createProductRequest());
     }
   };
 
   const handleUpdate = () => {
-   if (props.selected) {
-     if (isValid())
+    if (props.selected) {
+      if (isValid())
         productUpdate.mutate({
           productId: props.selected.id,
           request: createProductRequest(),
@@ -220,7 +228,11 @@ const ProductEdit = (props: IProductEdit) => {
     }
   };
 
-  if ( departmentsQuery.isFetched && coursesQuery.isFetched && productsQuery.isFetched) {
+  if (
+    departmentsQuery.isFetched &&
+    coursesQuery.isFetched &&
+    productsQuery.isFetched
+  ) {
     const departments = departmentsQuery.data;
     const courses = coursesQuery.data;
     const products = productsQuery.data;
@@ -249,17 +261,21 @@ const ProductEdit = (props: IProductEdit) => {
             label="Prezzo"
             slotProps={{
               input: {
-                startAdornment: <InputAdornment position="start">€</InputAdornment>,
+                startAdornment: (
+                  <InputAdornment position="start">€</InputAdornment>
+                ),
               },
-              htmlInput: { size: 10 }
+              htmlInput: { size: 10 },
             }}
             onChange={handleChangePrice}
             error={!!errorMessage.price}
             helperText={errorMessage.price}
           />
           <Box sx={{ mb: 2, display: "block" }}>
-            <FormControl sx={{mr: 2}}>
-              <InputLabel id="courses-select-label-id" required>Portata</InputLabel>
+            <FormControl sx={{ mr: 2 }}>
+              <InputLabel id="courses-select-label-id" required>
+                Portata
+              </InputLabel>
               <Select
                 id="course-select-id"
                 labelId="courses-select-label-id"
@@ -267,24 +283,30 @@ const ProductEdit = (props: IProductEdit) => {
                 required
                 value={courseId}
                 label="Portata"
-                sx={{minWidth: '18em'}}
+                sx={{ minWidth: "18em" }}
                 onChange={handleChangeCourse}
                 error={!!errorMessage.course}
               >
                 <MenuItem value="0">
                   <em>Seleziona una portata</em>
                 </MenuItem>
-                {
-                  courses.map((c) => (<MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>))
-                }
+                {courses.map((c) => (
+                  <MenuItem key={c.id} value={c.id}>
+                    {c.name}
+                  </MenuItem>
+                ))}
               </Select>
-              { ( () => {
-                if ( errorMessage.course)
-                  return <FormHelperText error>{errorMessage.course}</FormHelperText>
+              {(() => {
+                if (errorMessage.course)
+                  return (
+                    <FormHelperText error>{errorMessage.course}</FormHelperText>
+                  );
               })()}
             </FormControl>
             <FormControl>
-              <InputLabel id="departments-select-label-id" required>Reparto</InputLabel>
+              <InputLabel id="departments-select-label-id" required>
+                Reparto
+              </InputLabel>
               <Select
                 id="epartments-select-id"
                 labelId="departments-select-label-id"
@@ -292,65 +314,77 @@ const ProductEdit = (props: IProductEdit) => {
                 required
                 value={departmentId}
                 label="Reparto"
-                sx={{minWidth: '18em'}}
+                sx={{ minWidth: "18em" }}
                 onChange={handleChangeDepartment}
                 error={!!errorMessage.department}
               >
                 <MenuItem value="0">
                   <em>Seleziona un reparto</em>
                 </MenuItem>
-                {
-                  departments.map((d) => (<MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>))
-                }
+                {departments.map((d) => (
+                  <MenuItem key={d.id} value={d.id}>
+                    {d.name}
+                  </MenuItem>
+                ))}
               </Select>
-              { ( () => {
-                if ( errorMessage.department)
-                  return <FormHelperText error>{errorMessage.department}</FormHelperText>
+              {(() => {
+                if (errorMessage.department)
+                  return (
+                    <FormHelperText error>
+                      {errorMessage.department}
+                    </FormHelperText>
+                  );
               })()}
             </FormControl>
           </Box>
 
-          <Box sx={{display: 'block', mb: 2}}>
-          <LinkOutlined sx={{mr: 1}}/>
-          <FormControl >
-            <InputLabel id="linked-select-label-id">Prodotto collegato</InputLabel>
-            <Select
-              disabled={!!props.selected}
-              id="linked-select-id"
-              labelId="linked-select-label-id"
-              size="small"
-              value={parentId}
-              label="Prodotto collegato"
-              sx={{minWidth: '36em'}}
-              onChange={handleChangeProduct}
-            >
-              <MenuItem value="0">
-                <em>Selezione un prodotto collegato</em>
-              </MenuItem>
-              {
-                products.filter((p) => ! p.parentId).map((d) => (<MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>))
-              }
-            </Select>
-            <FormHelperText>Se necessario, selezionare un prodotto collegato con cui condividere la quantità in giacenza</FormHelperText>
-          </FormControl>
+          <Box sx={{ display: "block", mb: 2 }}>
+            <LinkOutlined sx={{ mr: 1 }} />
+            <FormControl>
+              <InputLabel id="linked-select-label-id">
+                Prodotto collegato
+              </InputLabel>
+              <Select
+                disabled={!!props.selected}
+                id="linked-select-id"
+                labelId="linked-select-label-id"
+                size="small"
+                value={parentId}
+                label="Prodotto collegato"
+                sx={{ minWidth: "36em" }}
+                onChange={handleChangeProduct}
+              >
+                <MenuItem value="0">
+                  <em>Selezione un prodotto collegato</em>
+                </MenuItem>
+                {products
+                  .filter((p) => !p.parentId)
+                  .map((d) => (
+                    <MenuItem key={d.id} value={d.id}>
+                      {d.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+              <FormHelperText>
+                Se necessario, selezionare un prodotto collegato con cui
+                condividere la quantità in giacenza
+              </FormHelperText>
+            </FormControl>
           </Box>
-
 
           {(() => {
             if (props.selected !== undefined)
               return (
                 <>
-                  <Button sx={{ mr: 1 }}
-                          variant="contained"
-                          startIcon={<SaveOutlined />}
-                          onClick={handleUpdate}
+                  <Button
+                    sx={{ mr: 1 }}
+                    variant="contained"
+                    startIcon={<SaveOutlined />}
+                    onClick={handleUpdate}
                   >
                     Modifica Prodotto
                   </Button>
-                  <Button
-                    variant="contained"
-                    onClick={() => resetState()}
-                  >
+                  <Button variant="contained" onClick={() => resetState()}>
                     Annulla Modifica
                   </Button>
                 </>
@@ -364,15 +398,23 @@ const ProductEdit = (props: IProductEdit) => {
                 >
                   Crea Prodotto
                 </Button>
-              )
+              );
           })()}
         </Box>
       );
     }
   }
 
-  if ( departmentsQuery.isError || coursesQuery.isError || productsQuery.isError ) {
-    return <Alert severity="error">Si è verificato un errore prelevando reparti, portate o prodotti</Alert>
+  if (
+    departmentsQuery.isError ||
+    coursesQuery.isError ||
+    productsQuery.isError
+  ) {
+    return (
+      <Alert severity="error">
+        Si è verificato un errore prelevando reparti, portate o prodotti
+      </Alert>
+    );
   }
 
   return (
@@ -381,21 +423,5 @@ const ProductEdit = (props: IProductEdit) => {
     </Box>
   );
 };
-
-interface ILinkedProduct {
-  productId?: number
-}
-
-const ViewLinkedProduct = (props: ILinkedProduct) => {
-
-  if ( props.productId ) {
-    return (
-      <>
-        <LinkOutlined sx={{ mr: 1, verticalAlign: 'middle' }} /><ProductName productId={props.productId} />
-      </>
-    )
-  }
-
-}
 
 export default ProductEdit;

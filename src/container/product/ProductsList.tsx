@@ -1,13 +1,10 @@
 // import React from 'react'
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  fetchProductDelete, productsSearchQuery, ProductsSearchQueryParams
-} from "../../api/sagra/sagraComponents.ts";
+import { fetchProductDelete, productsSearchQuery, ProductsSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
 import {
   Alert,
   Box,
-  Card, CardActionArea, CardContent,
   CircularProgress,
   IconButton,
   Table,
@@ -30,9 +27,8 @@ import { CourseName } from "../course/CourseName.tsx";
 
 interface IProductList {
   selected: Product | undefined
-  setSelected(product: Product | undefined) : void;
-  courseId?: number;
-  card?: boolean;
+  setSelected(product: Product | undefined) : void
+  courseId?: number
 }
 
 
@@ -40,7 +36,7 @@ const ProductsList = (props : IProductList) => {
 
   const searchParam = () => {
     const params = {} as ProductsSearchQueryParams;
-    if ( props.courseId !== undefined ) {
+    if (props.courseId !== undefined) {
       params.courseId = props.courseId;
     }
 
@@ -76,7 +72,38 @@ const ProductsList = (props : IProductList) => {
 
   const confirm = useConfirm()
 
-  const renderTableList = (products : Product[]) => {
+  const handleDelete = (product: Product) => {
+    props.setSelected(undefined)
+    confirm({
+      title: `Cancellazione prodotto '${product.name}'`,
+      description: product.parentId ?
+        "Vuoi procedere alla cancellazione del prodotto?"
+        : "Vuoi procedere alla cancellazione del prodotto e di tutti gli eventuali prodotti a questo collegati?",
+    }).then((confirm) => {
+      if (confirm.confirmed)
+        productDelete.mutate(product.id)
+    });
+  }
+
+  if (productsQuery.isLoading) {
+    return (<Box sx={{ display: "flex" }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (productsQuery.isError) {
+    return <Alert severity="error">Si è verificato un errore prelevando la lista degli
+      sconti: {productsQuery.error.message}</Alert>
+  }
+
+  const products = productsQuery.data;
+
+  if (products) {
+    if (products.length < 1) {
+      return <Typography>Nessuno prodotto presente</Typography>
+    }
+
     return (
       <form>
         <Table>
@@ -124,65 +151,6 @@ const ProductsList = (props : IProductList) => {
         </Table>
       </form>
     );
-  }
-
-  const renderCardList = (products : Product[]) => {
-    return (
-      <form>
-        <Box sx={{display: "flex", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >
-          {
-            products.map( (product: Product) =>
-              <Card key={product.id}  sx={{ minWidth: 200, cursor: 'copy'}} onClick={() => console.log("Clicked: " + product.name)}>
-                <CardContent sx={{textAlign: 'center'}}>
-                  <Typography sx={{fontWeight: 500}}>{product.name}</Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 5}}>
-                    <Typography>{currency(product.price)}</Typography>
-                    <Typography>{product.availableQuantity}</Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            )
-          }
-        </Box>
-      </form>
-    )
-  }
-
-  const handleDelete = (product: Product) => {
-    props.setSelected(undefined)
-    confirm({
-      title: `Cancellazione prodotto '${product.name}'`,
-      description: product.parentId ?
-        "Vuoi procedere alla cancellazione del prodotto?"
-        : "Vuoi procedere alla cancellazione del prodotto e di tutti gli eventuali prodotti a questo collegati?",
-    }).then((confirm  ) => {
-      if ( confirm.confirmed )
-        productDelete.mutate(product.id)
-    });
-  }
-
-  if (productsQuery.isLoading) {
-    return ( <Box sx={{ display: "flex" }}>
-      <CircularProgress />
-    </Box>
-    )
-  }
-
-  if (productsQuery.isError) {
-    return <Alert severity="error">Si è verificato un errore prelevando la lista degli sconti: {productsQuery.error.message}</Alert>
-  }
-
-  const products = productsQuery.data;
-
-  if (products) {
-    if (products.length < 1) {
-      return <Typography>Nessuno prodotto presente</Typography>
-    }
-
-    if ( props.card )
-      return renderCardList(products);
-    else
-      return renderTableList(products);
   }
 }
 
