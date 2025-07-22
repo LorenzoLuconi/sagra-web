@@ -21,6 +21,14 @@ const ProductQuantity = (props) => {
       />;
     }
 
+    if (product.availableQuantity < 1)
+      return <ErrorOutlined sx={(theme) => ({
+        cursor: "pointer",
+        color: theme.palette.error.light,
+        ml: 1, verticalAlign: "middle"
+      })}
+      />;
+
     if (product.availableQuantity < 10)
       return <WarningOutlined sx={(theme) => ({
         cursor: "pointer",
@@ -29,13 +37,7 @@ const ProductQuantity = (props) => {
       })}
       />;
 
-    if (product.availableQuantity < 1)
-      return <ErrorOutlined sx={(theme) => ({
-        cursor: "pointer",
-        color: theme.palette.error.light,
-        ml: 1, verticalAlign: "middle"
-      })}
-      />;
+
   };
 
   return (

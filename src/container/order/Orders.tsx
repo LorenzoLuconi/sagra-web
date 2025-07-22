@@ -121,10 +121,10 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                             {order.serviceNumber}
                           </TableCell>
                           <TableCell align="right">
-                            {currency(order.serviceCost / order.serviceNumber)}
+                            {currency(order.serviceCost)}
                           </TableCell>
                           <TableCell align="right">
-                            {currency(order.serviceCost)}
+                            {currency(order.serviceCost * order.serviceNumber)}
                           </TableCell>
                         </TableRow>
                       );
