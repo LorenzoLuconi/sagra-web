@@ -77,6 +77,7 @@ const ProductsList = (props: IProductsOrder) => {
             </TableRow>
           </TableHead>
           <TableBody className="divide-y">
+            <>
             {products.map((product: Product) => {
               return (
                 <TableRow
@@ -96,6 +97,7 @@ const ProductsList = (props: IProductsOrder) => {
                 </TableRow>
               );
             })}
+            </>
           </TableBody>
         </Table>
       </form>

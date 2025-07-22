@@ -11,6 +11,8 @@ const OrderTotal = (props: IOrderEdit) => {
 
   const {order} = useOrderStore()
 
+    console.log('OrderTotal: ', order)
+
   const total = () => {
     let t = 0
     // TODO trasformiamo il ServiceCost in costo unitario non totale?
@@ -19,12 +21,17 @@ const OrderTotal = (props: IOrderEdit) => {
        if (!order.takeAway) {
            t = order.serviceCost * order.serviceNumber;
        }
-     order.products.forEach((p: OrderedProduct) => {
-       t = t + (p.quantity * p.price);
+
+
+
+    order.products.forEach((p: OrderedProduct | undefined) => {
+        if (p !== undefined) {
+            t = t + (p.quantity * p.price);
+        }
      });
 
    }
-
+    console.log('Total: ', t)
     return t;
   };
 

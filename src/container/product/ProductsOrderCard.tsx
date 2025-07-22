@@ -58,6 +58,7 @@ const ProductsList = (props : IProductsOrder) => {
     return (
       <form>
         <Box sx={{display: "flex", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >
+          <>
           {
             products.map( (product: Product) =>
               <Card key={product.id}  sx={{ minWidth: 200, cursor: 'copy'}}
@@ -72,6 +73,7 @@ const ProductsList = (props : IProductsOrder) => {
               </Card>
             )
           }
+          </>
         </Box>
       </form>
     )
