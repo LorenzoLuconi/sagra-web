@@ -39,7 +39,6 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
     React.useEffect(() => {
 
         if (order !== undefined) {
-            console.log('OrderStore: ', order)
             setStoredOrder(order)
         }
     }, [order])
@@ -52,9 +51,6 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         }
         setStoredProducts(_storedProducts)
     }, [products])
-
-
-    console.log('StoredOrder: ', storedOrder, storedProducts)
 
 
     const setProductHandler = (product: Product, quantity: number) => {

@@ -1,14 +1,9 @@
 import * as React from 'react'
 
-import { Grid, IconButton, Paper, TextField, Typography } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import { DeleteOutlined } from "@mui/icons-material";
-import { currency } from "../../utils";
-import Product from "../Product.tsx";
-import {Product as ProductAPI} from '../../api/sagra/sagraSchemas.ts'
-
-import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import {OrderedProduct} from "../../api/sagra/sagraSchemas.ts";
+import {Grid, IconButton, Paper, TextField, Typography} from "@mui/material";
+import {DeleteOutlined} from "@mui/icons-material";
+import {currency} from "../../utils";
+import {OrderedProduct, Product as ProductAPI} from '../../api/sagra/sagraSchemas.ts'
 import {useOrderStore} from "../../context/OrderStore.tsx";
 
 interface IOrderedProductsEdit {
