@@ -1,21 +1,75 @@
-import { orderByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import { useQuery } from "@tanstack/react-query";
-import { Form, useParams } from "react-router";
+import * as React from 'react'
+
+import {orderByIdQuery, productByIdQuery} from "../../api/sagra/sagraComponents.ts";
+import {useQueries, useQuery} from "@tanstack/react-query";
+import {useParams} from "react-router";
 import OrderEditForm from "./OrderEditForm.tsx";
-import { CircularProgress, Grid, Paper } from "@mui/material";
+import {CircularProgress, Grid} from "@mui/material";
 import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
-import { useState } from "react";
-import { Order, OrderedProductRequest } from "../../api/sagra/sagraSchemas.ts";
 import OrderTotal from "./OrderTotal.tsx";
 import ProductToOrderDepartments from "./ProductsToOrderDepartments.tsx";
+import {OrderStore, useOrderStore} from "../../context/OrderStore.tsx";
+import {Order} from "../../api/sagra/sagraSchemas.ts";
+
+
+interface OrderFormI {
+  order: Order
+}
+
+const OrderForm: React.FC<OrderFormI> = (props) => {
+  const {order} = props
+
+
+  const combinedQueries = useQueries({
+        queries: order.products.map((product) => {
+          const productConf =
+              productByIdQuery({pathParams: {productId: product.productId}})
+          return {
+            queryKey: productConf.queryKey,
+            queryFn: productConf.queryFn
+          }
+        }
+      ),
+    combine: (results) => {
+      return {
+        data: results.map((result) => result.data),
+        pending: results.some((result) => result.isPending),
+      }
+    },
+  })
+
+  if (combinedQueries.pending) {
+    return <CircularProgress/>
+  }
+  if (combinedQueries.data) {
+
+    return (
+        <OrderStore products={combinedQueries.data} order={order}>
+          <form>
+            <Grid container spacing={2}>
+              <Grid size={7}><ProductToOrderDepartments/></Grid>
+              <Grid size={5}>
+                <OrderEditForm/>
+                <OrderTotal/>
+                <OrderedProductsEdit products={order?.products ?? []}/>
+              </Grid>
+            </Grid>
+          </form>
+        </OrderStore>
+    )
+  }
+}
 
 
 const OrderEdit = () => {
+
+  const {updateOrder} = useOrderStore()
+
   const params = useParams();
-  const orderId: number = params.orderId ? + params.orderId : 0;
+  const orderId: number = params.orderId ? +params.orderId : 0;
 
   const orderConf = orderByIdQuery({
-    pathParams: { orderId: orderId },
+    pathParams: {orderId: orderId},
   });
 
   const orderData = useQuery({
@@ -29,17 +83,9 @@ const OrderEdit = () => {
     const order = orderData.data;
 
     if (order) {
+
       return (
-        <form>
-          <Grid container spacing={2}>
-            <Grid size={7}><ProductToOrderDepartments /></Grid>
-            <Grid size={5}>
-              <OrderEditForm order={order} />
-              <OrderTotal order={order} />
-              <OrderedProductsEdit products={order.products} />
-            </Grid>
-          </Grid>
-        </form>
+            <OrderForm order={order}/>
       )
     }
     return <>Errore, ordine vuoto</>;

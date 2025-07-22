@@ -1,23 +1,31 @@
+import * as React from 'react'
+
 import { Grid, IconButton, Paper, TextField, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { DeleteOutlined } from "@mui/icons-material";
 import { currency } from "../../utils";
 import Product from "../Product.tsx";
+import {Product as ProductAPI} from '../../api/sagra/sagraSchemas.ts'
+
 import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
+import {OrderedProduct} from "../../api/sagra/sagraSchemas.ts";
+import {useOrderStore} from "../../context/OrderStore.tsx";
 
 interface IOrderedProductsEdit {
   products?: OrderedProduct[]
 }
 
 const OrderedProductsEdit  = (props:IOrderedProductsEdit) => {
-  const products = props.products ? props.products : [];
+    const {order} = useOrderStore()
+
+  const products = order?.products ?? []
 
 
   let prodElements;
   if (products.length > 0) {
-          prodElements = products.map((op: OrderedProduct) => {
+          prodElements = products.map((op: OrderedProduct, idx: number) => {
             return (
-              <OrderedProduct productId={op.productId} quantity={op.quantity} price={op.price} />
+              <OrderedProductItem key={idx} productId={op.productId} quantity={op.quantity} price={op.price} />
             )
           });
   } else {
@@ -39,45 +47,65 @@ interface IOrderedProduct {
   price? : number
 }
 
-const OrderedProduct = (props: IOrderedProduct) => {
-  const productConf = productByIdQuery({
-    pathParams: { productId: props.productId }
-  });
 
-  const productData = useQuery({
-    queryKey: productConf.queryKey,
-    queryFn: productConf.queryFn,
-    staleTime: 1000 * 60
-  });
+interface OrderedProductItemViewI {
+    product: ProductAPI
+    quantity: number
+    price?: number
+}
 
-  if ( productData.isFetched ) {
-    const product = productData.data
+const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
+    const {product, quantity} = props
+    const {setProduct} = useOrderStore()
+    const [quantityValue, setQuantityValue] = React.useState<number>(props.quantity)
 
-    if ( product ) {
-      const price = props.price ? props.price : product.price
-      const subTotal = props.quantity * price;
 
-      return (
-          <Grid key={product.id} container sx={{ verticalAlign: "center" }} spacing={1}>
+    React.useEffect(() => {
+        setQuantityValue(quantity)
+    }, [quantity])
+
+
+    const price = props.price ? props.price : product.price
+    const subTotal = props.quantity * price;
+    return (
+
+        <Grid key={product.id} container sx={{ alignItems: "center" }} spacing={1}>
             <Grid size={1}>
-              <IconButton><DeleteOutlined/></IconButton>
+                <IconButton><DeleteOutlined/></IconButton>
             </Grid>
             <Grid size={2}>
-              <TextField size="small" variant="standard" type="number" defaultValue={props.quantity} slotProps={{ htmlInput: { size: 2 } }}></TextField>
+                <TextField
+                    size="small"
+                    variant="standard"
+                    type="number"
+                    value={quantityValue}
+                    onChange={(e) => {console.log('AGGIORNA: ', e.target.value); setProduct(product, +e.target.value)}}
+                    slotProps={{ htmlInput: { size: 2 } }}/>
             </Grid>
             <Grid size={6}>
-              <Typography>{product.name}</Typography>
+                <Typography>{product.name}</Typography>
             </Grid>
             <Grid size={3} sx={{ textAlign: "right"}}>
-              <Typography >{currency(subTotal)}</Typography>
+                <Typography >{currency(subTotal)}</Typography>
             </Grid>
 
-          </Grid>
-      )
+        </Grid>
+    )
+}
+
+
+const OrderedProductItem = (props: IOrderedProduct) => {
+
+    const {products, order} = useOrderStore()
+
+    const product = products[props.productId]
+
+    if ( product ) {
+        return <OrderedProductItemView product={product} quantity={props.quantity} price={props.price}/>
     }
     else
       return <></>
-  }
+
 }
 
 export default OrderedProductsEdit;

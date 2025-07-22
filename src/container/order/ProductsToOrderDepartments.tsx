@@ -1,9 +1,10 @@
-import { departmentsSearchQuery } from "../../api/sagra/sagraComponents.ts";
-import { useQuery } from "@tanstack/react-query";
+import {departmentsSearchQuery} from "../../api/sagra/sagraComponents.ts";
+import {useQuery} from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { Department } from "../../api/sagra/sagraSchemas.ts";
-import { Button, Paper, Stack, TextField } from "@mui/material";
-import { useState } from "react";
+import {Department} from "../../api/sagra/sagraSchemas.ts";
+import {Button, Paper, Stack} from "@mui/material";
+import {useState} from "react";
+import ProductsInDepartment from "../product/ProductsInDepartment.tsx";
 
 const ProductToOrderDepartments = () => {
   const departmentsSearchConf = departmentsSearchQuery({});
@@ -27,17 +28,43 @@ const ProductToOrderDepartments = () => {
       }
 
       return (
-        <Paper>
-          <Stack direction="row" spacing={2}>
-        {
-          departments.map( (d : Department) => {
-            return (
-              <Button key={d.id}>{d.name}</Button>
-            )
-          })
-        }
+          <Stack direction="column" spacing={2}>
+            <Paper>
+
+              <Stack direction="row" spacing={2}>
+                <>
+                  {
+                    departments.map( (d : Department) => {
+                      return (
+                          <Button
+                              sx={{
+                                borderBottom: (selected === d.id? '1px solid red': 'none'),
+
+                                borderBottomLeftRadius: '0px',
+                                borderBottomRightRadius: '0px'
+                              }}
+                              key={d.id} onClick={() => {setSelected(d.id)}}
+                          >
+                            {d.name}
+                          </Button>
+                      )
+                    })
+                  }
+
+
+
+                </>
+
+              </Stack>
+            </Paper>
+            <Paper sx={{padding: '10px'}}>
+              <>
+                {selected && <ProductsInDepartment departmentId={selected}/>}
+              </>
+            </Paper>
           </Stack>
-        </Paper>
+
+
       )
 
     } else {

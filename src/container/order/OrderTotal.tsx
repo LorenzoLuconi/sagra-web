@@ -1,22 +1,29 @@
-import { Order, OrderedProduct } from "../../api/sagra/sagraSchemas.ts";
-import { Box, Container, Paper, Typography } from "@mui/material";
-import { currency } from "../../utils";
+import {Order, OrderedProduct} from "../../api/sagra/sagraSchemas.ts";
+import {Container, Paper, Typography} from "@mui/material";
+import {currency} from "../../utils";
+import {useOrderStore} from "../../context/OrderStore.tsx";
 
 export interface IOrderEdit {
   order: Order;
 }
 
 const OrderTotal = (props: IOrderEdit) => {
-  const { order } = props;
+
+  const {order} = useOrderStore()
 
   const total = () => {
+    let t = 0
     // TODO trasformiamo il ServiceCost in costo unitario non totale?
-    let t: number = order.serviceCost??0;
 
-    order.products.forEach((p: OrderedProduct) => {
-      t = t + (p.quantity * p.price);
-    });
-    console.log("Total:" + t);
+   if (order !== undefined) {
+       if (!order.takeAway) {
+           t = order.serviceCost * order.serviceNumber;
+       }
+     order.products.forEach((p: OrderedProduct) => {
+       t = t + (p.quantity * p.price);
+     });
+
+   }
 
     return t;
   };
