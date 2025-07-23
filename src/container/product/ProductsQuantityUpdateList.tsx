@@ -37,7 +37,8 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
   }
 
   const handleClick = (product: Product) => {
-    setSelectedProduct(product);
+    if ( ! product.sellLocked )
+      setSelectedProduct(product);
   }
 
   const handleCloseDialog = () => {
@@ -103,10 +104,12 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
             <>
               {products.map((product: Product) => {
                 return (
-                  <TableRow key={product.id} sx={{
-                      minWidth: 200,
-                      cursor: 'pointer',
-                    }}
+                  <TableRow key={product.id}
+                            sx={(theme) => ({
+                              minWidth: 200,
+                              cursor: ! product.sellLocked ? 'pointer' : 'default',
+                              backgroundColor: ! product.sellLocked ? theme.palette.background.paper : 'grey.300'
+                            })}
                     onClick={() => handleClick(product)}>
                     <TableCell sx={{ fontSize: "1.0em" }}>
                       {product.name}
