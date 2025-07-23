@@ -8,9 +8,8 @@ import {
 import {
   Alert,
   Box,
-  CircularProgress, Dialog, DialogContent, DialogTitle, DialogActions,
+  CircularProgress,
   Table,
-  Button,
   TableBody,
   TableCell,
   TableHead,
@@ -50,6 +49,8 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
     if (props.courseId !== undefined) {
       params.courseId = props.courseId;
     }
+
+    params.excludeLinked = true
 
     return params;
   };

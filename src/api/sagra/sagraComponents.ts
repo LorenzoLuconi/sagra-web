@@ -1519,6 +1519,7 @@ export type ProductsSearchQueryParams = {
    * @format int64
    */
   departmentId?: number;
+  excludeLinked?: boolean;
   /**
    * Ricerca con operatore 'contains'
    */
