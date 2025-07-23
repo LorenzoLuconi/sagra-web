@@ -85,6 +85,7 @@ const DiscountsList = (props : IDiscountsList) => {
               </TableRow>
             </TableHead>
             <TableBody className="divide-y">
+              <>
               {discounts?.map((discount: Discount) => {
                 return (
                   <TableRow key={discount.id} selected={props.selected?.id === discount.id}>
@@ -108,6 +109,7 @@ const DiscountsList = (props : IDiscountsList) => {
                   </TableRow>
                 );
               })}
+              </>
             </TableBody>
           </Table>
         </form>
