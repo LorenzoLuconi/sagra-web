@@ -1,19 +1,25 @@
 import * as React from 'react'
 import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
-import {cloneDeep, set} from "lodash";
+import {clone, cloneDeep, set} from "lodash";
+import {OrderErrorT} from "../utils";
+import toast from "react-hot-toast";
 
 interface OrderContextI {
     order?: Order
     updateOrderField: (field: string, value: unknown) => void
     products: Record<number, Product>
-    setProduct: (produce: Product, quantity: number) => void
+    setProduct: (product: Product, quantity: number) => void
     deleteProduct: (product: Product) => void
     addProduct: (product: Product, quantity: number) => void
     updateOrder: (order: Order) => void
+    errors: OrderErrorT
+    setFieldError: (field: string, message: string) => void
+    resetErrors: () => void
 }
 
 export const OrderContext = React.createContext<OrderContextI>({
     products: [],
+    errors: {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setProduct: (product: Product, quantity: number) => {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,7 +29,11 @@ export const OrderContext = React.createContext<OrderContextI>({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     updateOrder: (order: Order) => {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    updateOrderField: (field: string, value: unknown) => {}
+    updateOrderField: (field: string, value: unknown) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    setFieldError: (field: string, message: string) => {},
+
+    resetErrors: () => {}
 })
 
 interface OrderStoreI extends React.PropsWithChildren {
@@ -44,7 +54,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
     const {products, order} = props
     const [storedOrder, setStoredOrder] = React.useState<Order | undefined>(order??EmptyOrder)
     const [storedProducts, setStoredProducts] = React.useState<Record<number, Product>>({} as Record<number, Product>)
-
+    const [storedErrors, setStoredErrors] = React.useState<OrderErrorT>({})
 
     React.useEffect(() => {
         const _storedProducts: Record<number, Product> = {}
@@ -82,6 +92,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         const {products} = _order
 
         const _orderProduct: OrderedProduct | undefined = products.find((p: OrderedProduct) => {return p.productId === product.id})
+        let selectedOrderProduct = _orderProduct
         if (_orderProduct === undefined) {
 
             const oP: OrderedProduct = {
@@ -89,21 +100,25 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
                 quantity: quantity,
                 price: product.price
             }
-
+            selectedOrderProduct = oP
             products.push(oP)
         } else {
             _orderProduct.quantity = quantity
         }
 
+        if (selectedOrderProduct?.quantity <= product.availableQuantity) {
 
 
+            _storedProducts[product.id] = product
 
-        _storedProducts[product.id] = product
 
+            setStoredProducts(_storedProducts)
 
-        setStoredProducts(_storedProducts)
-
-        setStoredOrder(_order)
+            setStoredOrder(_order)
+        } else {
+            toast.error(`Quantità supera la disponibilità (${product.availableQuantity})`)
+            setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
+        }
     }
 
 
@@ -114,6 +129,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         const {products} = _order
 
         const _orderProduct: OrderedProduct | undefined = products.find((p: OrderedProduct) => {return p.productId === product.id})
+        let selectedOrderProduct = _orderProduct
         if (_orderProduct === undefined) {
 
             const oP: OrderedProduct = {
@@ -122,19 +138,31 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
                 price: product.price
             }
 
+            selectedOrderProduct = oP
+
             products.push(oP)
         } else {
+
+
             _orderProduct.quantity += quantity
         }
 
+        console.log('ADDPRODUCT: ', product.name, selectedOrderProduct?.quantity, product.availableQuantity, selectedOrderProduct?.quantity > product.availableQuantity)
 
-        _storedProducts[product.id] = product
+
+        if (selectedOrderProduct?.quantity <= product.availableQuantity) {
 
 
-        setStoredProducts(_storedProducts)
+            _storedProducts[product.id] = product
 
-        setStoredOrder(_order)
 
+            setStoredProducts(_storedProducts)
+
+            setStoredOrder(_order)
+        } else {
+            toast.error(`Quantità supera la disponibilità (${product.availableQuantity})`)
+            setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
+        }
     }
 
     const updateOrderHandled = (order: Order) => {
@@ -151,9 +179,6 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
             let _order = cloneDeep(prev)
 
-
-            console.log('UPDATEORDERHANDLER: ', _order, field, value)
-
             if (_order === undefined) {
                 _order = EmptyOrder as Order
             }
@@ -166,17 +191,35 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         })
     }
 
+    const setFieldErrorHandler = (field: string, message: string) => {
+        setStoredErrors((prev) => {
+            const _errors = clone(prev)
+            _errors[field] = message
+            return _errors
+        })
+    }
 
-        return (
+    const resetErrorsHandler = () => {
+        setStoredErrors((prev) => {
+            return {} as OrderErrorT
+        })
+    }
+
+
+
+    return (
         <OrderContext.Provider
             value={{
                 order: storedOrder,
                 products: storedProducts??[],
+                errors: storedErrors,
                 addProduct: addProductHandler,
                 setProduct: setProductHandler,
                 deleteProduct: deleteProductHandler,
                 updateOrder: updateOrderHandled,
-                updateOrderField: updateOrderFieldHandler
+                updateOrderField: updateOrderFieldHandler,
+                setFieldError: setFieldErrorHandler,
+                resetErrors: resetErrorsHandler
             }}
         >
             {props.children}
@@ -191,10 +234,13 @@ export const useOrderStore = () => {
     return {
         order: storeContext.order,
         products: storeContext.products,
+        errors: storeContext.errors,
         updateOrder: storeContext.updateOrder,
         addProduct: storeContext.addProduct,
         setProduct: storeContext.setProduct,
         deleteProduct: storeContext.deleteProduct,
-        updateOrderField: storeContext.updateOrderField
+        updateOrderField: storeContext.updateOrderField,
+        setFieldError: storeContext.setFieldError,
+        resetErrors: storeContext.resetErrors
     }
 }
