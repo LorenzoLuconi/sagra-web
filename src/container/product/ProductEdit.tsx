@@ -25,6 +25,7 @@ import {
   fetchProductUpdate,
   productsSearchQuery,
 } from "../../api/sagra/sagraComponents.ts";
+import { isNumber } from "../../utils";
 
 interface IProductEdit {
   selected?: Product;
@@ -40,7 +41,7 @@ interface ErrorMessages {
 
 const ProductEdit = (props: IProductEdit) => {
   const [name, setName] = React.useState(props.selected?.name ?? "");
-  const [price, setPrice] = React.useState<number>(props.selected?.price ?? 0);
+  const [price, setPrice] = React.useState<number>(props.selected?.price??0);
   const [departmentId, setDepartmentId] = React.useState<number>(
     props.selected?.departmentId ?? 0,
   );
@@ -54,7 +55,7 @@ const ProductEdit = (props: IProductEdit) => {
 
   const resetState = () => {
     setName("");
-    setPrice(0);
+    setPrice( 0 );
     setDepartmentId(0);
     setCourseId(0);
     setParentId(0);
@@ -89,19 +90,10 @@ const ProductEdit = (props: IProductEdit) => {
     [setName],
   );
 
-  const handleChangePrice = React.useCallback<
-    React.ChangeEventHandler<HTMLInputElement>
-  >(
-    (event) => {
-      if (event.currentTarget.value) {
-        console.log(event.currentTarget.value);
-        const value = Number.parseFloat(event.currentTarget.value);
-        if (value) setPrice(value);
-      } else {
-        setPrice(0);
-      }
-    },
-    [setPrice],
+  const handleChangePrice =
+    React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
+      setPrice(+event.currentTarget.value);
+    }, [setPrice],
   );
 
   const handleChangeDepartment = (event: SelectChangeEvent) => {
@@ -183,9 +175,8 @@ const ProductEdit = (props: IProductEdit) => {
       valid = false;
     }
 
-    if (!price) {
-      // FIXME validazione più accurata
-      errorMessages.price = "Prezzo obbligatorio";
+    if (! price || price <= 0) {
+      errorMessages.price = "Prezzo obbligatorio, deve essere un numero maggiore di 0";
       valid = false;
     }
 
@@ -255,6 +246,7 @@ const ProductEdit = (props: IProductEdit) => {
             helperText={errorMessage.name}
           />
           <TextField
+            type="number"
             size="small"
             required
             value={price}
@@ -265,7 +257,7 @@ const ProductEdit = (props: IProductEdit) => {
                   <InputAdornment position="start">€</InputAdornment>
                 ),
               },
-              htmlInput: { size: 10 },
+              htmlInput: { size: 10, step: 0.1 },
             }}
             onChange={handleChangePrice}
             error={!!errorMessage.price}
