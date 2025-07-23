@@ -144,6 +144,10 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             <RestaurantOutlined />
                             Prodotti
                         </MenuItem>
+                        <MenuItem onClick={() => {navigate('/products/updateQuantity')}}>
+                          <WarehouseOutlined />
+                          Giacenze Magazzino
+                        </MenuItem>
                         <MenuItem onClick={() => {navigate('/departments')}}>
                             <WorkspacesOutlined />
                             Reparti
@@ -157,10 +161,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             Sconti
                         </MenuItem>
 
-                        <MenuItem disabled onClick={() => {navigate('/products/init')}}>
-                            <WarehouseOutlined />
-                            Magazzino
-                        </MenuItem>
+
                         <Divider />
                         <MenuItem disabled onClick={() => {navigate('/stats')}}>
                             <AssessmentOutlined />

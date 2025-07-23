@@ -19,6 +19,7 @@ import DiscountContainer from "./container/discount/DiscountContainer.tsx";
 import ProductContainer from "./container/product/ProductContainer.tsx";
 import OrderNew from "./container/order/OrderNew.tsx";
 import {OrderStore} from "./context/OrderStore.tsx";
+import ProductQuantityUpdateContainer from "./container/product/ProductQuantityUpdateContainer.tsx";
 
 
 const lightTheme: Theme = createTheme({
@@ -78,6 +79,10 @@ const useRouter = () => {
                         path: '/products',
                         element: <ProductContainer/>
                     },
+                  {
+                    path: '/products/updateQuantity',
+                    element: <ProductQuantityUpdateContainer/>
+                  },
                     {
                         path: '/orders',
                         element: <Orders/>
@@ -146,6 +151,7 @@ export default function App() {
                       style: {
                           fontFamily: 'Roboto',
                           fontWeight: 700,
+                          fontFamily: 'Roboto',
                           maxWidth: '95vw',
                           backgroundColor: 'green',
                           color: 'white'
@@ -156,6 +162,7 @@ export default function App() {
                       style: {
                           fontFamily: 'Roboto',
                           fontWeight: 700,
+                          fontFamily: 'Roboto',
                           backgroundColor: '#d32f2f',
                           color: 'white',
                           width: '100%'

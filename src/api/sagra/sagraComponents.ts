@@ -422,6 +422,13 @@ export const useProductSellLock = (
   });
 };
 
+export type ProductInitQuantityPathParams = {
+  /**
+   * @format int64
+   */
+  productId: number;
+};
+
 export type ProductInitQuantityError = Fetcher.ErrorWrapper<
   | {
       status: 400;
@@ -433,18 +440,13 @@ export type ProductInitQuantityError = Fetcher.ErrorWrapper<
     }
 >;
 
-export type ProductInitQuantityResponse = {
-  [key: string]: string;
-};
-
-export type ProductInitQuantityRequestBody = Schemas.ProductQuantityInit[];
-
 export type ProductInitQuantityVariables = {
-  body?: ProductInitQuantityRequestBody;
+  body: Schemas.ProductQuantityUpdate;
+  pathParams: ProductInitQuantityPathParams;
 } & SagraContext["fetcherOptions"];
 
 /**
- * Modifica la quantità iniziale dei prodotti (inizializzazione giornaliera), impostando il valore passato che deve essere >= 0.
+ * Modifica la quantità iniziale del prodotto (inizializzazione giornaliera), impostando il valore passato che deve essere >= 0.
  * Viene sovrascritta la quantità disponibile e quella iniziale.
  *
  * Se ci sono degli ordini già effettuati in data odierna non è possibile effettuare l'inizializzazione (409)
@@ -454,16 +456,21 @@ export const fetchProductInitQuantity = (
   signal?: AbortSignal,
 ) =>
   sagraFetch<
-    ProductInitQuantityResponse,
+    Schemas.Product,
     ProductInitQuantityError,
-    ProductInitQuantityRequestBody,
+    Schemas.ProductQuantityUpdate,
     {},
     {},
-    {}
-  >({ url: "/v1/products/initQuantity", method: "put", ...variables, signal });
+    ProductInitQuantityPathParams
+  >({
+    url: "/v1/products/{productId}/initQuantity",
+    method: "put",
+    ...variables,
+    signal,
+  });
 
 /**
- * Modifica la quantità iniziale dei prodotti (inizializzazione giornaliera), impostando il valore passato che deve essere >= 0.
+ * Modifica la quantità iniziale del prodotto (inizializzazione giornaliera), impostando il valore passato che deve essere >= 0.
  * Viene sovrascritta la quantità disponibile e quella iniziale.
  *
  * Se ci sono degli ordini già effettuati in data odierna non è possibile effettuare l'inizializzazione (409)
@@ -471,7 +478,7 @@ export const fetchProductInitQuantity = (
 export const useProductInitQuantity = (
   options?: Omit<
     reactQuery.UseMutationOptions<
-      ProductInitQuantityResponse,
+      Schemas.Product,
       ProductInitQuantityError,
       ProductInitQuantityVariables
     >,
@@ -480,7 +487,7 @@ export const useProductInitQuantity = (
 ) => {
   const { fetcherOptions } = useSagraContext();
   return reactQuery.useMutation<
-    ProductInitQuantityResponse,
+    Schemas.Product,
     ProductInitQuantityError,
     ProductInitQuantityVariables
   >({
@@ -2458,6 +2465,104 @@ export const useCourseCreate = (
   });
 };
 
+export type OrdersCountQueryParams = {
+  /**
+   * Ricerca con operatore 'contains'
+   */
+  customer?: string;
+  username?: string;
+  /**
+   * @format date
+   */
+  created?: string;
+};
+
+export type OrdersCountError = Fetcher.ErrorWrapper<{
+  status: 400;
+  payload: Schemas.ErrorResource;
+}>;
+
+export type OrdersCountVariables = {
+  queryParams?: OrdersCountQueryParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchOrdersCount = (
+  variables: OrdersCountVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    Schemas.Count,
+    OrdersCountError,
+    undefined,
+    {},
+    OrdersCountQueryParams,
+    {}
+  >({ url: "/v1/orders/count", method: "get", ...variables, signal });
+
+export function ordersCountQuery(variables: OrdersCountVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<Schemas.Count>;
+};
+
+export function ordersCountQuery(
+  variables: OrdersCountVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<Schemas.Count>)
+    | reactQuery.SkipToken;
+};
+
+export function ordersCountQuery(
+  variables: OrdersCountVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/orders/count",
+      operationId: "ordersCount",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) => fetchOrdersCount(variables, signal),
+  };
+}
+
+export const useSuspenseOrdersCount = <TData = Schemas.Count,>(
+  variables: OrdersCountVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<Schemas.Count, OrdersCountError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<Schemas.Count, OrdersCountError, TData>({
+    ...ordersCountQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export const useOrdersCount = <TData = Schemas.Count,>(
+  variables: OrdersCountVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<Schemas.Count, OrdersCountError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<Schemas.Count, OrdersCountError, TData>({
+    ...ordersCountQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
 export type MonitorViewPathParams = {
   /**
    * @format int64
@@ -2668,6 +2773,11 @@ export type QueryOperation =
       path: "/v1/courses";
       operationId: "coursesSearch";
       variables: CoursesSearchVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/v1/orders/count";
+      operationId: "ordersCount";
+      variables: OrdersCountVariables | reactQuery.SkipToken;
     }
   | {
       path: "/v1/monitors/{monitorId}/view";

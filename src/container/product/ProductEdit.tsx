@@ -25,7 +25,6 @@ import {
   fetchProductUpdate,
   productsSearchQuery,
 } from "../../api/sagra/sagraComponents.ts";
-import { isNumber } from "../../utils";
 
 interface IProductEdit {
   selected?: Product;

@@ -89,18 +89,6 @@ export type ProductQuantityUpdate = {
   quantityVariation: number;
 };
 
-export type ProductQuantityInit = {
-  /**
-   * @format int64
-   */
-  productId: number;
-  /**
-   * @format int32
-   * @minimum 0
-   */
-  initialQuantity: number;
-};
-
 export type OrderRequest = {
   /**
    * @minLength 1
@@ -249,6 +237,13 @@ export type Course = {
    */
   id: number;
   name: string;
+};
+
+export type Count = {
+  /**
+   * @format int64
+   */
+  count: number;
 };
 
 export type MonitorProductView = {
