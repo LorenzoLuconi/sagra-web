@@ -12,7 +12,7 @@ import {
 import { Logo } from "../../layout/Logo.tsx";
 import { Order } from "../../api/sagra/sagraSchemas.ts";
 import { currency } from "../../utils";
-import { ProductName } from "./ProductName.tsx";
+import { ProductName } from "../product/ProductName.tsx";
 
 interface IOrderPrint {
   order: Order;
