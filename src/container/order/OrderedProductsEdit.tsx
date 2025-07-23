@@ -88,7 +88,7 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
                     onChange={(e) => {
                         console.log('AGGIORNA: ', e.target.value);
 
-                        if (e.target.value <=-1) {
+                        if (e.target.value <=0) {
                             toast.error(`Quantità deve essere positiva`)
                             setFieldError(`product.${product.id}`, 'Quantità deve essere positiva')
                         } else {
