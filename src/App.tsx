@@ -138,11 +138,13 @@ export default function App() {
                       icon: <InfoIcon/>,
                       style: {
                           fontWeight: 700,
+                          fontFamily: 'Roboto'
                       }
                   },
                   success: {
                       icon: <ThumbUpIcon/>,
                       style: {
+                          fontFamily: 'Roboto',
                           fontWeight: 700,
                           maxWidth: '95vw',
                           backgroundColor: 'green',
@@ -152,6 +154,7 @@ export default function App() {
                   error: {
                       icon: <ThumbDownIcon/>,
                       style: {
+                          fontFamily: 'Roboto',
                           fontWeight: 700,
                           backgroundColor: '#d32f2f',
                           color: 'white',
