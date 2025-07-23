@@ -20,6 +20,7 @@ import ProductContainer from "./container/product/ProductContainer.tsx";
 import OrderNew from "./container/order/OrderNew.tsx";
 import {OrderStore} from "./context/OrderStore.tsx";
 import ProductQuantityUpdateContainer from "./container/product/ProductQuantityUpdateContainer.tsx";
+import OrderPrint from "./container/product/OrderPrint.tsx";
 
 
 const lightTheme: Theme = createTheme({
@@ -95,6 +96,11 @@ const useRouter = () => {
                       path: '/orders/:orderId',
                         element: <OrderEdit/>
                     },
+
+                  {
+                    path: '/orders/:orderId/print',
+                    element: <OrderPrint />
+                  },
                     {
                       path: '/departments',
                       element: <DepartmentContainer/>
