@@ -5,6 +5,7 @@ import {DeleteOutlined} from "@mui/icons-material";
 import {currency} from "../../utils";
 import {OrderedProduct, Product as ProductAPI} from '../../api/sagra/sagraSchemas.ts'
 import {useOrderStore} from "../../context/OrderStore.tsx";
+import toast from "react-hot-toast";
 
 interface IOrderedProductsEdit {
   products?: OrderedProduct[]
@@ -50,6 +51,7 @@ interface OrderedProductItemViewI {
 }
 
 const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
+    const {errors, setFieldError} = useOrderStore()
     const {product, quantity} = props
     const {setProduct, deleteProduct} = useOrderStore()
     const [quantityValue, setQuantityValue] = React.useState<number>(props.quantity)
@@ -80,9 +82,25 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
                     variant="standard"
                     type="number"
                     aria-valuemin={1}
-
+                    name={`product.${product.id}`}
+                    error={errors[`product.${product.id}`] !== undefined}
                     value={quantityValue}
-                    onChange={(e) => {console.log('AGGIORNA: ', e.target.value); setProduct(product, +e.target.value)}}
+                    onChange={(e) => {
+                        console.log('AGGIORNA: ', e.target.value);
+
+                        if (e.target.value <=-1) {
+                            toast.error(`Quantità deve essere positiva`)
+                            setFieldError(`product.${product.id}`, 'Quantità deve essere positiva')
+                        } else {
+
+                            if (e.target.value <= product.availableQuantity) {
+                                setProduct(product, +e.target.value)
+                            } else {
+                                toast.error(`Quantità supera la disponibilità (${product.availableQuantity})`)
+                                setFieldError(`product.${product.id}`, 'Quantità supera la disponibilità')
+                            }
+                        }
+                    }}
                     slotProps={{ htmlInput: { size: 2, min: 1 } }}/>
             </Grid>
             <Grid size={6}>

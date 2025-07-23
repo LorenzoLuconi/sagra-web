@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import {Box, Typography} from "@mui/material";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
 import { ErrorOutlined, LockOutlined, WarningOutlined } from "@mui/icons-material";
 
@@ -41,10 +41,14 @@ const ProductQuantity = (props) => {
   };
 
   return (
-    <Typography>
-      {product.availableQuantity}
-      {alertIcon()}
-    </Typography>
+      <Box sx={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+        <Typography >
+          {product.availableQuantity}
+        </Typography>
+          <Typography>
+            <>{alertIcon()}</>
+          </Typography>
+      </Box>
   );
 };
 

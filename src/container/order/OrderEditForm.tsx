@@ -1,9 +1,15 @@
-import {Order, OrderedProductRequest} from "../../api/sagra/sagraSchemas.ts";
+import {ErrorResource, Order, OrderedProductRequest, OrderRequest} from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
 import {useState} from "react";
 import {Box, Button, FormControlLabel, Paper, Stack, Switch, TextField} from "@mui/material";
 import {PrintOutlined, SaveOutlined} from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
+import {checkOrderErrors} from "../../utils";
+import toast from "react-hot-toast";
+import {cloneDeep} from "lodash";
+import {useMutation} from "@tanstack/react-query";
+import {fetchOrderCreate} from "../../api/sagra/sagraComponents.ts";
+import {useNavigate} from "react-router";
 
 
 export interface IOrderEdit {
@@ -11,19 +17,49 @@ export interface IOrderEdit {
 }
 
 
-const OrderEditForm = (props : IOrderEdit) => {
+const OrderEditForm = () => {
 
-  const {order, updateOrderField} = useOrderStore();
-
-  console.log('Order: ', order)
-
-
+  const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors} = useOrderStore();
+  const navigate = useNavigate()
   // FIXME controllare se va bene fare "order ?" per verificare se undefined
   const [customer, setCustomer] = useState(order?.customer ?? "");
   const [takeAway, setTakeAway] = useState(order?.takeAway ?? false);
   const [changed, setChanged] = useState(false);
   const [coperti, setCoperti] = useState(order?.serviceNumber ?? 0);
   const [products, setProducts] = useState([] as OrderedProductRequest[]);
+
+
+  const postOrder = useMutation({
+      mutationFn: (data: OrderRequest) => {
+          return fetchOrderCreate({body: data})
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onError: (error, variables: OrderRequest) => {
+
+
+          const errors: ErrorResource = error as ErrorResource
+
+          toast.error(errors.message?? `Si è verificato un errore per l'ordine del client ${variables.customer}`)
+          errors.invalidValues!.map((invalidValue) => {
+              const {message, value, field} = invalidValue
+              if (field !== undefined) {
+                  const spString = field.match(/\[([^\]]+)\]/);
+                  const index = +spString[1]
+                  const productId = variables.products[index].productId
+                  setFieldError(`product.${productId}`, message?? `Errore per il prodotto ${productsTable[productId].name}`)
+                  toast.error(`Errore nella quantità (${value}) del prodotto ${productsTable[productId].name}`)
+              }
+
+          })
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onSuccess: (order: Order, variables: OrderRequest,context: unknown) => {
+          toast.success(`Ordine per cliente ${order.customer} creato con successo`)
+          navigate(`/orders/${order.id}`)
+      }
+  })
+
+
 
   React.useEffect(() => {
     if (order !== undefined) {
@@ -113,7 +149,7 @@ const OrderEditForm = (props : IOrderEdit) => {
   const handleChangeCustomer =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
             setCustomer(event.currentTarget.value);
-            updateOrderField('costomer', event.currentTarget.value)
+            updateOrderField('customer', event.currentTarget.value)
           }, [setCustomer]
       );
 
@@ -150,7 +186,9 @@ const OrderEditForm = (props : IOrderEdit) => {
   return (
       <Paper sx={{padding: 2 }}>
         <TextField fullWidth required
+                   name={'customer'}
                    value={customer}
+                   error={errors['customer'] !== undefined}
                    label="Nome cliente"
                    onChange={handleChangeCustomer}
         />
@@ -158,6 +196,8 @@ const OrderEditForm = (props : IOrderEdit) => {
 
           <TextField type="number" size='small'
                      value={coperti}
+                     name={'serviceNumber'}
+                     error={errors['serviceNumber'] !== undefined}
                      label="N. Coperti"
                      onChange={handleChangeCoperti}
                      disabled={takeAway}
@@ -172,7 +212,39 @@ const OrderEditForm = (props : IOrderEdit) => {
           />
         </Box>
         <Stack direction="row" spacing={1} sx={{marginTop: 1, justifyContent: 'center'}}>
-          <Button variant="contained" startIcon={<SaveOutlined/>}>Salva</Button>
+          <Button
+              variant="contained"
+              startIcon={<SaveOutlined/>}
+              onClick={() => {
+                resetErrors()
+                console.log('Order to save: ', order)
+                if (order !== undefined) {
+                    const orderErrors = checkOrderErrors(order, productsTable)
+                    const errorFields = Object.keys(orderErrors)
+
+                    errorFields.forEach((eK: string) => {
+                        setFieldError(eK, orderErrors[eK])
+                        toast.error(orderErrors[eK])
+                    })
+
+                    if (errorFields.length === 0) {
+                        const orderToSend: OrderRequest = {} as OrderRequest
+                        orderToSend.customer = order.customer
+                        orderToSend.takeAway = order.takeAway
+                        orderToSend.serviceNumber = order.serviceNumber
+                        orderToSend.note = order.note
+                        orderToSend.products = cloneDeep(order.products)
+
+                        console.log('Order2Send: ', orderToSend)
+                        postOrder.mutate(orderToSend)
+                    }
+
+
+                }
+              }}
+          >
+            Salva
+          </Button>
           <Button disabled={printDisabled()} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
         </Stack>
       </Paper>

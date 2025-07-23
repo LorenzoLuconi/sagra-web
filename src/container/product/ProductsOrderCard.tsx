@@ -85,7 +85,7 @@ const ProductsOrderCard = (props : IProductsOrder) => {
                         <Typography sx={{fontWeight: 500}}>{product.name}</Typography>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 5}}>
                           <Typography>{currency(product.price)}</Typography>
-                          <Typography><ProductQuantity product={product}/></Typography>
+                          <ProductQuantity product={product}/>
                         </Box>
                       </CardContent>
                       </CardActionArea>
