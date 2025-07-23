@@ -51,10 +51,10 @@ const OrderPrint = (props : IOrderPrint ) => {
       <button onClick={reactToPrintFn}>Print</button>
       <Box ref={contentRef} sx={{ p: 5}}>
         <Box sx={{display: 'flex', columnGap: 5, justifyContent: 'flex-start'}}>
-          <Logo sx={{fontSize: '8vh', color: 'text.primary', verticalAlign: 'middle'}} />
-          <Typography sx={{fontSize: '2em', color: 'text.primary'}}>Sagra San Pio X</Typography>
+          <Logo sx={{fontSize: '6vh', color: 'text.primary', verticalAlign: 'middle'}} />
+          <Typography sx={{fontSize: '1.8em', color: 'text.primary'}}>Sagra San Pio X</Typography>
         </Box>
-        <Box sx={{display: 'inline-block', height: '170px', width: '100%', mt: 1, border: '1px solid black', p: 1}}>
+        <Box sx={{display: 'inline-block', width: '100%', mt: 1, border: '1px solid black', p: 1}}>
           <Grid container spacing={2}>
             <Grid size={7}>
               <FieldValue field="Numero" value={order.id.toString()}/>
