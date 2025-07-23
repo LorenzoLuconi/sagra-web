@@ -1,3 +1,4 @@
+
 // import React from 'react'
 
 import { useQuery } from "@tanstack/react-query";
@@ -8,8 +9,8 @@ import {
 import {
   Alert,
   Box,
-  Card,
-  CardContent,
+  Card, CardActionArea,
+  CardContent, CardMedia,
   CircularProgress,
   Typography,
 } from "@mui/material";
@@ -41,8 +42,8 @@ const ProductsOrderCard = (props : IProductsOrder) => {
 
   if (productsQuery.isLoading) {
     return ( <Box sx={{ display: "flex" }}>
-      <CircularProgress />
-    </Box>
+          <CircularProgress />
+        </Box>
     )
   }
 
@@ -58,35 +59,42 @@ const ProductsOrderCard = (props : IProductsOrder) => {
     }
 
     return (
-      <form>
-        <Box sx={{display: "flex", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >
-          <>
-          {
-            products.map( (product: Product) =>
-              <Card key={product.id}
-                    sx={(theme) => ({
-                      minWidth: 200,
-                      cursor: productAvailable(product) ? 'pointer' : 'default',
-                      backgroundColor: productAvailable(product) ? theme.palette.background.paper : 'grey.300'
-                    })}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      if ( productAvailable(product) )
-                        props.addToOrder(product)}
-                    }>
-                <CardContent sx={{textAlign: 'center'}}>
-                  <Typography sx={{fontWeight: 500}}>{product.name}</Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 5}}>
-                    <Typography>{currency(product.price)}</Typography>
-                    <Typography><ProductQuantity product={product}/></Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            )
-          }
-          </>
-        </Box>
-      </form>
+        <form>
+          <Box sx={{display: "flex", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >
+            <>
+              {
+                products.map( (product: Product) =>
+                    <Card key={product.id}
+                          sx={(theme) => ({
+                            minWidth: 200,
+                            cursor: productAvailable(product) ? 'pointer' : 'default',
+                            backgroundColor: productAvailable(product) ? theme.palette.background.paper : 'grey.300'
+                          })}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            if ( productAvailable(product) )
+                              props.addToOrder(product)}
+                          }>
+                      <CardActionArea>
+                      <CardMedia
+                          sx={{ height: 100 }}
+                          image={`/prodotti/${product.name}.png`}
+                          title={`${product.name}`}
+                      />
+                      <CardContent sx={{textAlign: 'center'}}>
+                        <Typography sx={{fontWeight: 500}}>{product.name}</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 5}}>
+                          <Typography>{currency(product.price)}</Typography>
+                          <Typography><ProductQuantity product={product}/></Typography>
+                        </Box>
+                      </CardContent>
+                      </CardActionArea>
+                    </Card>
+                )
+              }
+            </>
+          </Box>
+        </form>
     )
   }
 }
