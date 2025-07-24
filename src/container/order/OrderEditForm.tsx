@@ -10,6 +10,7 @@ import {cloneDeep} from "lodash";
 import {useMutation} from "@tanstack/react-query";
 import {fetchOrderCreate} from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
+import OrderPrint from "./OrderPrint.tsx";
 
 
 export interface IOrderEdit {
@@ -245,7 +246,7 @@ const OrderEditForm = () => {
           >
             Salva
           </Button>
-          <Button disabled={printDisabled()} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+            { order && <OrderPrint order={order}/>}
         </Stack>
       </Paper>
   );

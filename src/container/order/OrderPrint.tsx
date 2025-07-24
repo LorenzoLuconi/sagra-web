@@ -1,22 +1,16 @@
 import * as React from "react";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
-import {
-  Box,
-  Grid,
-  Table, TableCell,
-  TableContainer,
-  TableHead, TableRow,
-  Typography
-} from "@mui/material";
-import { Logo } from "../../layout/Logo.tsx";
-import { Order, OrderedProduct, Product } from "../../api/sagra/sagraSchemas.ts";
-import { currency } from "../../utils";
-import { ProductName } from "../product/ProductName.tsx";
+import {useRef} from "react";
+import {useReactToPrint} from "react-to-print";
+import {Box, Button, Grid, Table, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
+import {PrintOutlined} from "@mui/icons-material";
+import {Logo} from "../../layout/Logo.tsx";
+import {Order, OrderedProduct, Product} from "../../api/sagra/sagraSchemas.ts";
+import {currency} from "../../utils";
+import {ProductName} from "../product/ProductName.tsx";
 import "./OrderPrint.css"
-import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import { useQuery } from "@tanstack/react-query";
-import { DepartmentName } from "../department/DepartmentName.tsx";
+import {productByIdQuery} from "../../api/sagra/sagraComponents.ts";
+import {useQuery} from "@tanstack/react-query";
+import {DepartmentName} from "../department/DepartmentName.tsx";
 
 interface OrderPrintProps {
   order: Order;
@@ -62,7 +56,7 @@ const OrderPrint = (props : OrderPrintProps ) => {
         price: 0.8
       }
     ]
-  }
+  } as Order
 
   // La chiave è l'id del prodotto, qualcosa di simile presente in OrderStore
   const productsMap : Record<number, Product> = {
@@ -75,7 +69,8 @@ const OrderPrint = (props : OrderPrintProps ) => {
 
   return (
     <>
-      <button onClick={reactToPrintFn}>Print</button>
+      <Button onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+
       <div ref={contentRef} className="printContent print-container">
         <OrderPrintPageCustomer order={order} />
 
