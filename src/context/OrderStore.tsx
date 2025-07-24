@@ -44,7 +44,7 @@ interface OrderStoreI extends React.PropsWithChildren {
 
 const EmptyOrder: Order = {
     products: [],
-    serviceNumber: 0,
+        serviceNumber: 1,
     serviceCost: 0.5,
     customer: '',
     takeAway: false,
