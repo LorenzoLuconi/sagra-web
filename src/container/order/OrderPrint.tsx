@@ -89,7 +89,7 @@ const OrderPrint = (props : OrderPrintProps ) => {
           Array.from(new Set(Object.values(productsMap).map(product => product.departmentId)).values()).map((departmentId: number) => {
             return (
               <>
-                <div className="page-break" />
+                <div key={'pb-'.concat(departmentId)} className="page-break" />
                 <OrderPrintPageDepartment key={departmentId} order={order} departmentId={+departmentId} productsMap={productsMap} />
               </>
             )
