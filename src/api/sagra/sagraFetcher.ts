@@ -1,4 +1,5 @@
 import { SagraContext } from "./sagraContext";
+import {manageErrorResponse} from "../../utils";
 
 const baseUrl = "http://localhost:8080";
 
@@ -69,21 +70,13 @@ export async function sagraFetch<
             : JSON.stringify(body)
           : undefined,
         headers: requestHeaders,
-      },
+      } as Request,
     );
+
     if (!response.ok) {
-      try {
-        error = await response.json();
-      } catch (e) {
-        error = {
-          status: "unknown" as const,
-          payload:
-            e instanceof Error
-              ? `Unexpected error (${e.message})`
-              : "Unexpected error",
-        };
-      }
-    } else if (response.headers.get("content-type")?.includes("json")) {
+      await manageErrorResponse<TError>(response)
+    }
+    if (response.headers.get("content-type")?.includes("json")) {
       return await response.json();
     } else {
       // if it is not a json response, assume it is a blob and cast it to TData
@@ -98,7 +91,6 @@ export async function sagraFetch<
     };
     throw errorObject;
   }
-  throw error;
 }
 
 const resolveUrl = (

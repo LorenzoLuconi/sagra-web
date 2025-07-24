@@ -1,4 +1,5 @@
 import {Order, Product} from "../api/sagra/sagraSchemas.ts";
+import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
 
 export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<string, string>) => {
     const res: any = {}
@@ -51,7 +52,7 @@ export const checkOrderErrors = (order: Order, productsTable: Record<number, Pro
         res['customer'] = 'Bisogna specificare il nome del cliente'
     }
 
-    if (order.serviceNumber === 0 && !order.takeAway) {
+    if (order.serviceNumber === -2 && !order.takeAway) {
         res['serviceNumber'] = 'Bisogna specificare numero di coperti'
     }
 
@@ -76,4 +77,30 @@ export const checkOrderErrors = (order: Order, productsTable: Record<number, Pro
     }
 
     return res
+}
+
+export  async function  manageErrorResponse<TError>(response: Response)  {
+    const {status} = response;
+
+    let eW: ErrorWrapper<TError>
+    // let error: ErrorResponse = {} as ErrorResponse
+    console.log('ManageResponse: ---- ', response.status)
+      try {
+        eW = {
+            status: response.status as unknown,
+            payload: await response.json()
+        } as ErrorWrapper<TError>
+
+    } catch (e: Error) {
+        console.log('Catch: ', e)
+        eW =  {
+            status: status as unknown,
+            payload: `${status}`
+        } as ErrorWrapper<TError>
+    }
+
+
+    console.log('----', eW)
+
+    throw eW
 }
