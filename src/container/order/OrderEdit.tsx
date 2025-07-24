@@ -45,7 +45,7 @@ const OrderForm: React.FC<OrderFormI> = (props) => {
 
     return (
         <OrderStore products={combinedQueries.data} order={order}>
-          <form>
+
             <Grid container spacing={2}>
               <Grid size={7}>
                 <ProductsToOrder/>
@@ -56,7 +56,7 @@ const OrderForm: React.FC<OrderFormI> = (props) => {
                 <OrderedProductsEdit products={order?.products ?? []}/>
               </Grid>
             </Grid>
-          </form>
+
         </OrderStore>
     )
   }
