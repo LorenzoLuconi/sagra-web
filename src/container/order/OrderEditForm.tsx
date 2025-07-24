@@ -6,7 +6,7 @@ import {PrintOutlined, SaveOutlined} from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
-import {cloneDeep} from "lodash";
+import {cloneDeep, isEqual} from "lodash";
 import {useMutation} from "@tanstack/react-query";
 import {fetchOrderCreate} from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
@@ -17,7 +17,8 @@ export interface IOrderEdit {
 }
 
 
-const OrderEditForm = () => {
+const OrderEditForm: React.FC<IOrderEdit> = (props) => {
+    const {order: storedOrder} = props
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors} = useOrderStore();
   const navigate = useNavigate()
@@ -27,6 +28,9 @@ const OrderEditForm = () => {
   const [changed, setChanged] = useState(false);
   const [coperti, setCoperti] = useState(order?.serviceNumber ?? 0);
   const [products, setProducts] = useState([] as OrderedProductRequest[]);
+
+  const differences = !isEqual(storedOrder, order)
+console.log('DIFFERENCES: ', storedOrder, order, differences)
 
 
   const postOrder = useMutation({
@@ -213,6 +217,7 @@ const OrderEditForm = () => {
         </Box>
         <Stack direction="row" spacing={1} sx={{marginTop: 1, justifyContent: 'center'}}>
           <Button
+              disabled={!differences}
               variant="contained"
               startIcon={<SaveOutlined/>}
               onClick={() => {
@@ -231,7 +236,7 @@ const OrderEditForm = () => {
                         const orderToSend: OrderRequest = {} as OrderRequest
                         orderToSend.customer = order.customer
                         orderToSend.takeAway = order.takeAway
-                        orderToSend.serviceNumber = order.serviceNumber
+                        orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
                         orderToSend.note = order.note
                         orderToSend.products = cloneDeep(order.products)
 
@@ -245,7 +250,7 @@ const OrderEditForm = () => {
           >
             Salva
           </Button>
-          <Button disabled={printDisabled()} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+          <Button disabled={differences} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
         </Stack>
       </Paper>
   );
