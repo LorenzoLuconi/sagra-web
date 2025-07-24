@@ -155,7 +155,6 @@ export default function App() {
                   success: {
                       icon: <ThumbUpIcon/>,
                       style: {
-                          fontFamily: 'Roboto',
                           fontWeight: 700,
                           fontFamily: 'Roboto',
                           maxWidth: '95vw',
@@ -168,7 +167,6 @@ export default function App() {
                       style: {
                           fontFamily: 'Roboto',
                           fontWeight: 700,
-                          fontFamily: 'Roboto',
                           backgroundColor: '#d32f2f',
                           color: 'white',
                           width: '100%'
