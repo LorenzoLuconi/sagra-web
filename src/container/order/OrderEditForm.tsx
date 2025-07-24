@@ -30,8 +30,6 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
   const [products, setProducts] = useState([] as OrderedProductRequest[]);
 
   const differences = !isEqual(storedOrder, order)
-console.log('DIFFERENCES: ', storedOrder, order, differences)
-
 
   const postOrder = useMutation({
       mutationFn: (data: OrderRequest) => {
