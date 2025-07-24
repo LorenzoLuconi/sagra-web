@@ -37,14 +37,14 @@ const OrderPrint = (props : OrderPrintProps ) => {
 
   const order : Order = {
     id: 7811,
-    customer: "Lorenzo Luconi Trombacchi dei conti di Tonfano",
+    customer: "Lorenzo Luconi Trombacchi",
     totalAmount: 147.50,
     serviceNumber: 4,
     serviceCost: 0.5,
     takeAway: false,
     discountRate: 20,
     created: '2025-07-23T23:58:45',
-    note: 'era meglio morire da piccoli con i peli del culo a batuffoli che morire ...',
+    note: 'vuole il ketchup e non la maionese',
     products: [
       {
         productId: 1,
@@ -125,7 +125,7 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
     <>
       <Box sx={{ m: 3}}>
         <OrderPrintLogo/>
-        <OrderPrintInfo order={order} />
+        <OrderPrintInfo order={order} hideTable={true}/>
         <OrderPrintTitle title="Copia Cliente" />
         <TableContainer>
           <Table sx={{width: '100%'}}>
@@ -233,6 +233,7 @@ const OrderPrintLogo = () => {
 
 interface OrderPrintInfoProps {
   order: Order
+  hideTable?: boolean
 }
 
 const OrderPrintInfo = (props: OrderPrintInfoProps) => {
@@ -252,11 +253,18 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
 
           {
             order.takeAway ?
-              <>
-                <Typography sx={{fontSize: '1.6em', fontWeight: 500}}>ASPORTO</Typography>
-              </>
+              <Box sx={{border: '1px dashed black', borderRadius: '4px', height: '70px', p: 1, mt: 1, textAlign: 'center'}}>
+                <Typography sx={{fontSize: '1.6em', fontWeight: 500, mt: 2}}>ASPORTO</Typography>
+              </Box>
               :
-              <FieldValue field="Coperti" value={order.serviceNumber.toString() }/>
+              <>
+                <FieldValue field="Coperti" value={order.serviceNumber.toString() }/>
+                { props.hideTable ? '' :
+                  <Box sx={{border: '1px dashed black', borderRadius: '4px', height: '70px', p: 1, mt: 1}}>
+                    <Typography sx={{fontSize: '0.9em'}}>Tavolo</Typography>
+                  </Box>
+                }
+              </>
           }
 
         </Grid>
