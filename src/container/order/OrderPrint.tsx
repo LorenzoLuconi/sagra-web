@@ -1,7 +1,18 @@
 import * as React from "react";
 import {useRef} from "react";
 import {useReactToPrint} from "react-to-print";
-import {Box, Button, Grid, Table, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from "@mui/material";
 import {PrintOutlined} from "@mui/icons-material";
 import {Logo} from "../../layout/Logo.tsx";
 import {Order, OrderedProduct, Product} from "../../api/sagra/sagraSchemas.ts";
@@ -132,6 +143,7 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
                 <TableCell align="right" sx={{ width: '120px'}}>Totale</TableCell>
               </TableRow>
             </TableHead>
+            <TableBody>
               { order.products.map(p =>
                 <TableRow key={p.productId} sx={{p: 0}}>
                   <TableCell><Typography sx={{ fontSize: '1.1em'}}><ProductName productId={p.productId}/></Typography></TableCell>
@@ -154,6 +166,7 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
                 <TableCell colSpan={3} align="right" sx={{ fontSize: '1.1em', fontWeight: 500 }}>TOTALE</TableCell>
                 <TableCell colSpan={3} align="right" sx={{ fontSize: '1.1em', fontWeight: 500 }}>{currency(order.totalAmount)}</TableCell>
               </TableRow>
+            </TableBody>
           </Table>
         </TableContainer>
       </Box>
@@ -203,12 +216,14 @@ const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
                 <TableCell align="center" sx={{ width: '100px'}}>Quantità</TableCell>
               </TableRow>
             </TableHead>
+          <TableBody>
               { productsToPrint.map(p =>
                 <TableRow key={p.productId} sx={{p: 0}}>
                   <TableCell><Typography sx={{ fontSize: '1.1em'}}><ProductName productId={p.productId}/></Typography></TableCell>
                   <TableCell align="center">{p.quantity}</TableCell>
                 </TableRow>
               )}
+          </TableBody>
           </Table>
         </TableContainer>
       </Box>
