@@ -4,12 +4,13 @@ import {orderByIdQuery, productByIdQuery} from "../../api/sagra/sagraComponents.
 import {useQueries, useQuery} from "@tanstack/react-query";
 import {useParams} from "react-router";
 import OrderEditForm from "./OrderEditForm.tsx";
-import {CircularProgress, Grid} from "@mui/material";
+import {Box, CircularProgress, Grid} from "@mui/material";
 import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
 import OrderTotal from "./OrderTotal.tsx";
 import {OrderStore, useOrderStore} from "../../context/OrderStore.tsx";
 import {Order} from "../../api/sagra/sagraSchemas.ts";
 import ProductsToOrder from "./ProductsToOrder.tsx";
+import ErrorInfo from "../../view/ErrorInfo.tsx";
 
 
 interface OrderFormI {
@@ -44,19 +45,23 @@ const OrderForm: React.FC<OrderFormI> = (props) => {
   if (combinedQueries.data) {
 
     return (
-        <OrderStore products={combinedQueries.data} order={order}>
+        <OrderStore products={combinedQueries.data} order={order} gap={10}>
+          <form>
 
             <Grid container spacing={2}>
               <Grid size={7}>
                 <ProductsToOrder/>
               </Grid>
-              <Grid size={5}>
-                <OrderEditForm/>
+              <Grid size={5} spacing={2}>
+                <OrderEditForm order={order}/>
                 <OrderTotal order={order}/>
                 <OrderedProductsEdit products={order?.products ?? []}/>
+                <ErrorInfo/>
               </Grid>
+
             </Grid>
 
+          </form>
         </OrderStore>
     )
   }
