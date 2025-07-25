@@ -51,7 +51,7 @@ const OrderForm: React.FC<OrderFormI> = (props) => {
                 <ProductsToOrder/>
               </Grid>
               <Grid size={5} spacing={2}>
-                <OrderEditForm order={order}/>
+                <OrderEditForm order={order} update={true}/>
                 <OrderTotal order={order}/>
                 <OrderedProductsEdit products={order?.products ?? []}/>
                 <ErrorInfo/>

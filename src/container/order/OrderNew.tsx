@@ -31,7 +31,7 @@ const OrderNew = () => {
                         }}/>
                     </Grid>
                     <Grid size={5}>
-                        <OrderEditForm/>
+                        <OrderEditForm update={false}/>
                         <OrderTotal/>
                         <OrderedProductsEdit products={order?.products ?? []}/>
                     </Grid>

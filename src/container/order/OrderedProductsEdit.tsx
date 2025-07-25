@@ -91,13 +91,16 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
                             toast.error(`Quantità deve essere positiva`)
                             setFieldError(`product.${product.id}`, 'Quantità deve essere positiva')
                         } else {
-
+                            setProduct(product, +e.target.value)
+                            /*
                             if (e.target.value <= product.availableQuantity) {
                                 setProduct(product, +e.target.value)
                             } else {
                                 toast.error(`Quantità supera la disponibilità (${product.availableQuantity})`)
                                 setFieldError(`product.${product.id}`, 'Quantità supera la disponibilità')
                             }
+
+                             */
                         }
                     }}
                     slotProps={{ htmlInput: { size: 2, min: 1 } }}/>

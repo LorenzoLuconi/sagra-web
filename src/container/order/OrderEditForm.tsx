@@ -2,24 +2,26 @@ import {ErrorResource, Order, OrderedProductRequest, OrderRequest} from "../../a
 import * as React from "react";
 import {useState} from "react";
 import {Box, Button, FormControlLabel, Paper, Stack, Switch, TextField} from "@mui/material";
-import {PrintOutlined, SaveOutlined} from "@mui/icons-material";
+import {SaveOutlined} from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
 import {cloneDeep, isEqual} from "lodash";
 import {useMutation} from "@tanstack/react-query";
-import {fetchOrderCreate} from "../../api/sagra/sagraComponents.ts";
+import {fetchOrderCreate, fetchOrderUpdate, orderByIdQuery} from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
 import OrderPrint from "./OrderPrint.tsx";
+import {queryClient} from "../../main.tsx";
 
 
 export interface IOrderEdit {
   order?: Order;
+  update: boolean
 }
 
 
 const OrderEditForm: React.FC<IOrderEdit> = (props) => {
-    const {order: storedOrder} = props
+    const {order: storedOrder, update} = props
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors} = useOrderStore();
   const navigate = useNavigate()
@@ -32,9 +34,45 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
 
   const differences = !isEqual(storedOrder, order)
 
-  const postOrder = useMutation({
+    const updateOrder = useMutation({
+        mutationFn: (data: OrderRequest) => {
+            return fetchOrderUpdate({body: data, pathParams: {orderId: storedOrder?.id??0}})
+        },
+        onError: (error, variables: OrderRequest) => {
+
+            const errors: ErrorResource = error as ErrorResource
+
+            toast.error(errors.message?? `Si è verificato un errore per l'ordine del client ${variables.customer}`)
+            errors.invalidValues!.map((invalidValue) => {
+                const {message, value, field} = invalidValue
+                if (field !== undefined) {
+                    const spString = field.match(/\[([^\]]+)\]/);
+                    const index = +spString[1]
+                    const productId = variables.products[index].productId
+                    setFieldError(`product.${productId}`, message?? `Errore per il prodotto ${productsTable[productId].name}`)
+                    toast.error(`Errore nella quantità (${value}) del prodotto ${productsTable[productId].name}`)
+                }
+
+            })
+        },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        onSuccess: (order: Order, variables: OrderRequest,context: unknown) => {
+
+            const fetchOrderConf = orderByIdQuery({pathParams: {orderId: order.id}})
+
+            queryClient.invalidateQueries({queryKey: fetchOrderConf.queryKey}).then(() => {
+
+                toast.success(`Ordine per cliente ${order.customer} modificato con successo`)
+                navigate(`/orders/${order.id}`)
+            })
+
+        }
+    })
+
+
+  const createOrder = useMutation({
       mutationFn: (data: OrderRequest) => {
-          return fetchOrderCreate({body: data})
+              return fetchOrderCreate({body: data})
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onError: (error, variables: OrderRequest) => {
@@ -232,17 +270,22 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
                     })
 
                     if (errorFields.length === 0) {
-                        const orderToSend: OrderRequest = {} as OrderRequest
-                        orderToSend.customer = order.customer
-                        orderToSend.takeAway = order.takeAway
-                        orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
-                        orderToSend.note = order.note
-                        orderToSend.products = cloneDeep(order.products)
 
-                        console.log('Order2Send: ', orderToSend)
-                        postOrder.mutate(orderToSend)
+                            const orderToSend: OrderRequest = {} as OrderRequest
+                            orderToSend.customer = order.customer
+                            orderToSend.takeAway = order.takeAway
+                            orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
+                            orderToSend.note = order.note
+                            orderToSend.products = cloneDeep(order.products)
+
+                            console.log('Order2Send: ', orderToSend)
+                        if (update) {
+                            updateOrder.mutate(orderToSend)
+                        } else {
+                            createOrder.mutate(orderToSend)
+
+                        }
                     }
-
 
                 }
               }}
