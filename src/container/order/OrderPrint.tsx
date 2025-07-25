@@ -25,6 +25,12 @@ interface OrderPrintProps {
   products: Record<number, Product>
 }
 
+const TableStyle = {
+  border: '1px solid black',
+  borderRadius: '3px',
+  width: '100%'
+}
+
 const OrderPrint = (props : OrderPrintProps ) => {
 
   const contentRef = useRef<HTMLDivElement>(null);
@@ -36,7 +42,7 @@ const OrderPrint = (props : OrderPrintProps ) => {
     <>
       <Button disabled={props.disabled} onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
 
-      <div ref={contentRef} className="printContent print-container">
+      <div ref={contentRef} className="printContent print-container" style={{ alignItems: 'center'}}>
         <OrderPrintPageCustomer order={order} products={products} />
 
         {
@@ -63,7 +69,7 @@ interface IFieldValue {
 
 const FieldValue = (props: IFieldValue) => {
   return (
-    <Box sx={{ display: "flex", mb: 0.3, verticalAlign: "middle", border: 0 }} >
+    <Box sx={{ display: "flex", mb: 0.2, verticalAlign: "middle", border: 0 }} >
       <Box sx={{ minWidth: '80px', paddingTop: '3px' }}>
         <Typography sx={{fontSize: '0.9em', textTransform: 'uppercase'}}>{props.field}:</Typography>
       </Box>
@@ -89,8 +95,8 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
         <OrderPrintLogo/>
         <OrderPrintInfo order={order} hideTable={true}/>
         <OrderPrintTitle title="Copia Cliente" />
-        <TableContainer>
-          <Table sx={{width: '100%'}} size="small">
+        <TableContainer sx={TableStyle}>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell sx={{width: '100%'}}>Prodotto</TableCell>
@@ -102,7 +108,7 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
             <TableBody>
               { order.products.map(p =>
                 <TableRow key={p.productId} sx={{p: 0}}>
-                  <TableCell><Typography sx={{ fontSize: '1.1em'}}>{products[p.productId]?.name}</Typography></TableCell>
+                  <TableCell><Typography sx={{ fontSize: '1.2em'}}>{products[p.productId]?.name}</Typography></TableCell>
                   <TableCell align="center">{p.quantity}</TableCell>
                   <TableCell align="right">{currency(p.price)}</TableCell>
                   <TableCell align="right">{currency(p.price * p.quantity)}</TableCell>
@@ -111,7 +117,7 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
 
               { order.serviceNumber > 0 ?
                 <TableRow >
-                  <TableCell><Typography sx={{ fontSize: '1.1em'}}>Coperti</Typography></TableCell>
+                  <TableCell><Typography sx={{ fontSize: '1.2em'}}>Coperti</Typography></TableCell>
                   <TableCell align="center">{order.serviceNumber}</TableCell>
                   <TableCell align="right">{currency(order.serviceCost)}</TableCell>
                   <TableCell align="right">{currency(order.serviceNumber * order.serviceCost)}</TableCell>
@@ -164,8 +170,8 @@ const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
             <DepartmentName departmentId={departmentId}/>
           </Typography>
         </Box>
-        <TableContainer>
-          <Table sx={{width: '100%'}} size="small">
+        <TableContainer sx={TableStyle}>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell>Prodotto</TableCell>
@@ -175,7 +181,7 @@ const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
           <TableBody>
               { productsToPrint.map(p =>
                 <TableRow key={p.productId} sx={{p: 0}}>
-                  <TableCell ><Typography sx={{ fontSize: '1.1em'}}>{products[p.productId].name}</Typography></TableCell>
+                  <TableCell ><Typography sx={{ fontSize: '1.2em'}}>{products[p.productId].name}</Typography></TableCell>
                   <TableCell align="center">{p.quantity}</TableCell>
                 </TableRow>
               )}
@@ -206,7 +212,7 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
   const {order} = props
 
   return (
-    <Box sx={{display: 'inline-block', width: '100%', mt: 1, border: 1, p: 1, backgroundColor: '#FDFDFD' }}>
+    <Box sx={{display: 'inline-block', width: '100%', mt: 1, border: 1, p: 1, backgroundColor: '#FAFAFA' }}>
       <Grid container spacing={4}>
         <Grid size={7}>
           <FieldValue field="Numero" value={order.id.toString()}/>
@@ -219,7 +225,7 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
 
           {
             order.takeAway ?
-              <Box sx={{border: '1px dashed black', borderRadius: '4px', height: '70px', p: 1, mt: 1, textAlign: 'center'}}>
+              <Box sx={{border: '1px dashed black', borderRadius: '4px', height: '60px', p: 1, mt: 1, textAlign: 'center'}}>
                 <Typography sx={{fontSize: '1.6em', fontWeight: 500, mt: 2}}>ASPORTO</Typography>
               </Box>
               :
