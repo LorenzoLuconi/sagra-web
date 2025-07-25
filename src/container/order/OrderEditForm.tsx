@@ -292,7 +292,7 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
           >
             Salva
           </Button>
-            {order && <OrderPrint disabled={differences} order={order}/>}
+            {order && <OrderPrint disabled={differences} order={order} products={productsTable}/>}
         </Stack>
       </Paper>
   );
