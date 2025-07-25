@@ -1,4 +1,4 @@
-import {Order, Product} from "../api/sagra/sagraSchemas.ts";
+import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
 
 export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<string, string>) => {
@@ -63,7 +63,7 @@ export const checkOrderErrors = (order: Order, productsTable: Record<number, Pro
         res['products'] = 'Bisogna specificare almeno una portata'
     }
 
-
+/*
     for (let i = 0; i<products.length; i++) {
         const {productId, quantity} = products[i]
         const fullProduct = productsTable[productId]
@@ -75,7 +75,7 @@ export const checkOrderErrors = (order: Order, productsTable: Record<number, Pro
             }
         }
     }
-
+*/
     return res
 }
 
@@ -103,4 +103,45 @@ export  async function  manageErrorResponse<TError>(response: Response)  {
     console.log('----', eW)
 
     throw eW
+}
+
+export const addOperator = (oldQuantity: number, newQuantity: number): number => {
+    return oldQuantity+newQuantity
+}
+
+export const setOperator = (oldQuantity: number, newQuantity: number): number => {
+    return newQuantity
+}
+
+export const testOrderProductAvailability = (product: Product, quantity: number, originalOrder: Order, storedOrder: Order, operator: (oldQuantity: number, newQuantity: number) => number): boolean => {
+
+        const {products} = storedOrder
+        const {products: originalProducts} = originalOrder
+
+        const _orderProduct: OrderedProduct | undefined = products.find((p: OrderedProduct) => {return p.productId === product.id})
+        const _originalOrderProduct: OrderedProduct | undefined = originalProducts.find((p: OrderedProduct) => {return p.productId === product.id})
+        let selectedOrderProduct = _orderProduct
+        if (_orderProduct === undefined) {
+
+            const oP: OrderedProduct = {
+                productId: product.id,
+                quantity: quantity,
+                price: product.price
+            }
+
+            selectedOrderProduct = oP
+
+            products.push(oP)
+        } else {
+
+
+            _orderProduct.quantity = operator(_orderProduct.quantity, quantity)
+        }
+
+        console.log('testOrderProductAvailability: ', product.name, selectedOrderProduct?.quantity, product.availableQuantity, selectedOrderProduct?.quantity > product.availableQuantity)
+        const originalQuantity = _originalOrderProduct?.quantity ?? 0
+        const orderQuantity = _orderProduct?.quantity ?? 0
+
+        const diff = orderQuantity - originalQuantity
+        return (diff <= product.availableQuantity)
 }

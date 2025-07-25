@@ -3,6 +3,7 @@ import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {clone, cloneDeep, set} from "lodash";
 import {OrderErrorT} from "../utils";
 import toast from "react-hot-toast";
+import {deepMerge} from "../api/sagra/sagraUtils.ts";
 
 interface OrderContextI {
     order?: Order
@@ -89,10 +90,15 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         const _order = cloneDeep(storedOrder ?? {products: []} as Order)
         const _storedProducts = cloneDeep(storedProducts)
 
+        resetErrorsHandler()
+
         const {products} = _order
+        const {products: originalProducts} = order
 
         const _orderProduct: OrderedProduct | undefined = products.find((p: OrderedProduct) => {return p.productId === product.id})
-        let selectedOrderProduct = _orderProduct
+        const _originalOrderProduct: OrderedProduct | undefined = originalProducts.find((p: OrderedProduct) => {return p.productId === product.id})
+
+        //let selectedOrderProduct = cloneDeep(_orderProduct)
         if (_orderProduct === undefined) {
 
             const oP: OrderedProduct = {
@@ -100,13 +106,21 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
                 quantity: quantity,
                 price: product.price
             }
-            selectedOrderProduct = oP
+          //  selectedOrderProduct = oP
             products.push(oP)
         } else {
             _orderProduct.quantity = quantity
         }
 
-        if (selectedOrderProduct?.quantity <= product.availableQuantity) {
+        const originalQuantity = _originalOrderProduct?.quantity ?? 0
+        const orderQuantity = _orderProduct?.quantity
+
+        const diff = orderQuantity - originalQuantity
+
+
+        console.log('setProductHandler: ',originalQuantity, orderQuantity, product.availableQuantity, diff > product.availableQuantity)
+
+        if (diff <= product.availableQuantity) {
 
 
             _storedProducts[product.id] = product
@@ -124,11 +138,14 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
     const addProductHandler = (product: Product, quantity: number) => {
         const _order = cloneDeep(storedOrder ?? {products: []} as Order)
-        const _storedProducts = cloneDeep(storedProducts)
 
+        const _storedProducts = cloneDeep(storedProducts)
+        resetErrorsHandler()
         const {products} = _order
+        const {products: originalProducts} = order
 
         const _orderProduct: OrderedProduct | undefined = products.find((p: OrderedProduct) => {return p.productId === product.id})
+        const _originalOrderProduct: OrderedProduct | undefined = originalProducts.find((p: OrderedProduct) => {return p.productId === product.id})
         let selectedOrderProduct = _orderProduct
         if (_orderProduct === undefined) {
 
@@ -148,9 +165,16 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         }
 
         console.log('ADDPRODUCT: ', product.name, selectedOrderProduct?.quantity, product.availableQuantity, selectedOrderProduct?.quantity > product.availableQuantity)
+        const originalQuantity = _originalOrderProduct?.quantity ?? 0
+        const orderQuantity = _orderProduct?.quantity ?? 0
+
+        const diff = orderQuantity - originalQuantity
 
 
-        if (selectedOrderProduct?.quantity <= product.availableQuantity) {
+        console.log('addProductHandler: ',originalQuantity, orderQuantity, product.availableQuantity, diff > product.availableQuantity)
+
+
+        if (diff <= product.availableQuantity) {
 
 
             _storedProducts[product.id] = product
