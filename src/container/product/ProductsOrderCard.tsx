@@ -67,6 +67,7 @@ const ProductsOrderCard = (props : IProductsOrder) => {
                     <Card key={product.id}
                           sx={(theme) => ({
                             minWidth: 200,
+                            maxWidth: 200,
                             cursor: productAvailable(product) ? 'pointer' : 'default',
                             backgroundColor: productAvailable(product) ? theme.palette.background.paper : 'grey.300'
                           })}
