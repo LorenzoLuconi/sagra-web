@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {clone, cloneDeep, set} from "lodash";
-import {OrderErrorT} from "../utils";
+import {addOperator, OrderErrorT, setOperator, testOrderProductAvailability} from "../utils";
 import toast from "react-hot-toast";
 import {deepMerge} from "../api/sagra/sagraUtils.ts";
 
@@ -92,6 +92,9 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
         resetErrorsHandler()
 
+        const canSet = testOrderProductAvailability(product, quantity, order??EmptyOrder, _order, setOperator)
+        /*
+
         const {products} = _order
         const {products: originalProducts} = order
 
@@ -121,7 +124,9 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         console.log('setProductHandler: ',originalQuantity, orderQuantity, product.availableQuantity, diff > product.availableQuantity)
 
         if (diff <= product.availableQuantity) {
+*/
 
+        if (canSet) {
 
             _storedProducts[product.id] = product
 
@@ -141,6 +146,10 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
         const _storedProducts = cloneDeep(storedProducts)
         resetErrorsHandler()
+
+        const canAdd = testOrderProductAvailability(product, quantity, order??EmptyOrder, _order, addOperator)
+/*
+
         const {products} = _order
         const {products: originalProducts} = order
 
@@ -175,7 +184,8 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
 
         if (diff <= product.availableQuantity) {
-
+*/
+        if (canAdd) {
 
             _storedProducts[product.id] = product
 
