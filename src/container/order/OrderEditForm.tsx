@@ -10,6 +10,7 @@ import {cloneDeep, isEqual} from "lodash";
 import {useMutation} from "@tanstack/react-query";
 import {fetchOrderCreate} from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
+import OrderPrint from "./OrderPrint.tsx";
 
 
 export interface IOrderEdit {
@@ -248,7 +249,7 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
           >
             Salva
           </Button>
-          <Button disabled={differences} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+            {order && <OrderPrint disabled={differences} order={order}/>}
         </Stack>
       </Paper>
   );

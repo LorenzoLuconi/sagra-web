@@ -25,6 +25,7 @@ import {DepartmentName} from "../department/DepartmentName.tsx";
 
 interface OrderPrintProps {
   order: Order;
+  disabled: boolean
 }
 
 interface OrderedProductPrint {
@@ -80,7 +81,7 @@ const OrderPrint = (props : OrderPrintProps ) => {
 
   return (
     <>
-      <Button onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+      <Button disabled={props.disabled} onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
 
       <div ref={contentRef} className="printContent print-container">
         <OrderPrintPageCustomer order={order} />
