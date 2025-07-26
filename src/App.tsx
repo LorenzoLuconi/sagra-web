@@ -27,8 +27,11 @@ const lightTheme: Theme = createTheme({
     palette: {
         mode: 'light',
         background: {
-            paper: '#f5f5f5',
-            default: '#fff'
+            paper: '#F8F8F8',
+            default: '#fff',
+            productCard: '#fff',
+            productAlmostSoldOut: 'hsla(48, 100%, 88%, 0.5)',
+            productSoldOut: 'hsla(17, 100%, 88%, 0.5)',
         }
     }
 })
@@ -37,7 +40,8 @@ const darkTheme = createTheme({
         mode: 'dark',
         background: {
             paper: '#181818',
-            default: '#181818'
+            default: '#181818',
+            productCard: '#181818'
         }
     },
 });

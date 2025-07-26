@@ -30,7 +30,6 @@ const OrderEditTotal = () => {
 
   return (
     <>
-      <Typography sx={{ fontSize: '0.8em'}}>Totale Ordine</Typography>
       <Container sx={{textAlign: 'center'}}>
         <Typography sx={{ fontWeight: 700, fontSize: '2.0em', justifyContent: 'center'}}>{currency(total())}</Typography>
       </Container>

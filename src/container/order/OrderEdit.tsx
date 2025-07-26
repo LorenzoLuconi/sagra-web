@@ -53,15 +53,15 @@ const OrderForm: React.FC<OrderFormI> = (props) => {
               <Grid size={5}>
                 <ErrorInfo/>
 
-                <Paper variant="outlined" sx={{ p: 1, backgroundColor: '#FAFAFA'}} className="paper-linked-bottom">
-                 <OrderEditTotal order={order}/>
+                <Paper variant="outlined" sx={{ p: .5}} className="paper-top">
+                 <OrderEditTotal />
                 </Paper>
 
-                <Paper variant="outlined" sx={{ p: 0.5, backgroundColor: '#FAFAFA'}} className="paper-linked-top paper-linked-bottom">
+                <Paper variant="outlined" sx={{ p: 0.5}} className="paper-middle">
                   <OrderEditProducts products={order?.products ?? []}/>
                 </Paper>
 
-                <Paper variant="outlined" sx={{padding: 2, backgroundColor: '#FAFAFA' }} className="paper-linked-top">
+                <Paper variant="outlined" sx={{padding: 2 }} className="paper-bottom">
                   <OrderEditForm order={order} update={true}/>
                 </Paper>
 

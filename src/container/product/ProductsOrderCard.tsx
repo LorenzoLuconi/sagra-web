@@ -59,8 +59,7 @@ const ProductsOrderCard = (props : IProductsOrder) => {
     }
 
     return (
-        <form>
-          <Box sx={{display: "flex", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >
+          <Box sx={{display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >
             <>
               {
                 products.map( (product: Product) =>
@@ -68,34 +67,32 @@ const ProductsOrderCard = (props : IProductsOrder) => {
                           sx={(theme) => ({
                             minWidth: 200,
                             maxWidth: 200,
-                            cursor: productAvailable(product) ? 'pointer' : 'default',
-                            backgroundColor: productAvailable(product) ? theme.palette.background.paper : 'grey.300'
+                            backgroundColor: (! productAvailable(product) ? theme.palette.background.productSoldOut : ( product.availableQuantity < 10 ? theme.palette.background.productAlmostSoldOut : theme.palette.background.productCard))
                           })}
                           onClick={(event) => {
                             event.preventDefault();
                             if ( productAvailable(product) )
                               props.addToOrder(product)}
                           }>
-                      <CardActionArea>
-                      <CardMedia
-                          sx={{ height: 100 }}
-                          image={`/prodotti/${product.name}.png`}
-                          title={`${product.name}`}
-                      />
-                      <CardContent sx={{textAlign: 'center'}}>
-                        <Typography sx={{fontWeight: 500}}>{product.name}</Typography>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 5}}>
-                          <Typography>{currency(product.price)}</Typography>
-                          <ProductQuantity product={product}/>
-                        </Box>
-                      </CardContent>
+                      <CardActionArea disableRipple={!productAvailable(product)} sx={{cursor: productAvailable(product) ? 'pointer' : 'default'}}>
+                        <CardMedia
+                            sx={{ height: 100 }}
+                            image={`/prodotti/${product.name}.png`}
+                            title={`${product.name}`}
+                        />
+                        <CardContent sx={{textAlign: 'center'}}>
+                          <Typography sx={{fontWeight: 500}}>{product.name}</Typography>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 5}}>
+                            <Typography>{currency(product.price)}</Typography>
+                            <ProductQuantity product={product}/>
+                          </Box>
+                        </CardContent>
                       </CardActionArea>
                     </Card>
                 )
               }
             </>
           </Box>
-        </form>
     )
   }
 }

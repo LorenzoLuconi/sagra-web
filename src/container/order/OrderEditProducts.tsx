@@ -63,7 +63,7 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
     const subTotal = props.quantity * price;
     return (
 
-        <Grid key={product.id} container sx={{ alignItems: "center" }} spacing={1}>
+        <Grid key={product.id} container sx={{ alignItems: "center", mt: 0.3 }} spacing={1}>
             <Grid size={1}>
                 <IconButton
                     onClick={() => {
@@ -76,7 +76,7 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
             <Grid size={2}>
                 <TextField
                     size="small"
-                    variant="standard"
+                    variant="outlined"
                     type="number"
                     aria-valuemin={1}
                     name={`product.${product.id}`}

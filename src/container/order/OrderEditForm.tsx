@@ -2,7 +2,7 @@ import {ErrorResource, Order, OrderRequest} from "../../api/sagra/sagraSchemas.t
 import * as React from "react";
 import {useState} from "react";
 import {Box, Button, FormControlLabel, Stack, Switch, TextField} from "@mui/material";
-import {SaveOutlined} from "@mui/icons-material";
+import { CancelOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
@@ -151,6 +151,7 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
     <>
         <TextField fullWidth required
                    name={'customer'}
+                   size='small'
                    value={customer}
                    error={errors['customer'] !== undefined}
                    label="Nome cliente"
@@ -225,7 +226,20 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
           >
             Salva
           </Button>
-            {order && order.id  && <OrderPrint disabled={differences} order={order} products={productsTable}/>}
+
+          {
+            (order && order.id) ?
+            <Button
+              disabled={!differences}
+              variant="contained"
+              onClick={ () =>  {
+                // FIXME deve essere resettato lo stato
+                navigate(`/orders/${order.id}`)
+              }}
+              startIcon={<CancelOutlined/>}
+            >Annulla</Button> : ''
+          }
+          {order && order.id  && <OrderPrint disabled={differences} order={order} products={productsTable}/>}
         </Stack>
     </>
   );
