@@ -1,9 +1,9 @@
 import * as React from "react"
-import {OrderStore, useOrderStore} from "../../context/OrderStore.tsx";
+import {useOrderStore} from "../../context/OrderStore.tsx";
 import {Grid} from "@mui/material";
 import OrderEditForm from "./OrderEditForm.tsx";
-import OrderTotal from "./OrderTotal.tsx";
-import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
+import OrderEditTotal from "./OrderEditTotal.tsx";
+import OrderEditProducts from "./OrderEditProducts.tsx";
 import ProductsList from "../product/ProductsOrderCard.tsx"
 import {Order, Product} from "../../api/sagra/sagraSchemas.ts";
 
@@ -15,7 +15,6 @@ const OrderNew = () => {
             const newOrder: Order = {takeAway: false,  serviceNumber: 0, products: []} as Order
             console.log('UpdateOrder', newOrder)
             updateOrder(newOrder)
-
         }
     }, [])
 
@@ -32,8 +31,8 @@ const OrderNew = () => {
                     </Grid>
                     <Grid size={5}>
                         <OrderEditForm update={false}/>
-                        <OrderTotal/>
-                        <OrderedProductsEdit products={order?.products ?? []}/>
+                        <OrderEditTotal/>
+                        <OrderEditProducts products={order?.products ?? []}/>
                     </Grid>
                 </Grid>
     )

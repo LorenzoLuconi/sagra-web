@@ -1,17 +1,14 @@
 import * as React from 'react'
 
-import {Grid, IconButton, Paper, TextField, Typography} from "@mui/material";
+import {Grid, IconButton, TextField, Typography} from "@mui/material";
 import {DeleteOutlined} from "@mui/icons-material";
 import {currency} from "../../utils";
 import {OrderedProduct, Product as ProductAPI} from '../../api/sagra/sagraSchemas.ts'
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import toast from "react-hot-toast";
 
-interface IOrderedProductsEdit {
-  products?: OrderedProduct[]
-}
 
-const OrderedProductsEdit  = (props:IOrderedProductsEdit) => {
+const OrderEditProducts  = () => {
     const {order} = useOrderStore()
 
   const products = order?.products ?? []
@@ -31,9 +28,9 @@ const OrderedProductsEdit  = (props:IOrderedProductsEdit) => {
   }
 
   return (
-    <Paper sx={{ mt: 1, p: 0.5 }}>
+    <>
       {prodElements}
-    </Paper>
+    </>
   )
 }
 
@@ -87,7 +84,7 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
                     value={quantityValue}
                     onChange={(e) => {
 
-                        if (e.target.value <=0) {
+                        if (+e.target.value <=0) {
                             toast.error(`Quantità deve essere positiva`)
                             setFieldError(`product.${product.id}`, 'Quantità deve essere positiva')
                         } else {
@@ -109,7 +106,7 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
                 <Typography>{product.name}</Typography>
             </Grid>
             <Grid size={3} sx={{ textAlign: "right"}}>
-                <Typography >{currency(subTotal)}</Typography>
+                <Typography sx={{pr: 1}}>{currency(subTotal)}</Typography>
             </Grid>
 
         </Grid>
@@ -119,7 +116,7 @@ const OrderedProductItemView: React.FC<OrderedProductItemViewI> = (props) => {
 
 const OrderedProductItem = (props: IOrderedProduct) => {
 
-    const {products, order} = useOrderStore()
+    const {products} = useOrderStore()
 
     const product = products[props.productId]
 
@@ -131,4 +128,4 @@ const OrderedProductItem = (props: IOrderedProduct) => {
 
 }
 
-export default OrderedProductsEdit;
+export default OrderEditProducts;

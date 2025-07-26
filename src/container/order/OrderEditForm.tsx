@@ -1,12 +1,12 @@
-import {ErrorResource, Order, OrderedProductRequest, OrderRequest} from "../../api/sagra/sagraSchemas.ts";
+import {ErrorResource, Order, OrderRequest} from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
 import {useState} from "react";
-import {Box, Button, FormControlLabel, Paper, Stack, Switch, TextField} from "@mui/material";
+import {Box, Button, FormControlLabel, Stack, Switch, TextField} from "@mui/material";
 import {SaveOutlined} from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
-import {cloneDeep, isEqual} from "lodash";
+import { cloneDeep, isEqual } from "lodash";
 import {useMutation} from "@tanstack/react-query";
 import {fetchOrderCreate, fetchOrderUpdate, orderByIdQuery} from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
@@ -25,12 +25,10 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors} = useOrderStore();
   const navigate = useNavigate()
-  // FIXME controllare se va bene fare "order ?" per verificare se undefined
   const [customer, setCustomer] = useState(order?.customer ?? "");
   const [takeAway, setTakeAway] = useState(order?.takeAway ?? false);
-  const [changed, setChanged] = useState(false);
   const [coperti, setCoperti] = useState(order?.serviceNumber ?? 0);
-  const [products, setProducts] = useState([] as OrderedProductRequest[]);
+  const [note, setNote] = useState(order?.note ?? '');
 
   const differences = !isEqual(storedOrder, order)
 
@@ -56,7 +54,7 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
             })
         },
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onSuccess: (order: Order, variables: OrderRequest,context: unknown) => {
+        onSuccess: (order: Order) => {
 
             const fetchOrderConf = orderByIdQuery({pathParams: {orderId: order.id}})
 
@@ -87,14 +85,14 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
                   const spString = field.match(/\[([^\]]+)\]/);
                   const index = +spString[1]
                   const productId = variables.products[index].productId
-                  setFieldError(`product.${productId}`, message?? `Errore per il prodotto ${productsTable[productId].name}`)
+                  setFieldError(`product.${productId}`, message ?? `Errore per il prodotto ${productsTable[productId].name}`)
                   toast.error(`Errore nella quantità (${value}) del prodotto ${productsTable[productId].name}`)
               }
 
           })
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      onSuccess: (order: Order, variables: OrderRequest,context: unknown) => {
+      onSuccess: (order: Order) => {
           toast.success(`Ordine per cliente ${order.customer} creato con successo`)
           navigate(`/orders/${order.id}`)
       }
@@ -109,102 +107,19 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
   }, [order])
 
 
-  const incOrAddProduct = (productId: number) => {
-    const newOrderedProducts: OrderedProductRequest[] = [];
-    let found: boolean = false;
-    products.forEach((orderedProduct) => {
-      if (orderedProduct.productId === productId) {
-        newOrderedProducts.push({
-          productId: orderedProduct.productId,
-          quantity: orderedProduct.quantity + 1
-        });
-        found = true;
-        setChanged(true);
-      } else {
-        newOrderedProducts.push({
-          productId: orderedProduct.productId,
-          quantity: orderedProduct.quantity
-        });
-      }
-    });
-
-    if (!found) {
-      newOrderedProducts.push({
-        productId: productId,
-        quantity: 1
-      });
-      setChanged(true);
-    }
-
-    setProducts(newOrderedProducts);
-  };
-
-  // INUTILE, perchè la quantità o si aggiunge 1 (inc) o si setta per l'attuale form
-  const decProduct = (productId: number) => {
-    const newOrderedProducts: OrderedProductRequest[] = [];
-    let changed: boolean = false;
-    products.forEach((orderedProduct) => {
-      if (orderedProduct.productId === productId) {
-        if (orderedProduct.quantity > 1) {
-          newOrderedProducts.push({
-            productId: orderedProduct.productId,
-            quantity: orderedProduct.quantity - 1
-          });
-          changed = true;
-        }
-      } else {
-        newOrderedProducts.push({
-          productId: orderedProduct.productId,
-          quantity: orderedProduct.quantity
-        });
-      }
-    });
-
-    if (changed) {
-      setProducts(newOrderedProducts);
-      setChanged(true);
-    }
-  };
-
-  const removeProduct = (productId: number) => {
-    const newOrderedProducts: OrderedProductRequest[] = [];
-    let changed: boolean = false;
-
-    products.forEach((orderedProduct) => {
-      if (orderedProduct.productId !== productId) {
-        newOrderedProducts.push({
-          productId: orderedProduct.productId,
-          quantity: orderedProduct.quantity
-        });
-      } else {
-        changed = true;
-      }
-
-      if (changed) {
-        setProducts(newOrderedProducts);
-        setChanged(true);
-      }
-    });
-  };
-
   const handleChangeCustomer =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
             setCustomer(event.currentTarget.value);
             updateOrderField('customer', event.currentTarget.value)
-          }, [setCustomer]
+          }, [setCustomer, updateOrderField]
       );
 
   const handleChangeTakeAway =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
             setTakeAway(event.target.checked);
         updateOrderField('takeAway', event.target.checked)
-          }, [setTakeAway]
+          }, [setTakeAway, updateOrderField]
       );
-
-  const printDisabled  = () : boolean  => {
-    // Non abbiamo un ordine salvato oppure è modificato e quindi non ancora salvato
-    return ! order || changed;
-  }
 
   const handleChangeCoperti =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
@@ -221,11 +136,19 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
             }
             setCoperti(value);
             updateOrderField('serviceNumber', value)
-          }, [setCoperti]
+          }, [setCoperti, updateOrderField]
       )
 
+  const handleChangeNote =
+    React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
+        setNote(event.currentTarget.value);
+        updateOrderField('note', event.currentTarget.value)
+      }, [setNote, updateOrderField]
+    );
+
+
   return (
-      <Paper sx={{padding: 2 }}>
+    <>
         <TextField fullWidth required
                    name={'customer'}
                    value={customer}
@@ -251,6 +174,16 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
                 <Switch checked={takeAway} onChange={handleChangeTakeAway} />
               }
           />
+        </Box>
+        <Box>
+          <TextField fullWidth size="small"
+                     label="Note"
+                     multiline
+                     minRows={2}
+                     value={note}
+                     sx={{mt: 2}}
+                     onChange={handleChangeNote}
+                     />
         </Box>
         <Stack direction="row" spacing={1} sx={{marginTop: 1, justifyContent: 'center'}}>
           <Button
@@ -292,9 +225,9 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
           >
             Salva
           </Button>
-            {order && <OrderPrint disabled={differences} order={order} products={productsTable}/>}
+            {order && order.id  && <OrderPrint disabled={differences} order={order} products={productsTable}/>}
         </Stack>
-      </Paper>
+    </>
   );
 }
 

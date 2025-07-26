@@ -4,9 +4,9 @@ import {orderByIdQuery, productByIdQuery} from "../../api/sagra/sagraComponents.
 import {useQueries, useQuery} from "@tanstack/react-query";
 import {useParams} from "react-router";
 import OrderEditForm from "./OrderEditForm.tsx";
-import {Box, CircularProgress, Grid} from "@mui/material";
-import OrderedProductsEdit from "./OrderedProductsEdit.tsx";
-import OrderTotal from "./OrderTotal.tsx";
+import { CircularProgress, Grid, Paper } from "@mui/material";
+import OrderEditProducts from "./OrderEditProducts.tsx";
+import OrderEditTotal from "./OrderEditTotal.tsx";
 import {OrderStore, useOrderStore} from "../../context/OrderStore.tsx";
 import {Order} from "../../api/sagra/sagraSchemas.ts";
 import ProductsToOrder from "./ProductsToOrder.tsx";
@@ -45,16 +45,26 @@ const OrderForm: React.FC<OrderFormI> = (props) => {
   if (combinedQueries.data) {
 
     return (
-        <OrderStore products={combinedQueries.data} order={order} gap={10}>
+        <OrderStore products={combinedQueries.data} order={order}>
             <Grid container spacing={2}>
               <Grid size={7}>
                 <ProductsToOrder/>
               </Grid>
-              <Grid size={5} spacing={2}>
-                <OrderEditForm order={order} update={true}/>
-                <OrderTotal order={order}/>
-                <OrderedProductsEdit products={order?.products ?? []}/>
+              <Grid size={5}>
                 <ErrorInfo/>
+
+                <Paper variant="outlined" sx={{ p: 1, backgroundColor: '#FAFAFA'}} className="paper-linked-bottom">
+                 <OrderEditTotal order={order}/>
+                </Paper>
+
+                <Paper variant="outlined" sx={{ p: 0.5, backgroundColor: '#FAFAFA'}} className="paper-linked-top paper-linked-bottom">
+                  <OrderEditProducts products={order?.products ?? []}/>
+                </Paper>
+
+                <Paper variant="outlined" sx={{padding: 2, backgroundColor: '#FAFAFA' }} className="paper-linked-top">
+                  <OrderEditForm order={order} update={true}/>
+                </Paper>
+
               </Grid>
 
             </Grid>

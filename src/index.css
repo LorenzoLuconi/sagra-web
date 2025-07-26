@@ -1,3 +1,26 @@
 body {
     margin: 0px;
 }
+
+.noRoundTop {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.noRoundBottom {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.paper-linked-top {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0  !important;
+    margin-top: 0 !important;
+}
+
+.paper-linked-bottom {
+    border-bottom-right-radius: 0  !important;
+    border-bottom-left-radius: 0 !important;
+    margin-top: 0 !important;
+    border-bottom: 0 !important;
+}
