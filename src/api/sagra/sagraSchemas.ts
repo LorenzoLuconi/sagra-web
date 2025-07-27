@@ -89,6 +89,20 @@ export type ProductQuantityUpdate = {
   quantityVariation: number;
 };
 
+export type ErrorResourceNotEnoughQuantity = {
+  message?: string;
+  invalidProducts?: InvalidProduct[];
+};
+
+export type InvalidProduct = {
+  /**
+   * @format int64
+   */
+  productId?: number;
+  message?: string;
+  error?: "NOT_ENOUGH_QUANTITY" | "LOCKED";
+};
+
 export type OrderRequest = {
   /**
    * @minLength 1
@@ -237,6 +251,46 @@ export type Course = {
    */
   id: number;
   name: string;
+};
+
+export type StatsOrder = {
+  /**
+   * Numero totale dei coperti
+   *
+   * @format int64
+   */
+  totalServiceNumber: number;
+  /**
+   * Totale ammontare degli ordini
+   */
+  totalAmount: number;
+  /**
+   * Numero di ordini registrati
+   *
+   * @format int64
+   */
+  count: number;
+  /**
+   * Dettagli dei prodotti ordinati
+   */
+  products: StatsOrderedProducts[];
+};
+
+export type StatsOrderedProducts = {
+  /**
+   * @format int64
+   */
+  productId: number;
+  /**
+   * Totale importo prodotto venduto
+   */
+  totalAmount: number;
+  /**
+   * Quantità venduta del prodotto
+   *
+   * @format int64
+   */
+  count: number;
 };
 
 export type Count = {

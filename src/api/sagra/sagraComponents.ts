@@ -249,7 +249,7 @@ export type ProductUpdateQuantityError = Fetcher.ErrorWrapper<
     }
   | {
       status: 450;
-      payload: Schemas.ErrorResource;
+      payload: Schemas.ErrorResourceNotEnoughQuantity;
     }
 >;
 
@@ -604,7 +604,7 @@ export type OrderUpdateError = Fetcher.ErrorWrapper<
     }
   | {
       status: 450;
-      payload: Schemas.ErrorResource;
+      payload: Schemas.ErrorResourceNotEnoughQuantity;
     }
 >;
 
@@ -1805,7 +1805,7 @@ export const useOrdersSearch = <TData = OrdersSearchResponse,>(
 
 export type OrderCreateError = Fetcher.ErrorWrapper<{
   status: 450;
-  payload: Schemas.ErrorResource;
+  payload: Schemas.ErrorResourceNotEnoughQuantity;
 }>;
 
 export type OrderCreateVariables = {
@@ -2466,6 +2466,104 @@ export const useCourseCreate = (
   });
 };
 
+export type OrderStatsQueryParams = {
+  /**
+   * @format date
+   */
+  date?: string;
+};
+
+export type OrderStatsError = Fetcher.ErrorWrapper<undefined>;
+
+export type OrderStatsResponse = {
+  [key: string]: Schemas.StatsOrder;
+};
+
+export type OrderStatsVariables = {
+  queryParams?: OrderStatsQueryParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchOrderStats = (
+  variables: OrderStatsVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    OrderStatsResponse,
+    OrderStatsError,
+    undefined,
+    {},
+    OrderStatsQueryParams,
+    {}
+  >({ url: "/v1/stats/orders", method: "get", ...variables, signal });
+
+export function orderStatsQuery(variables: OrderStatsVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<OrderStatsResponse>;
+};
+
+export function orderStatsQuery(
+  variables: OrderStatsVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<OrderStatsResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function orderStatsQuery(
+  variables: OrderStatsVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/stats/orders",
+      operationId: "orderStats",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) => fetchOrderStats(variables, signal),
+  };
+}
+
+export const useSuspenseOrderStats = <TData = OrderStatsResponse,>(
+  variables: OrderStatsVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<OrderStatsResponse, OrderStatsError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<
+    OrderStatsResponse,
+    OrderStatsError,
+    TData
+  >({
+    ...orderStatsQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export const useOrderStats = <TData = OrderStatsResponse,>(
+  variables: OrderStatsVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<OrderStatsResponse, OrderStatsError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<OrderStatsResponse, OrderStatsError, TData>({
+    ...orderStatsQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
 export type OrdersCountQueryParams = {
   /**
    * Ricerca con operatore 'contains'
@@ -2774,6 +2872,11 @@ export type QueryOperation =
       path: "/v1/courses";
       operationId: "coursesSearch";
       variables: CoursesSearchVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/v1/stats/orders";
+      operationId: "orderStats";
+      variables: OrderStatsVariables | reactQuery.SkipToken;
     }
   | {
       path: "/v1/orders/count";
