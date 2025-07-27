@@ -1,9 +1,8 @@
 import * as React from 'react'
-import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
+import {Order, Product} from "../api/sagra/sagraSchemas.ts";
 import {clone, cloneDeep, set} from "lodash";
 import {addOperator, OrderErrorT, setOperator, testOrderProductAvailability} from "../utils";
 import toast from "react-hot-toast";
-import {deepMerge} from "../api/sagra/sagraUtils.ts";
 
 interface OrderContextI {
     order?: Order
@@ -43,7 +42,7 @@ interface OrderStoreI extends React.PropsWithChildren {
 
 }
 
-const EmptyOrder: Order = {
+export const EmptyOrder: Order = {
     products: [],
         serviceNumber: 1,
     serviceCost: 0.5,

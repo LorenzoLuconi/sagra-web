@@ -112,8 +112,9 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
         <AppBar  position={'sticky'} sx={{backgroundColor: 'transparent'}}>
             <Paper elevation={2} sx={{ display: 'flex', p: 1, alignItems: 'center'}}>
                 <Logo sx={{fontSize: '3rem'}} color={'text.primary'}/>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginRight: 1}}>
-                    <Button variant="text" color={'error'} startIcon={<ReceiptOutlined/>} sx={{  marginRight: 1}} onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mr: 1}}>
+                    <Button variant="text" color={'error'} startIcon={<ReceiptOutlined/>} sx={{  mr: 1}}
+                            onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
                     <Button variant="text"  startIcon={<LibraryBooksOutlined />} sx={{ color: 'text.primary', marginRight: 1}} onClick={() => {navigate('/orders')}}>Elenco Ordini</Button>
 
                     <Button
