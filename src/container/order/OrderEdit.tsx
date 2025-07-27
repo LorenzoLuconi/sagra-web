@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { orderByIdQuery } from "../../api/sagra/sagraComponents.ts";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
@@ -25,13 +23,13 @@ const OrderEdit = () => {
     const error = orderData.error;
     console.log(error);
 
-    if ( error.status === 404) {
-      return (
-        <Alert severity="error">
-          Ordine con id {arams.orderId} non trovato
-        </Alert>
-      );
-    }
+    // if ( error.status === 404) {
+    //   return (
+    //     <Alert severity="error">
+    //       Ordine con id {params.orderId} non trovato
+    //     </Alert>
+    //   );
+    // }
 
     return (
       <Alert severity="error">
@@ -40,7 +38,7 @@ const OrderEdit = () => {
     );
   }
 
-  if (orderData.isPendings) {
+  if (orderData.isPending) {
     return <CircularProgress />;
   }
 

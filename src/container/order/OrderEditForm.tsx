@@ -8,18 +8,23 @@ import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
 import { cloneDeep, isEqual } from "lodash";
 import {useMutation} from "@tanstack/react-query";
-import {fetchOrderCreate, fetchOrderUpdate, orderByIdQuery} from "../../api/sagra/sagraComponents.ts";
+import {
+  fetchOrderCreate,
+  fetchOrderUpdate,
+  orderByIdQuery,
+  productsSearchQuery
+} from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
 import OrderPrint from "./OrderPrint.tsx";
 import {queryClient} from "../../main.tsx";
 
 
-export interface IOrderEdit {
-  order?: Order;
+export interface OrderEditProps {
+  order: Order;
 }
 
 
-const OrderEditForm: React.FC<IOrderEdit> = (props) => {
+const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const {order: storedOrder} = props
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors} = useOrderStore();
@@ -31,8 +36,10 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
 
   const differences = !isEqual(storedOrder, order)
   console.log("Calcolo differenze: " + differences);
+  const productsSearchConf = productsSearchQuery({});
 
-  const updateOrder = useMutation({
+
+    const updateOrder = useMutation({
       mutationFn: (data: OrderRequest) => {
           return fetchOrderUpdate({body: data, pathParams: {orderId: storedOrder?.id??0}})
       },
@@ -59,9 +66,10 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
           const fetchOrderConf = orderByIdQuery({pathParams: {orderId: order.id}})
 
           queryClient.invalidateQueries({queryKey: fetchOrderConf.queryKey}).then(() => {
-
+            queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
               toast.success(`Ordine per cliente ${order.customer} modificato con successo`)
               navigate(`/orders/${order.id}`)
+            })
           })
 
       }
@@ -77,8 +85,9 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
 
 
           const errors: ErrorResource = error as ErrorResource
-
           toast.error(errors.message?? `Si è verificato un errore per l'ordine del client ${variables.customer}`)
+
+          // FIXME: questo può riportare error 400 e quindi invalidValues oppure errore 450 con invalidProducts
           errors.invalidValues!.map((invalidValue) => {
               const {message, value, field} = invalidValue
               if (field !== undefined) {
@@ -224,7 +233,7 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
               variant="contained"
               startIcon={<SaveOutlined/>}
               onClick= {() => handleSave()}
-          >{order.id ? 'Aggiorna' : 'Crea'}</Button>
+          >{order?.id ? 'Aggiorna' : 'Crea'}</Button>
 
           {
             (order && order.id) ?
@@ -238,7 +247,7 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
               startIcon={<CancelOutlined/>}
             >Annulla</Button> : ''
           }
-          {order && <OrderPrint disabled={differences || ! order.id} order={order} products={productsTable}/>}
+          <OrderPrint disabled={differences || ! order.id} order={order} products={productsTable}/>
         </Stack>
     </>
   );

@@ -4,8 +4,17 @@ import {clone, cloneDeep, set} from "lodash";
 import {addOperator, OrderErrorT, setOperator, testOrderProductAvailability} from "../utils";
 import toast from "react-hot-toast";
 
+// @ts-ignore
+export const EmptyOrder: Order = {
+  products: [],
+  serviceNumber: 1,
+  serviceCost: 0.5,
+  customer: '',
+  takeAway: false,
+} as Order
+
 interface OrderContextI {
-    order?: Order
+    order: Order
     updateOrderField: (field: string, value: unknown) => void
     products: Record<number, Product>
     setProduct: (product: Product, quantity: number) => void
@@ -17,7 +26,10 @@ interface OrderContextI {
     resetErrors: () => void
 }
 
+
+
 export const OrderContext = React.createContext<OrderContextI>({
+    order : EmptyOrder,
     products: [],
     errors: {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -38,21 +50,13 @@ export const OrderContext = React.createContext<OrderContextI>({
 
 interface OrderStoreI extends React.PropsWithChildren {
     products: Product[]
-    order?: Order
-
+    order: Order
 }
 
-export const EmptyOrder: Order = {
-    products: [],
-        serviceNumber: 1,
-    serviceCost: 0.5,
-    customer: '',
-    takeAway: false,
-} as Order
 
 export const OrderStore: React.FC<OrderStoreI> = (props) => {
     const {products, order} = props
-    const [storedOrder, setStoredOrder] = React.useState<Order | undefined>(order??EmptyOrder)
+    const [storedOrder, setStoredOrder] = React.useState<Order>(order)
     const [storedProducts, setStoredProducts] = React.useState<Record<number, Product>>({} as Record<number, Product>)
     const [storedErrors, setStoredErrors] = React.useState<OrderErrorT>({})
 
@@ -134,8 +138,8 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
             setStoredOrder(_order)
         } else {
-            toast.error(`Quantità supera la disponibilità (${product.availableQuantity})`)
-            setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
+          toast.error(`La quantità richiesta per '${product.name}' supera la disponibilità (${product.availableQuantity})`)
+          setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
         }
     }
 
@@ -192,8 +196,9 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
             setStoredProducts(_storedProducts)
 
             setStoredOrder(_order)
+            toast.success(`Inserito/aggiunto '${product.name}' all'ordine`, { duration: 1200, position: 'top-right' })
         } else {
-            toast.error(`Quantità supera la disponibilità (${product.availableQuantity})`)
+            toast.error(`La quantità richiesta per '${product.name}' supera la disponibilità (${product.availableQuantity})`)
             setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
         }
     }
@@ -233,7 +238,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
     }
 
     const resetErrorsHandler = () => {
-        setStoredErrors((prev) => {
+        setStoredErrors(() => {
             return {} as OrderErrorT
         })
     }

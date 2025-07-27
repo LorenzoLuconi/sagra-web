@@ -38,7 +38,7 @@ interface OrderEditContainerProps {
   if (combinedQueries.pending) {
     return <CircularProgress />;
   }
-  if (combinedQueries.data) {
+  if (combinedQueries.data ) {
     return (
       <OrderStore products={combinedQueries.data} order={order}>
         <Grid container spacing={2}>
@@ -53,7 +53,7 @@ interface OrderEditContainerProps {
             </Paper>
 
             <Paper variant="outlined" sx={{ p: 0.5 }} className="paper-middle">
-              <OrderEditProducts products={order?.products ?? []} />
+              <OrderEditProducts />
             </Paper>
 
             <Paper
@@ -61,7 +61,7 @@ interface OrderEditContainerProps {
               sx={{ padding: 2 }}
               className="paper-bottom"
             >
-              <OrderEditForm order={order} update={true} />
+              <OrderEditForm order={order} />
             </Paper>
           </Grid>
         </Grid>

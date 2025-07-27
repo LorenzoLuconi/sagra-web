@@ -21,7 +21,6 @@ const ProductsToOrder = () => {
   const { addProduct } = useOrderStore();
 
   const handleAddProduct = (product: Product) => {
-    console.log("handleAddProduct", product);
     addProduct(product, 1);
   };
 
