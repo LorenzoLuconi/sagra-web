@@ -16,12 +16,11 @@ import {queryClient} from "../../main.tsx";
 
 export interface IOrderEdit {
   order?: Order;
-  update: boolean
 }
 
 
 const OrderEditForm: React.FC<IOrderEdit> = (props) => {
-    const {order: storedOrder, update} = props
+    const {order: storedOrder} = props
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors} = useOrderStore();
   const navigate = useNavigate()
@@ -146,6 +145,38 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
       }, [setNote, updateOrderField]
     );
 
+  const handleSave = () => {
+    resetErrors()
+    console.log('Order to save: ', order)
+    if (order !== undefined) {
+      const orderErrors = checkOrderErrors(order, productsTable)
+      const errorFields = Object.keys(orderErrors)
+
+      errorFields.forEach((eK: string) => {
+        setFieldError(eK, orderErrors[eK])
+        toast.error(orderErrors[eK])
+      })
+
+      if (errorFields.length === 0) {
+
+        const orderToSend: OrderRequest = {} as OrderRequest
+        orderToSend.customer = order.customer
+        orderToSend.takeAway = order.takeAway
+        orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
+        orderToSend.note = order.note
+        orderToSend.products = cloneDeep(order.products)
+
+        console.log('Order2Send: ', orderToSend)
+
+        if (order.id) {
+          updateOrder.mutate(orderToSend)
+        } else {
+          createOrder.mutate(orderToSend)
+        }
+      }
+    }
+  }
+
 
   return (
     <>
@@ -191,41 +222,8 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
               disabled={!differences}
               variant="contained"
               startIcon={<SaveOutlined/>}
-              onClick={() => {
-                resetErrors()
-                console.log('Order to save: ', order)
-                if (order !== undefined) {
-                    const orderErrors = checkOrderErrors(order, productsTable)
-                    const errorFields = Object.keys(orderErrors)
-
-                    errorFields.forEach((eK: string) => {
-                        setFieldError(eK, orderErrors[eK])
-                        toast.error(orderErrors[eK])
-                    })
-
-                    if (errorFields.length === 0) {
-
-                            const orderToSend: OrderRequest = {} as OrderRequest
-                            orderToSend.customer = order.customer
-                            orderToSend.takeAway = order.takeAway
-                            orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
-                            orderToSend.note = order.note
-                            orderToSend.products = cloneDeep(order.products)
-
-                            console.log('Order2Send: ', orderToSend)
-                        if (update) {
-                            updateOrder.mutate(orderToSend)
-                        } else {
-                            createOrder.mutate(orderToSend)
-
-                        }
-                    }
-
-                }
-              }}
-          >
-            Salva
-          </Button>
+              onClick= {() => handleSave()}
+          >Salva</Button>
 
           {
             (order && order.id) ?
