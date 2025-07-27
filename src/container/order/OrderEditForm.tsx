@@ -20,7 +20,7 @@ export interface IOrderEdit {
 
 
 const OrderEditForm: React.FC<IOrderEdit> = (props) => {
-    const {order: storedOrder} = props
+  const {order: storedOrder} = props
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors} = useOrderStore();
   const navigate = useNavigate()
@@ -30,41 +30,42 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
   const [note, setNote] = useState(order?.note ?? '');
 
   const differences = !isEqual(storedOrder, order)
+  console.log("Calcolo differenze: " + differences);
 
-    const updateOrder = useMutation({
-        mutationFn: (data: OrderRequest) => {
-            return fetchOrderUpdate({body: data, pathParams: {orderId: storedOrder?.id??0}})
-        },
-        onError: (error, variables: OrderRequest) => {
+  const updateOrder = useMutation({
+      mutationFn: (data: OrderRequest) => {
+          return fetchOrderUpdate({body: data, pathParams: {orderId: storedOrder?.id??0}})
+      },
+      onError: (error, variables: OrderRequest) => {
 
-            const errors: ErrorResource = error as ErrorResource
+          const errors: ErrorResource = error as ErrorResource
 
-            toast.error(errors.message?? `Si è verificato un errore per l'ordine del client ${variables.customer}`)
-            errors.invalidValues!.map((invalidValue) => {
-                const {message, value, field} = invalidValue
-                if (field !== undefined) {
-                    const spString = field.match(/\[([^\]]+)\]/);
-                    const index = +spString[1]
-                    const productId = variables.products[index].productId
-                    setFieldError(`product.${productId}`, message?? `Errore per il prodotto ${productsTable[productId].name}`)
-                    toast.error(`Errore nella quantità (${value}) del prodotto ${productsTable[productId].name}`)
-                }
+          toast.error(errors.message?? `Si è verificato un errore per l'ordine del client ${variables.customer}`)
+          errors.invalidValues!.map((invalidValue) => {
+              const {message, value, field} = invalidValue
+              if (field !== undefined) {
+                  const spString = field.match(/\[([^\]]+)\]/);
+                  const index = +spString[1]
+                  const productId = variables.products[index].productId
+                  setFieldError(`product.${productId}`, message?? `Errore per il prodotto ${productsTable[productId].name}`)
+                  toast.error(`Errore nella quantità (${value}) del prodotto ${productsTable[productId].name}`)
+              }
 
-            })
-        },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onSuccess: (order: Order) => {
+          })
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onSuccess: (order: Order) => {
 
-            const fetchOrderConf = orderByIdQuery({pathParams: {orderId: order.id}})
+          const fetchOrderConf = orderByIdQuery({pathParams: {orderId: order.id}})
 
-            queryClient.invalidateQueries({queryKey: fetchOrderConf.queryKey}).then(() => {
+          queryClient.invalidateQueries({queryKey: fetchOrderConf.queryKey}).then(() => {
 
-                toast.success(`Ordine per cliente ${order.customer} modificato con successo`)
-                navigate(`/orders/${order.id}`)
-            })
+              toast.success(`Ordine per cliente ${order.customer} modificato con successo`)
+              navigate(`/orders/${order.id}`)
+          })
 
-        }
-    })
+      }
+  })
 
 
   const createOrder = useMutation({
@@ -223,7 +224,7 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
               variant="contained"
               startIcon={<SaveOutlined/>}
               onClick= {() => handleSave()}
-          >Salva</Button>
+          >{order.id ? 'Aggiorna' : 'Crea'}</Button>
 
           {
             (order && order.id) ?
@@ -237,7 +238,7 @@ const OrderEditForm: React.FC<IOrderEdit> = (props) => {
               startIcon={<CancelOutlined/>}
             >Annulla</Button> : ''
           }
-          {order && order.id  && <OrderPrint disabled={differences} order={order} products={productsTable}/>}
+          {order && <OrderPrint disabled={differences || ! order.id} order={order} products={productsTable}/>}
         </Stack>
     </>
   );
