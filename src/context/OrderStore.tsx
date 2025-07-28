@@ -259,7 +259,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
 
     const isNewOrderHandler = (): boolean  => {
-        return order.id !== EmptyOrder.id
+        return order.id === EmptyOrder.id
     }
 
     return (
