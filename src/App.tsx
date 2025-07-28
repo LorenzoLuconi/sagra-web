@@ -21,17 +21,20 @@ import OrderNew from "./container/order/OrderNew.tsx";
 import {OrderStore} from "./context/OrderStore.tsx";
 import ProductQuantityUpdateContainer from "./container/product/ProductQuantityUpdateContainer.tsx";
 import OrderPrint from "./container/order/OrderPrint.tsx";
+import Login from "./layout/Login.tsx";
 
 
 const lightTheme: Theme = createTheme({
     palette: {
         mode: 'light',
+        productAvailability: {
+          almostSoldOut: 'hsla(48, 100%, 88%, 0.5)',
+          productSoldOut: 'hsla(17, 100%, 88%, 0.5)'
+        },
         background: {
             paper: '#F8F8F8',
             default: '#fff',
             productCard: '#fff',
-            productAlmostSoldOut: 'hsla(48, 100%, 88%, 0.5)',
-            productSoldOut: 'hsla(17, 100%, 88%, 0.5)',
         }
     }
 })
@@ -121,12 +124,18 @@ const useRouter = () => {
                     path: '/discounts',
                     element: <DiscountContainer/>
                   },
+                  {
+                    path: '/login',
+                    element: <Login />
+                  },
 
 
-                    {
+
+                  {
                         path: '*',
                         element: <UnmanagedPathView/>
-                    }
+                    },
+
 
 
 

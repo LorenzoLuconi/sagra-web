@@ -174,7 +174,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             Monitor
                         </MenuItem>
                     </StyledMenu>
-                    <IconButton disabled>
+                    <IconButton onClick={ () => navigate('/login')}>
                         <AccountCircleOutlined />
                     </IconButton>
                     <MaterialUISwitch onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
