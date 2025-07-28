@@ -84,7 +84,12 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
       }
     });
   }
-  const manageError = (error: ErrorWrapper<unknown>) => {
+
+
+    const productsSearchConf = productsSearchQuery({});
+
+
+    const manageError = (error: ErrorWrapper<unknown>) => {
       // @ts-ignore
     const {status, payload} = error.stack
 
@@ -100,12 +105,17 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                   setFieldError(`product.${invalidProduct.productId}`, `${invalidProduct.message}`)
                   toast.error(`${productsTable[invalidProduct.productId].name} ${invalidProduct.message}`)
               })
+
+              queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
+
+                  toast.success("Quantità dei prodotti aggiornata")
+
+              }).catch((e: Error) => {console.log('Errore: ', e)})
+
               break;
           }
       }
   }
-
-  const productsSearchConf = productsSearchQuery({});
 
 
     const updateOrder = useMutation({
