@@ -1,23 +1,28 @@
-import {ErrorResource, Order, OrderRequest} from "../../api/sagra/sagraSchemas.ts";
+import {
+  ErrorResourceNotEnoughQuantity,
+  Order,
+  OrderRequest,
+} from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
 import {useState} from "react";
-import {Box, Button, FormControlLabel, Stack, Switch, TextField} from "@mui/material";
-import { CancelOutlined, SaveOutlined } from "@mui/icons-material";
+import {Box, Button, FormControlLabel, Switch, TextField} from "@mui/material";
+import { CancelOutlined, DeleteOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
 import { cloneDeep, isEqual } from "lodash";
 import {useMutation} from "@tanstack/react-query";
 import {
-  fetchOrderCreate,
+  fetchOrderCreate, fetchOrderDelete,
   fetchOrderUpdate,
-  orderByIdQuery,
+  orderByIdQuery, ordersSearchQuery,
   productsSearchQuery
 } from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
 import OrderPrint from "./OrderPrint.tsx";
 import {queryClient} from "../../main.tsx";
 import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
+import { useConfirm } from "material-ui-confirm";
 
 
 export interface OrderEditProps {
@@ -28,7 +33,7 @@ export interface OrderEditProps {
 const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const {order: storedOrder} = props
 
-  const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore} = useOrderStore();
+  const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore, isNewOrder} = useOrderStore();
   const navigate = useNavigate()
   const [customer, setCustomer] = useState(order?.customer ?? "");
   const [takeAway, setTakeAway] = useState(order?.takeAway ?? false);
@@ -38,8 +43,50 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const differences = !isEqual(storedOrder, order)
   console.log("Calcolo differenze: " + differences);
 
+  const resetState = () => {
+    setCustomer("")
+    setTakeAway(false)
+    setCoperti(0)
+    setNote('')
+    resetStore()
+  }
+
+  const ordersSearchConf = ordersSearchQuery({});
+
+  const orderDelete = useMutation({
+    mutationFn: (orderId: number) => {
+      return fetchOrderDelete({
+        pathParams: { orderId },
+      });
+    },
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries({ queryKey: ordersSearchConf.queryKey })
+        .then(() => {
+          toast.success(`L'ordine n. ${order.id} è stato rimosso`);
+        });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const confirm = useConfirm()
+
+  const handleDelete = () => {
+    confirm({
+      title: `Cancellazione ordine`,
+      description: `Vuoi procedere alla cancellazione dell'ordine n. ${order.id} del cliente '${order.customer}'?`
+    }).then((confirm) => {
+      if (confirm.confirmed) {
+        orderDelete.mutate(order.id)
+        navigate("/orders/new")
+      }
+    });
+  }
   const manageError = (error: ErrorWrapper<unknown>) => {
-      const {status, payload} = error.stack
+      // @ts-ignore
+    const {status, payload} = error.stack
 
       console.log('Status: ', status, payload)
 
@@ -47,14 +94,14 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
       switch (status) {
           case 450: {
-              const {invalidProducts} = payload
-              invalidProducts!.map((product) => {
-                  console.log('Error: ', product)
-                  setFieldError(`product.${product.productId}`, `${product.message}`)
-                  toast.error(`${productsTable[product.productId].name} ${product.message}`)
+              const {invalidProducts} = payload as ErrorResourceNotEnoughQuantity
+              invalidProducts.map((invalidProduct) => {
+                  console.log('Errore 450 per prodotto non valid: ', invalidProduct)
+                  setFieldError(`product.${invalidProduct.productId}`, `${invalidProduct.message}`)
+                  toast.error(`${productsTable[invalidProduct.productId].name} ${invalidProduct.message}`)
               })
+              break;
           }
-
       }
   }
 
@@ -65,7 +112,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
       mutationFn: (data: OrderRequest) => {
           return fetchOrderUpdate({body: data, pathParams: {orderId: storedOrder?.id??0}})
       },
-      onError: (error, variables: OrderRequest) => {
+      onError: (error: OrderRequest) => {
           console.log('error: ', error as ErrorWrapper<unknown>)
 
           const netError = error as ErrorWrapper<unknown>
@@ -94,10 +141,9 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
               return fetchOrderCreate({body: data})
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      onError: (error, variables: OrderRequest) => {
-
-    console.log('error: ', error, error as ErrorWrapper<unknown>)
-          const errors: ErrorResource = error as ErrorResource
+      onError: (error: OrderRequest) => {
+          console.log('error: ', error, error as ErrorWrapper<unknown>)
+          //const errors: ErrorResource = error as ErrorResource
 
           manageError(errors as ErrorWrapper<unknown>)
       },
@@ -179,7 +225,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
         console.log('Order2Send: ', orderToSend)
 
-        if (order.id!== -1) {
+        if (! isNewOrder()) {
           updateOrder.mutate(orderToSend)
         } else {
           createOrder.mutate(orderToSend)
@@ -228,28 +274,33 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                      onChange={handleChangeNote}
                      />
         </Box>
-        <Stack direction="row" spacing={1} sx={{marginTop: 1, justifyContent: 'center'}}>
+        <Box sx={{ mt: 1, display: "flex", justifyContent: "space-between", gap: 1,
+                  p: 2
+        }}>
           <Button
+            size="small"
               disabled={!differences}
               variant="contained"
               startIcon={<SaveOutlined/>}
               onClick= {() => handleSave()}
-          >{order?.id !== -1 ? 'Aggiorna' : 'Crea'}</Button>
-
-          {
-            (order && order.id) ?
+          >{ isNewOrder() ? 'Crea' : 'Aggiorna'}</Button>
             <Button
+              size="small"
               disabled={!differences}
               variant="contained"
               onClick={ () =>  {
-                // FIXME deve essere resettato lo stato
-                  resetStore()
+                  resetState()
               }}
               startIcon={<CancelOutlined/>}
-            >Annulla</Button> : ''
-          }
-          <OrderPrint disabled={differences || ! order.id} order={order} products={productsTable}/>
-        </Stack>
+            >Annulla</Button>
+          <OrderPrint disabled={differences || isNewOrder() } order={order} products={productsTable}/>
+          <Button size="small"
+                  variant="contained"
+                  disabled={ isNewOrder() }
+                  onClick={ () => handleDelete()}
+                  startIcon={<DeleteOutlined/>}
+          >Elimina</Button>
+        </Box>
     </>
   );
 }

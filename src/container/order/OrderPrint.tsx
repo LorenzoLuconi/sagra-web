@@ -40,7 +40,7 @@ const OrderPrint = (props : OrderPrintProps ) => {
 
   return (
     <>
-      <Button disabled={props.disabled} onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+      <Button size="small" disabled={props.disabled} onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
 
       <div ref={contentRef} className="printContent print-container" style={{ alignItems: 'center'}}>
         <OrderPrintPageCustomer order={order} products={products} />
@@ -215,7 +215,7 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
     <Box sx={{display: 'inline-block', width: '100%', mt: 1, border: 1, p: 1, backgroundColor: '#FAFAFA' }}>
       <Grid container spacing={4}>
         <Grid size={7}>
-          <FieldValue field="Numero" value={order.id?.toString()}/>
+          <FieldValue field="Numero" value={order.id.toString()}/>
           <FieldValue field="Nome" value={order.customer}/>
           <FieldValue field="Data" value={order.created}/>
           <FieldValue field="Note" value={order.note ?? '-'}/>
