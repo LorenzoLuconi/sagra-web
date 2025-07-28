@@ -144,8 +144,8 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
             setStoredOrder(_order)
         } else {
-          toast.error(`La quantità richiesta per '${product.name}' supera la disponibilità (${product.availableQuantity})`)
-          setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
+          toast.error(`Impossibile aggiungere il prodotto '${product.name}': quantità massima raggiunta (${product.availableQuantity})`, { duration: 3000, position: 'top-right' })
+          // setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
         }
     }
 
@@ -204,8 +204,8 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
             setStoredOrder(_order)
             toast.success(`Inserito/aggiunto '${product.name}' all'ordine`, { duration: 1200, position: 'top-right' })
         } else {
-            toast.error(`La quantità richiesta per '${product.name}' supera la disponibilità (${product.availableQuantity})`)
-            setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
+            toast.error(`Impossibile aggiungere il prodotto '${product.name}' all'ordine: quantità massima raggiunta (${product.availableQuantity})`, { duration: 3000, position: 'top-right' })
+            // setFieldErrorHandler(`product.${product.id}`, 'Quantità supera la disponibilità')
         }
     }
 

@@ -95,7 +95,6 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
       console.log('Status: ', status, payload)
 
-      toast.error(`${payload.message}`)
 
       switch (status) {
           case 450: {
@@ -103,16 +102,18 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
               invalidProducts.map((invalidProduct) => {
                   console.log('Errore 450 per prodotto non valid: ', invalidProduct)
                   setFieldError(`product.${invalidProduct.productId}`, `${invalidProduct.message}`)
-                  toast.error(`${productsTable[invalidProduct.productId].name} ${invalidProduct.message}`)
+                  toast.error(`Ordine non registrato per quantità prodotto non sufficiente per '${productsTable[invalidProduct.productId].name}'`)
               })
 
               queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
-
-                  toast.success("Quantità dei prodotti aggiornata")
-
+                  //toast.success("Quantità dei prodotti aggiornata")
               }).catch((e: Error) => {console.log('Errore: ', e)})
 
               break;
+          }
+
+          default: {
+            toast.error(`${payload.message}`)
           }
       }
   }
