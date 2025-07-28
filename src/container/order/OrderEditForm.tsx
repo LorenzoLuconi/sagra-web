@@ -254,6 +254,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                    error={errors['customer'] !== undefined}
                    label="Nome cliente"
                    onChange={handleChangeCustomer}
+                   helperText={errors['customer'] !== undefined ? errors['customer'] : ''}
         />
         <Box sx={{ display: "flex", marginTop: 2 }}>
 
