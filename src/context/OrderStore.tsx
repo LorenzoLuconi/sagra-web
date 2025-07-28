@@ -26,6 +26,7 @@ interface OrderContextI {
     errors: OrderErrorT
     setFieldError: (field: string, message: string) => void
     resetErrors: () => void
+    isNewOrder: () => boolean
 }
 
 
@@ -49,8 +50,8 @@ export const OrderContext = React.createContext<OrderContextI>({
     updateOrderField: (field: string, value: unknown) => {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setFieldError: (field: string, message: string) => {},
-
-    resetErrors: () => {}
+    resetErrors: () => {},
+    isNewOrder: (): boolean => {return false}
 })
 
 interface OrderStoreI extends React.PropsWithChildren {
@@ -257,6 +258,9 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
     }
 
 
+    const isNewOrderHandler = (): boolean  => {
+        return order.id !== EmptyOrder.id
+    }
 
     return (
         <OrderContext.Provider
@@ -271,7 +275,8 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
                 updateOrder: updateOrderHandled,
                 updateOrderField: updateOrderFieldHandler,
                 setFieldError: setFieldErrorHandler,
-                resetErrors: resetErrorsHandler
+                resetErrors: resetErrorsHandler,
+                isNewOrder: isNewOrderHandler
             }}
         >
             {props.children}
@@ -294,6 +299,7 @@ export const useOrderStore = () => {
         deleteProduct: storeContext.deleteProduct,
         updateOrderField: storeContext.updateOrderField,
         setFieldError: storeContext.setFieldError,
-        resetErrors: storeContext.resetErrors
+        resetErrors: storeContext.resetErrors,
+        isNewOrder: storeContext.isNewOrder
     }
 }
