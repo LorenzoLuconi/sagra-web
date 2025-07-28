@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useQueries } from "@tanstack/react-query";
 import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import { CircularProgress, Grid, Paper } from "@mui/material";
+import { CircularProgress, Grid, Paper, Typography } from "@mui/material";
 import { OrderStore } from "../../context/OrderStore.tsx";
 import ProductsToOrder from "./ProductsToOrder.tsx";
 import ErrorInfo from "../../view/ErrorInfo.tsx";
@@ -48,7 +48,14 @@ interface OrderEditContainerProps {
           <Grid size={5}>
             <ErrorInfo />
 
-            <Paper variant="outlined" sx={{ p: 0.5 }} className="paper-top">
+            {
+              order.id > 0 &&
+              <Paper variant="outlined" sx={{ p: 0.5, textAlign: 'center', backgroundColor: '#D9D9D9' }} className="paper-top">
+                <Typography sx={{fontWeight: 500, fontSize: '1.1em'}}>Ordine n. {order.id}</Typography>
+              </Paper>
+            }
+
+            <Paper variant="outlined" sx={{ p: 0.5 }} className="paper-middle">
               <OrderEditTotal />
             </Paper>
 

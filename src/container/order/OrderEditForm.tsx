@@ -5,7 +5,7 @@ import {
 } from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
 import {useState} from "react";
-import {Box, Button, FormControlLabel, Switch, TextField} from "@mui/material";
+import { Box, Button, FormControlLabel, Switch, TextField, Typography } from "@mui/material";
 import { CancelOutlined, DeleteOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import {checkOrderErrors} from "../../utils";
@@ -138,7 +138,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
           queryClient.invalidateQueries({queryKey: fetchOrderConf.queryKey}).then(() => {
             queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
-              toast.success(`Ordine per cliente ${order.customer} modificato con successo`)
+              toast.success(`L'ordine n. ${order.id} è stato aggiornato`)
               navigate(`/orders/${order.id}`)
             })
           })
@@ -160,7 +160,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
-          toast.success(`Ordine per cliente ${order.customer} creato con successo`)
+          toast.success(`Ordine per cliente '${order.customer}' creato con n. ${order.id}`)
           navigate(`/orders/${order.id}`)
       }
   })
@@ -216,31 +216,30 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const handleSave = () => {
     resetErrors()
     console.log('Order to save: ', order)
-    if (order !== undefined) {
-      const orderErrors = checkOrderErrors(order, productsTable)
-      const errorFields = Object.keys(orderErrors)
+    const orderErrors = checkOrderErrors(order, productsTable)
+    const errorFields = Object.keys(orderErrors)
 
-      errorFields.forEach((eK: string) => {
-        setFieldError(eK, orderErrors[eK])
-        toast.error(orderErrors[eK])
-      })
+    errorFields.forEach((eK: string) => {
+      setFieldError(eK, orderErrors[eK])
+      toast.error(orderErrors[eK])
+    })
 
-      if (errorFields.length === 0) {
+    if (errorFields.length === 0) {
 
-        const orderToSend: OrderRequest = {} as OrderRequest
-        orderToSend.customer = order.customer
-        orderToSend.takeAway = order.takeAway
-        orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
-        orderToSend.note = order.note
-        orderToSend.products = cloneDeep(order.products)
+      const orderToSend: OrderRequest = {} as OrderRequest
+      orderToSend.customer = order.customer
+      orderToSend.takeAway = order.takeAway
+      orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
+      orderToSend.note = order.note
+      orderToSend.products = cloneDeep(order.products)
 
-        console.log('Order2Send: ', orderToSend)
+      console.log('Order2Send: ', orderToSend)
 
-        if (! isNewOrder()) {
-          updateOrder.mutate(orderToSend)
-        } else {
-          createOrder.mutate(orderToSend)
-        }
+      if (! isNewOrder()) {
+        updateOrder.mutate(orderToSend)
+
+      } else {
+        createOrder.mutate(orderToSend)
       }
     }
   }
