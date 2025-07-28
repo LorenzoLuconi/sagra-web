@@ -35,20 +35,20 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore, isNewOrder} = useOrderStore();
   const navigate = useNavigate()
-  const [customer, setCustomer] = useState(order?.customer ?? "");
-  const [takeAway, setTakeAway] = useState(order?.takeAway ?? false);
-  const [coperti, setCoperti] = useState(order?.serviceNumber ?? 0);
-  const [note, setNote] = useState(order?.note ?? '');
+  const [customer, setCustomer] = useState(order.customer);
+  const [takeAway, setTakeAway] = useState(order.takeAway);
+  const [coperti, setCoperti] = useState(order.serviceNumber);
+  const [note, setNote] = useState(order.note ?? '');
 
   const differences = !isEqual(storedOrder, order)
   console.log("Calcolo differenze: " + differences);
 
-  const resetState = () => {
-    setCustomer("")
-    setTakeAway(false)
-    setCoperti(0)
-    setNote('')
+  const handleCancel = () => {
     resetStore()
+    setCustomer(storedOrder.customer)
+    setCoperti(storedOrder.serviceNumber)
+    setNote(storedOrder.note ?? '');
+    setTakeAway(storedOrder.takeAway);
   }
 
   const ordersSearchConf = ordersSearchQuery({});
@@ -289,7 +289,15 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
               disabled={!differences}
               variant="contained"
               onClick={ () =>  {
-                  resetState()
+                confirm({
+                  title: `Annulla modifiche ordine`,
+                  description: `Le modifiche in corso dell'ordine verranno annullate, vuoi procedere?`
+                }).then((confirm) => {
+                  if (confirm.confirmed) {
+                    handleCancel()
+                  }
+                });
+
               }}
               startIcon={<CancelOutlined/>}
             >Annulla</Button>
@@ -298,6 +306,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                   variant="contained"
                   disabled={ isNewOrder() }
                   onClick={ () => handleDelete()}
+                  color="error"
                   startIcon={<DeleteOutlined/>}
           >Elimina</Button>
         </Box>
