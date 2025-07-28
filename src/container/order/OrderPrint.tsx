@@ -40,7 +40,7 @@ const OrderPrint = (props : OrderPrintProps ) => {
 
   return (
     <>
-      <Button size="small" disabled={props.disabled} onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+      <Button size="small" disabled={props.disabled}  color="success" onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
 
       <div ref={contentRef} className="printContent print-container" style={{ alignItems: 'center'}}>
         <OrderPrintPageCustomer order={order} products={products} />
