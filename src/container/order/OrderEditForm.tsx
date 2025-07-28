@@ -41,7 +41,6 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const [note, setNote] = useState(order.note ?? '');
 
   const differences = !isEqual(storedOrder, order)
-  console.log("Calcolo differenze: " + differences);
 
   const handleCancel = () => {
     resetStore()
