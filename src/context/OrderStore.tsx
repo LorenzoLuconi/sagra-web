@@ -74,6 +74,11 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         setStoredProducts(_storedProducts)
     }, [products])
 
+    React.useEffect(() => {
+        setStoredOrder(order)
+    }, [order])
+
+
 
     const deleteProductHandler = (product: Product) => {
             setStoredOrder((prev) => {
