@@ -301,22 +301,22 @@ export type Count = {
 };
 
 export type MonitorProductView = {
-  name?: string;
+  name: string;
   /**
    * @format int32
    */
-  initialQuantity?: number;
+  initialQuantity: number;
   /**
    * @format int32
    */
-  availableQuantity?: number;
+  availableQuantity: number;
 };
 
 export type MonitorView = {
-  name?: string;
+  name: string;
   /**
    * @format date-time
    */
-  lastUpdate?: string;
-  products?: MonitorProductView[];
+  lastUpdate: string;
+  products: MonitorProductView[];
 };
