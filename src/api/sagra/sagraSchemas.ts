@@ -30,7 +30,7 @@ export type ProductRequest = {
 };
 
 export type ErrorResource = {
-  message?: string;
+  message: string;
   /**
    * @uniqueItems true
    */
@@ -38,9 +38,9 @@ export type ErrorResource = {
 };
 
 export type InvalidValue = {
-  field?: string;
+  field: string;
   value?: void;
-  message?: string;
+  message: string;
 };
 
 export type Product = {
@@ -90,17 +90,17 @@ export type ProductQuantityUpdate = {
 };
 
 export type ErrorResourceNotEnoughQuantity = {
-  message?: string;
-  invalidProducts?: InvalidProduct[];
+  message: string;
+  invalidProducts: InvalidProduct[];
 };
 
 export type InvalidProduct = {
   /**
    * @format int64
    */
-  productId?: number;
-  message?: string;
-  error?: "NOT_ENOUGH_QUANTITY" | "LOCKED";
+  productId: number;
+  message: string;
+  error: "NOT_ENOUGH_QUANTITY" | "LOCKED";
 };
 
 export type OrderRequest = {
