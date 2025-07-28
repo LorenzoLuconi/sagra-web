@@ -17,6 +17,7 @@ import {
 import {useNavigate} from "react-router";
 import OrderPrint from "./OrderPrint.tsx";
 import {queryClient} from "../../main.tsx";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 
 export interface OrderEditProps {
@@ -36,6 +37,27 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
   const differences = !isEqual(storedOrder, order)
   console.log("Calcolo differenze: " + differences);
+
+  const manageError = (error: ErrorWrapper<unknown>) => {
+      const {status, payload} = error.stack
+
+      console.log('Status: ', status, payload)
+
+      toast.error(`${payload.message}`)
+
+      switch (status) {
+          case 450: {
+              const {invalidProducts} = payload
+              invalidProducts!.map((product) => {
+                  console.log('Error: ', product)
+                  setFieldError(`product.${product.productId}`, `${product.message}`)
+                  toast.error(`${productsTable[product.productId].name} ${product.message}`)
+              })
+          }
+
+      }
+  }
+
   const productsSearchConf = productsSearchQuery({});
 
 
@@ -44,21 +66,12 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
           return fetchOrderUpdate({body: data, pathParams: {orderId: storedOrder?.id??0}})
       },
       onError: (error, variables: OrderRequest) => {
+          console.log('error: ', error as ErrorWrapper<unknown>)
 
-          const errors: ErrorResource = error as ErrorResource
+          const netError = error as ErrorWrapper<unknown>
 
-          toast.error(errors.message?? `Si è verificato un errore per l'ordine del client ${variables.customer}`)
-          errors.invalidValues!.map((invalidValue) => {
-              const {message, value, field} = invalidValue
-              if (field !== undefined) {
-                  const spString = field.match(/\[([^\]]+)\]/);
-                  const index = +spString[1]
-                  const productId = variables.products[index].productId
-                  setFieldError(`product.${productId}`, message?? `Errore per il prodotto ${productsTable[productId].name}`)
-                  toast.error(`Errore nella quantità (${value}) del prodotto ${productsTable[productId].name}`)
-              }
+          manageError(netError)
 
-          })
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
@@ -83,22 +96,10 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onError: (error, variables: OrderRequest) => {
 
-
+    console.log('error: ', error, error as ErrorWrapper<unknown>)
           const errors: ErrorResource = error as ErrorResource
-          toast.error(errors.message?? `Si è verificato un errore per l'ordine del client ${variables.customer}`)
 
-          // FIXME: questo può riportare error 400 e quindi invalidValues oppure errore 450 con invalidProducts
-          errors.invalidValues!.map((invalidValue) => {
-              const {message, value, field} = invalidValue
-              if (field !== undefined) {
-                  const spString = field.match(/\[([^\]]+)\]/);
-                  const index = +spString[1]
-                  const productId = variables.products[index].productId
-                  setFieldError(`product.${productId}`, message ?? `Errore per il prodotto ${productsTable[productId].name}`)
-                  toast.error(`Errore nella quantità (${value}) del prodotto ${productsTable[productId].name}`)
-              }
-
-          })
+          manageError(errors as ErrorWrapper<unknown>)
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
@@ -178,7 +179,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
         console.log('Order2Send: ', orderToSend)
 
-        if (order.id) {
+        if (order.id!== -1) {
           updateOrder.mutate(orderToSend)
         } else {
           createOrder.mutate(orderToSend)
@@ -233,7 +234,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
               variant="contained"
               startIcon={<SaveOutlined/>}
               onClick= {() => handleSave()}
-          >{order?.id ? 'Aggiorna' : 'Crea'}</Button>
+          >{order?.id !== -1 ? 'Aggiorna' : 'Crea'}</Button>
 
           {
             (order && order.id) ?

@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { Alert, CircularProgress } from "@mui/material";
 import OrderEditContainer from "./OrderEditContainer.tsx";
+import {ErrorResource} from "../../api/sagra/sagraSchemas.ts";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 const OrderEdit = () => {
   const params = useParams();
@@ -20,9 +22,15 @@ const OrderEdit = () => {
   });
 
   if (orderData.isError) {
-    const error = orderData.error;
+    const error = orderData.error as ErrorWrapper<unknown>;
     console.log(error);
-
+    if (error.stack.status === 404) {
+      return (
+           <Alert severity="error">
+             Ordine con id {params.orderId} non trovato
+           </Alert>
+      )
+    }
     // if ( error.status === 404) {
     //   return (
     //     <Alert severity="error">
@@ -30,12 +38,14 @@ const OrderEdit = () => {
     //     </Alert>
     //   );
     // }
-
+/*
     return (
       <Alert severity="error">
         Si è verificato un errore prelevando l'ordine
       </Alert>
     );
+
+ */
   }
 
   if (orderData.isPending) {
