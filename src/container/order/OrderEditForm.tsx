@@ -27,7 +27,7 @@ export interface OrderEditProps {
 const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const {order: storedOrder} = props
 
-  const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors} = useOrderStore();
+  const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore} = useOrderStore();
   const navigate = useNavigate()
   const [customer, setCustomer] = useState(order?.customer ?? "");
   const [takeAway, setTakeAway] = useState(order?.takeAway ?? false);
@@ -242,7 +242,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
               variant="contained"
               onClick={ () =>  {
                 // FIXME deve essere resettato lo stato
-                navigate(`/orders/${order.id}`)
+                  resetStore()
               }}
               startIcon={<CancelOutlined/>}
             >Annulla</Button> : ''

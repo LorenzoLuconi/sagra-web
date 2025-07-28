@@ -11,10 +11,12 @@ export const EmptyOrder: Order = {
   serviceCost: 0.5,
   customer: '',
   takeAway: false,
+    id: -1
 } as Order
 
 interface OrderContextI {
     order: Order
+    resetStore: () => void
     updateOrderField: (field: string, value: unknown) => void
     products: Record<number, Product>
     setProduct: (product: Product, quantity: number) => void
@@ -32,6 +34,9 @@ export const OrderContext = React.createContext<OrderContextI>({
     order : EmptyOrder,
     products: [],
     errors: {},
+
+    resetStore: () => {},
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setProduct: (product: Product, quantity: number) => {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -204,7 +209,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
     }
 
     const updateOrderHandled = (order: Order) => {
-        setStoredOrder((prev) => {
+        setStoredOrder(() => {
             return order
         })
 
@@ -243,6 +248,14 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         })
     }
 
+    const resetStoreHandler = () => {
+        setStoredOrder(() => {
+           // return (order.id === -1 ? EmptyOrder : order)
+            return order
+        })
+        resetErrorsHandler()
+    }
+
 
 
     return (
@@ -251,6 +264,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
                 order: storedOrder,
                 products: storedProducts??[],
                 errors: storedErrors,
+                resetStore: resetStoreHandler,
                 addProduct: addProductHandler,
                 setProduct: setProductHandler,
                 deleteProduct: deleteProductHandler,
@@ -273,6 +287,7 @@ export const useOrderStore = () => {
         order: storeContext.order,
         products: storeContext.products,
         errors: storeContext.errors,
+        resetStore: storeContext.resetStore,
         updateOrder: storeContext.updateOrder,
         addProduct: storeContext.addProduct,
         setProduct: storeContext.setProduct,
