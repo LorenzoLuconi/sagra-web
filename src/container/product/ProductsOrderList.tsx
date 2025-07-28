@@ -1,20 +1,11 @@
 // import React from 'react'
 
-import { useQuery } from "@tanstack/react-query";
 import {
-  productsSearchQuery,
-  ProductsSearchQueryParams,
-} from "../../api/sagra/sagraComponents.ts";
-import {
-  Alert,
-  Box,
-  CircularProgress,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
 import { currency } from "../../utils";
@@ -22,50 +13,9 @@ import ProductQuantity from "./ProductQuantity.tsx";
 import { IProductsOrder, productAvailable } from "./IProductsOrder.tsx";
 
 const ProductsOrderList = (props: IProductsOrder) => {
-  const searchParam = () => {
-    const params = {} as ProductsSearchQueryParams;
-    if (props.courseId !== undefined) {
-      params.courseId = props.courseId;
-    }
+  const {products, addToOrder} = props;
 
-    return params;
-  };
-
-  const productsSearchConf = productsSearchQuery({
-    queryParams: searchParam(),
-  });
-
-  const productsQuery = useQuery({
-    queryKey: productsSearchConf.queryKey,
-    queryFn: productsSearchConf.queryFn,
-    staleTime: 1000 * 10
-  });
-
-  if (productsQuery.isLoading) {
-    return (
-      <Box sx={{ display: "flex" }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (productsQuery.isError) {
-    return (
-      <Alert severity="error">
-        Si è verificato un errore prelevando la lista degli sconti:{" "}
-        {productsQuery.error.message}
-      </Alert>
-    );
-  }
-
-  const products = productsQuery.data;
-
-  if (products) {
-    if (products.length < 1) {
-      return <Typography>Nessuno prodotto presente</Typography>;
-    }
-
-    return (
+  return (
       <form>
         <Table>
           <TableHead>
@@ -90,7 +40,7 @@ const ProductsOrderList = (props: IProductsOrder) => {
                   })}
                   onClick={() => {
                     if ( productAvailable(product) )
-                      props.addToOrder(product)
+                      addToOrder(product)
                   }}
                 >
                   <TableCell sx={{ fontSize: "1.0em" }}>
@@ -110,8 +60,7 @@ const ProductsOrderList = (props: IProductsOrder) => {
         </Table>
       </form>
     );
-  }
-};
+}
 
 
 

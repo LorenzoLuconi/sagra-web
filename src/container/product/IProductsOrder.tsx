@@ -1,8 +1,7 @@
 import { Product } from "../../api/sagra/sagraSchemas.ts";
 
 export interface IProductsOrder {
-  courseId?: number;
-
+  products: Product[];
   addToOrder(product: Product): void;
 }
 
