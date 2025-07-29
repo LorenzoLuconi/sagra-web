@@ -4,7 +4,7 @@ import {
   OrderRequest,
 } from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
-import {useState} from "react";
+import { useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -12,7 +12,7 @@ import {
   Switch,
   TextField,
 } from "@mui/material";
-import { CancelOutlined, DeleteOutlined, SaveOutlined } from "@mui/icons-material";
+import { CancelOutlined, DeleteOutlined, PrintOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
@@ -29,6 +29,7 @@ import OrderPrint from "./OrderPrint.tsx";
 import {queryClient} from "../../main.tsx";
 import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 import { useConfirm } from "material-ui-confirm";
+import { useReactToPrint } from "react-to-print";
 
 
 export interface OrderEditProps {
@@ -44,6 +45,9 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const [takeAway, setTakeAway] = useState(order.takeAway);
   const [coperti, setCoperti] = useState<number|null>(order.serviceNumber);
   const [note, setNote] = useState(order.note ?? '');
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const reactToPrintFn = useReactToPrint({ contentRef });
 
   const differences = !isEqual(storedOrder, order)
 
@@ -304,6 +308,9 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
               startIcon={<SaveOutlined/>}
               onClick= {() => handleSave()}
           >{ isNewOrder() ? 'Crea' : 'Aggiorna'}</Button>
+          <Button size="small"  color="success"
+                  disabled={differences || isNewOrder()}
+                  onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
             <Button
               size="small"
               disabled={!differences}
@@ -317,11 +324,10 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                     handleCancel()
                   }
                 });
-
               }}
               startIcon={<CancelOutlined/>}
             >Annulla</Button>
-          <OrderPrint disabled={differences || isNewOrder() } order={order} products={productsTable}/>
+
           <Button size="small"
                   variant="contained"
                   disabled={ isNewOrder() }
@@ -330,6 +336,11 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                   startIcon={<DeleteOutlined/>}
           >Elimina</Button>
         </Box>
+        { ! (differences || isNewOrder()) &&
+          <div ref={contentRef} className="printContent print-container">
+            <OrderPrint order={order} products={productsTable}/>
+          </div>
+        }
     </>
   );
 }
