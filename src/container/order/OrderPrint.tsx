@@ -48,10 +48,10 @@ const OrderPrint = (props : OrderPrintProps ) => {
         {
           Array.from(new Set(Object.values(products).map(product => product.departmentId)).values()).map((departmentId: number) => {
             return (
-              <>
-                <div key={'pb-'.concat(''+departmentId)} className="page-break" />
+              <div key={'pb-'.concat(''+departmentId)} >
+                <div className="page-break" />
                 <OrderPrintPageDepartment key={departmentId} order={order} departmentId={+departmentId} products={products} />
-              </>
+              </div>
             )
           })
         }
@@ -106,6 +106,7 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
               </TableRow>
             </TableHead>
             <TableBody>
+              <>
               { order.products.map(p =>
                 <TableRow key={p.productId} sx={{p: 0}}>
                   <TableCell><Typography sx={{ fontSize: '1.2em'}}>{products[p.productId]?.name}</Typography></TableCell>
@@ -114,16 +115,18 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
                   <TableCell align="right">{currency(p.price * p.quantity)}</TableCell>
                 </TableRow>
               )}
+              </>
+              <>
+              { order.serviceNumber > 0 &&
 
-              { order.serviceNumber > 0 ?
                 <TableRow >
                   <TableCell><Typography sx={{ fontSize: '1.2em'}}>Coperti</Typography></TableCell>
                   <TableCell align="center">{order.serviceNumber}</TableCell>
                   <TableCell align="right">{currency(order.serviceCost)}</TableCell>
                   <TableCell align="right">{currency(order.serviceNumber * order.serviceCost)}</TableCell>
                 </TableRow>
-                : ''
               }
+              </>
               <TableRow sx={{ display: 'none'}} >
                 <TableCell colSpan={3} align="right" sx={{ fontSize: '1.1em', fontWeight: 500 }}>TOTALE</TableCell>
                 <TableCell colSpan={3} align="right" sx={{ fontSize: '1.1em', fontWeight: 500 }}>{currency(order.totalAmount)}</TableCell>
@@ -179,12 +182,14 @@ const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
               </TableRow>
             </TableHead>
           <TableBody>
+            <>
               { productsToPrint.map(p =>
                 <TableRow key={p.productId} sx={{p: 0}}>
                   <TableCell ><Typography sx={{ fontSize: '1.2em'}}>{products[p.productId].name}</Typography></TableCell>
                   <TableCell align="center">{p.quantity}</TableCell>
                 </TableRow>
               )}
+            </>
           </TableBody>
           </Table>
         </TableContainer>
@@ -222,7 +227,7 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
         </Grid>
         <Grid size={5}>
           <FieldValue field="Totale" value={ order.discountRate ? `${currency(order.totalAmount)} (sconto ${order.discountRate}%)` : currency(order.totalAmount)}/>
-
+            <>
           {
             order.takeAway ?
               <Box sx={{border: '1px dashed black', borderRadius: '4px', height: '60px', p: 1, mt: 1, textAlign: 'center'}}>
@@ -238,7 +243,7 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
                 }
               </>
           }
-
+            </>
         </Grid>
       </Grid>
     </Box>
