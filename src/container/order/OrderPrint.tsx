@@ -38,6 +38,11 @@ const OrderPrint = (props : OrderPrintProps ) => {
 
   const {order, products} = props;
 
+  if ( ! products || Object.keys(products).length === 0 || ! order.products || order.products.length === 0)
+    return <></>
+
+  //console.log("Products to print: ", Object.keys(products));
+
   return (
     <>
       <Button size="small" disabled={props.disabled}  color="success" onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
@@ -46,12 +51,11 @@ const OrderPrint = (props : OrderPrintProps ) => {
         <OrderPrintPageCustomer order={order} products={products} />
 
         {
-          Array.from(new Set(Object.values(products).map(product => product.departmentId)).values()).map((departmentId: number) => {
+          Array.from(new Set(order.products.map( p => products[p.productId]).map(p => p.departmentId))).map( (departmentId ) => {
             return (
-              <div key={'pb-'.concat(''+departmentId)} >
-                <div className="page-break" />
-                <OrderPrintPageDepartment key={departmentId} order={order} departmentId={+departmentId} products={products} />
-              </div>
+                <div key={departmentId} className="page-break">
+                 <OrderPrintPageDepartment order={order} departmentId={+departmentId} products={products} />
+                </div>
             )
           })
         }
