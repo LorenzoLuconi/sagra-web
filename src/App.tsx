@@ -22,34 +22,7 @@ import {OrderStore} from "./context/OrderStore.tsx";
 import ProductQuantityUpdateContainer from "./container/product/ProductQuantityUpdateContainer.tsx";
 import OrderPrint from "./container/order/OrderPrint.tsx";
 import StatsContainer from "./container/stats/StatsContainer.tsx";
-
-
-const lightTheme: Theme = createTheme({
-    palette: {
-        mode: 'light',
-        background: {
-            paper: '#F8F8F8',
-            default: '#fff',
-            productCard: '#fff',
-            productAlmostSoldOut: 'hsla(48, 100%, 88%, 0.5)',
-            productSoldOut: 'hsla(17, 100%, 88%, 0.5)',
-        }
-    }
-})
-const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-        background: {
-            paper: '#181818',
-            default: '#181818',
-            productCard: '#181818'
-        }
-    },
-});
-const sagraTheme: Record<string, Theme> = {
-    'light': lightTheme,
-    'dark': darkTheme
-}
+import {sagraTheme} from "./SagraTheme.ts";
 
 
 
