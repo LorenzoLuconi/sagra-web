@@ -52,8 +52,9 @@ export const checkOrderErrors = (order: Order, productsTable: Record<number, Pro
         res['customer'] = 'Bisogna specificare il nome del cliente'
     }
 
-    if (order.serviceNumber === -2 && !order.takeAway) {
-        res['serviceNumber'] = 'Bisogna specificare numero di coperti'
+    console.log("Order service: ", order.serviceNumber);
+    if ( (! order.serviceNumber || order.serviceNumber < 0) && !order.takeAway) {
+        res['serviceNumber'] = 'Inserire un numero di coperti'
     }
 
     // Check products quantity
