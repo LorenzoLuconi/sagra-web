@@ -51,7 +51,7 @@ const OrderPrint = (props : OrderPrintProps ) => {
         <OrderPrintPageCustomer order={order} products={products} />
 
         {
-          Array.from(new Set(order.products.map( p => products[p.productId]).map(p => p.departmentId))).map( (departmentId ) => {
+          Array.from(new Set(order.products.map( p => products[p.productId].departmentId))).map( (departmentId ) => {
             return (
                 <div key={departmentId} className="page-break">
                  <OrderPrintPageDepartment order={order} departmentId={+departmentId} products={products} />
