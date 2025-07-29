@@ -36,7 +36,7 @@ const OrderPrint = (props : OrderPrintProps ) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const {order, products} = props;
+  const {order, products, disabled} = props;
 
   if ( ! products || Object.keys(products).length === 0 || ! order.products || order.products.length === 0)
     return <></>
@@ -45,22 +45,24 @@ const OrderPrint = (props : OrderPrintProps ) => {
 
   return (
     <>
-      <Button size="small" disabled={props.disabled}  color="success" onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+      <Button size="small" disabled={disabled}  color="success" onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
 
-      <div ref={contentRef} className="printContent print-container" style={{ alignItems: 'center'}}>
-        <OrderPrintPageCustomer order={order} products={products} />
+      { ! disabled &&
+        <div ref={contentRef} className="printContent print-container" style={{ alignItems: 'center'}}>
+          <OrderPrintPageCustomer order={order} products={products} />
 
-        {
-          Array.from(new Set(order.products.map( p => products[p.productId].departmentId))).map( (departmentId ) => {
-            return (
-                <div key={departmentId} className="page-break">
-                 <OrderPrintPageDepartment order={order} departmentId={+departmentId} products={products} />
-                </div>
-            )
-          })
-        }
+          {
+            Array.from(new Set(order.products.map( p => products[p.productId].departmentId))).map( (departmentId ) => {
+              return (
+                  <div key={departmentId} className="page-break">
+                   <OrderPrintPageDepartment order={order} departmentId={+departmentId} products={products} />
+                  </div>
+              )
+            })
+          }
 
-      </div>
+        </div>
+      }
     </>
   )
 }
