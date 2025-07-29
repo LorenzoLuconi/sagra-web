@@ -8,12 +8,9 @@ import {useState} from "react";
 import {
   Box,
   Button,
-  FormControl,
-  FormControlLabel, FormHelperText, Input,
-  InputLabel,
+  FormControlLabel,
   Switch,
   TextField,
-  Typography
 } from "@mui/material";
 import { CancelOutlined, DeleteOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
@@ -32,7 +29,6 @@ import OrderPrint from "./OrderPrint.tsx";
 import {queryClient} from "../../main.tsx";
 import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 import { useConfirm } from "material-ui-confirm";
-import InputNumber from "rc-input-number";
 
 
 export interface OrderEditProps {
@@ -196,23 +192,18 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
           }, [setTakeAway, updateOrderField]
       );
 
- /* const handleChangeCoperti =
+  const handleChangeCoperti =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-        let value = 0;
-            if ( ! event.currentTarget.value ) {
-              value = 0
-            } else {
-              // FIXME non c'e' un controllo se il valore è numerico
-              const number = Number.parseInt(event.currentTarget.value);
-              if ( number >=  0)
-                value = number
-              else
-                value = 0
-            }
+          const value = Number.parseInt(event.target.value)
+          if ( ! isNaN(value)) {
             setCoperti(value);
             updateOrderField('serviceNumber', value)
-          }, [setCoperti, updateOrderField]
-      )*/
+          } else {
+            setCoperti(null);
+            updateOrderField('serviceNumber', null)
+          }
+        }, [setCoperti, updateOrderField]
+      )
 
 
   const handleChangeNote =
@@ -273,19 +264,17 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
       >
       </Box>
         <Box sx={{ display: "flex", marginTop: 2 }}>
-          <Typography>Coperti</Typography>
-          <InputNumber value={coperti} id="input-coperti"
-                       style={{ marginRight: '15px', marginLeft: '10px' }}
-                       controls={true}
-                       disabled={takeAway}
-                       min={0}
-                       size={5}
-                       onChange={(value) => {
-                         setCoperti(value);
-                         updateOrderField('serviceNumber', value)
-                       }} />
-
-
+          <TextField size='small'
+                     value={coperti}
+                     name={'serviceNumber'}
+                     error={errors['serviceNumber'] !== undefined}
+                     label="Coperti"
+                     onChange={handleChangeCoperti}
+                     disabled={takeAway}
+                     slotProps={{ htmlInput: { size: 8 } }}
+                     sx={{ ml: 0, mr: 2}}
+                     helperText={ errors['serviceNumber'] ?? ''}
+          />
 
           <FormControlLabel
               label="Asporto"

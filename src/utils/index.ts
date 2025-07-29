@@ -1,5 +1,6 @@
 import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
+import { isNaN } from "lodash";
 
 export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<string, string>) => {
     const res: any = {}
@@ -52,9 +53,8 @@ export const checkOrderErrors = (order: Order, productsTable: Record<number, Pro
         res['customer'] = 'Bisogna specificare il nome del cliente'
     }
 
-    console.log("Order service: ", order.serviceNumber);
-    if ( (! order.serviceNumber || order.serviceNumber < 0) && !order.takeAway) {
-        res['serviceNumber'] = 'Inserire un numero di coperti'
+    if ( (order.serviceNumber === null || order.serviceNumber < 0) && !order.takeAway) {
+        res['serviceNumber'] = 'Inserire il numero di coperti'
     }
 
     // Check products quantity

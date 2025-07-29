@@ -26,7 +26,6 @@
     "flowbite-react": "^0.11.7",
     "lodash": "^4.17.21",
     "material-ui-confirm": "^4.0.0",
-    "rc-input-number": "^9.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",
