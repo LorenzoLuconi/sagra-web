@@ -21,6 +21,7 @@ import OrderNew from "./container/order/OrderNew.tsx";
 import {OrderStore} from "./context/OrderStore.tsx";
 import ProductQuantityUpdateContainer from "./container/product/ProductQuantityUpdateContainer.tsx";
 import OrderPrint from "./container/order/OrderPrint.tsx";
+import StatsContainer from "./container/stats/StatsContainer.tsx";
 
 
 const lightTheme: Theme = createTheme({
@@ -121,7 +122,10 @@ const useRouter = () => {
                     path: '/discounts',
                     element: <DiscountContainer/>
                   },
-
+                    {
+                      path: '/stats',
+                      element: <StatsContainer/>
+                    },
 
                     {
                         path: '*',
