@@ -53,7 +53,7 @@ export const checkOrderErrors = (order: Order, productsTable: Record<number, Pro
         res['customer'] = 'Bisogna specificare il nome del cliente'
     }
 
-    if ( (order.serviceNumber === null || order.serviceNumber < 0) && !order.takeAway) {
+    if ( (order.serviceNumber === undefined || order.serviceNumber < 0) && !order.takeAway) {
         res['serviceNumber'] = 'Inserire il numero di coperti'
     }
 

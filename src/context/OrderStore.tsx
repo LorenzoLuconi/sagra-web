@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 // @ts-ignore
 export const EmptyOrder: Order = {
   products: [],
-  serviceNumber: null,
+  serviceNumber: undefined,
   serviceCost: 0.5,
   customer: '',
   takeAway: false,

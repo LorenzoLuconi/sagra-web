@@ -43,7 +43,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const navigate = useNavigate()
   const [customer, setCustomer] = useState(order.customer);
   const [takeAway, setTakeAway] = useState(order.takeAway);
-  const [coperti, setCoperti] = useState<number|null>(order.serviceNumber);
+  const [coperti, setCoperti] = useState<number|undefined>(order.serviceNumber);
   const [note, setNote] = useState(order.note ?? '');
 
   const contentRef = useRef<HTMLDivElement>(null);
@@ -203,8 +203,8 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
             setCoperti(value);
             updateOrderField('serviceNumber', value)
           } else {
-            setCoperti(null);
-            updateOrderField('serviceNumber', null)
+            setCoperti(undefined);
+            updateOrderField('serviceNumber', undefined)
           }
         }, [setCoperti, updateOrderField]
       )
@@ -269,14 +269,15 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
       </Box>
         <Box sx={{ display: "flex", marginTop: 2 }}>
           <TextField size='small'
-                     value={coperti}
+                     value={coperti !== undefined ? coperti : ''}
                      required
+                     type="number"
                      name={'serviceNumber'}
                      error={errors['serviceNumber'] !== undefined}
                      label="Coperti"
                      onChange={handleChangeCoperti}
                      disabled={takeAway}
-                     slotProps={{ htmlInput: { size: 8 } }}
+                     slotProps={{ htmlInput: { size: 8, min: 0 } }}
                      sx={{ ml: 0, mr: 2}}
                      helperText={ errors['serviceNumber'] ?? ''}
           />
