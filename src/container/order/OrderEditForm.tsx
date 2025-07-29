@@ -266,6 +266,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
         <Box sx={{ display: "flex", marginTop: 2 }}>
           <TextField size='small'
                      value={coperti}
+                     required
                      name={'serviceNumber'}
                      error={errors['serviceNumber'] !== undefined}
                      label="Coperti"
