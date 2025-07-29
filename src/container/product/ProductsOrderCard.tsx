@@ -21,11 +21,13 @@ const ProductsOrderCard = (props : IProductsOrder) => {
               {
                 products.map( (product: Product) =>
                     <Card key={product.id}
-                          sx={(theme) => ({
+                          sx={(theme) => {
+                              console.log('Theme: ', theme)
+                              return ({
                             minWidth: 200,
                             maxWidth: 200,
-                            backgroundColor: (! productAvailable(product) ? theme.palette.background.productSoldOut : ( product.availableQuantity < 10 ? theme.palette.background.productAlmostSoldOut : theme.palette.background.productCard))
-                          })}
+                            backgroundColor: (! productAvailable(product) ? theme.palette.status.productSoldOut : ( product.availableQuantity < 10 ? theme.palette.status.productAlmostSoldOut : theme.palette.background.productCard))
+                          })}}
                           onClick={(event) => {
                             event.preventDefault();
                             if ( productAvailable(product) )
