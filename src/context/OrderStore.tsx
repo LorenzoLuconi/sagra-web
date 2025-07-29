@@ -259,6 +259,13 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
            // return (order.id === -1 ? EmptyOrder : order)
             return order
         })
+        setStoredProducts(() => {
+            const _storedProducts: Record<number, Product> = {}
+            for (let i = 0; i< products.length; i++) {
+                _storedProducts[products[i].id] = products[i]
+            }
+            return _storedProducts
+        })
         resetErrorsHandler()
     }
 
