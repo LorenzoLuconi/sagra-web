@@ -21,37 +21,9 @@ import OrderNew from "./container/order/OrderNew.tsx";
 import {OrderStore} from "./context/OrderStore.tsx";
 import ProductQuantityUpdateContainer from "./container/product/ProductQuantityUpdateContainer.tsx";
 import OrderPrint from "./container/order/OrderPrint.tsx";
+import StatsContainer from "./container/stats/StatsContainer.tsx";
+import {sagraTheme} from "./SagraTheme.ts";
 import Login from "./layout/Login.tsx";
-
-
-const lightTheme: Theme = createTheme({
-    palette: {
-        mode: 'light',
-        productAvailability: {
-          almostSoldOut: 'hsla(48, 100%, 88%, 0.5)',
-          productSoldOut: 'hsla(17, 100%, 88%, 0.5)'
-        },
-        background: {
-            paper: '#F8F8F8',
-            default: '#fff',
-            productCard: '#fff',
-        }
-    }
-})
-const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-        background: {
-            paper: '#181818',
-            default: '#181818',
-            productCard: '#181818'
-        }
-    },
-});
-const sagraTheme: Record<string, Theme> = {
-    'light': lightTheme,
-    'dark': darkTheme
-}
 
 
 
@@ -130,6 +102,10 @@ const useRouter = () => {
                   },
 
 
+                    {
+                      path: '/stats',
+                      element: <StatsContainer/>
+                    },
 
                   {
                         path: '*',

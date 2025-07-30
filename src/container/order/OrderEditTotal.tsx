@@ -7,24 +7,16 @@ const OrderEditTotal = () => {
 
   const {order} = useOrderStore()
 
-    console.log('OrderEditTotal: ', order)
-
   const total = () => {
-    let t = 0
-    if (order !== undefined) {
-       if (!order.takeAway) {
-           t = order.serviceCost * order.serviceNumber;
-       }
+    let t = 0;
+    if (order.serviceNumber) {
+      t = order.serviceCost * order.serviceNumber;
+    }
 
+    order.products.forEach((p: OrderedProduct) => {
+      t = t + p.quantity * p.price;
+    });
 
-
-    order.products.forEach((p: OrderedProduct | undefined) => {
-        if (p !== undefined) {
-            t = t + (p.quantity * p.price);
-        }
-     });
-
-   }
     return t;
   };
 

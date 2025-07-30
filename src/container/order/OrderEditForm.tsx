@@ -4,9 +4,15 @@ import {
   OrderRequest,
 } from "../../api/sagra/sagraSchemas.ts";
 import * as React from "react";
-import {useState} from "react";
-import { Box, Button, FormControlLabel, Switch, TextField, Typography } from "@mui/material";
-import { CancelOutlined, DeleteOutlined, SaveOutlined } from "@mui/icons-material";
+import { useRef, useState } from "react";
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Switch,
+  TextField,
+} from "@mui/material";
+import { CancelOutlined, DeleteOutlined, PrintOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
@@ -23,12 +29,12 @@ import OrderPrint from "./OrderPrint.tsx";
 import {queryClient} from "../../main.tsx";
 import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 import { useConfirm } from "material-ui-confirm";
+import { useReactToPrint } from "react-to-print";
 
 
 export interface OrderEditProps {
   order: Order;
 }
-
 
 const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const {order: storedOrder} = props
@@ -37,11 +43,13 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const navigate = useNavigate()
   const [customer, setCustomer] = useState(order.customer);
   const [takeAway, setTakeAway] = useState(order.takeAway);
-  const [coperti, setCoperti] = useState(order.serviceNumber);
+  const [coperti, setCoperti] = useState<number|undefined>(order.serviceNumber);
   const [note, setNote] = useState(order.note ?? '');
 
+  const contentRef = useRef<HTMLDivElement>(null);
+  const reactToPrintFn = useReactToPrint({ contentRef });
+
   const differences = !isEqual(storedOrder, order)
-  console.log("Calcolo differenze: " + differences);
 
   const handleCancel = () => {
     resetStore()
@@ -190,21 +198,17 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
   const handleChangeCoperti =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-        let value = 0;
-            if ( ! event.currentTarget.value ) {
-              value = 0
-            } else {
-              // FIXME non c'e' un controllo se il valore è numerico
-              const number = Number.parseInt(event.currentTarget.value);
-              if ( number >=  0)
-                value = number
-              else
-                value = 0
-            }
+          const value = Number.parseInt(event.target.value)
+          if ( ! isNaN(value)) {
             setCoperti(value);
             updateOrderField('serviceNumber', value)
-          }, [setCoperti, updateOrderField]
+          } else {
+            setCoperti(undefined);
+            updateOrderField('serviceNumber', undefined)
+          }
+        }, [setCoperti, updateOrderField]
       )
+
 
   const handleChangeNote =
     React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
@@ -256,18 +260,28 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                    onChange={handleChangeCustomer}
                    helperText={errors['customer'] !== undefined ? errors['customer'] : ''}
         />
+      <Box
+        component="form"
+        sx={{ '& > :not(style)': { m: 1 } }}
+        noValidate
+        autoComplete="off"
+      >
+      </Box>
         <Box sx={{ display: "flex", marginTop: 2 }}>
-
-          <TextField type="number" size='small'
-                     value={coperti}
+          <TextField size='small'
+                     value={coperti !== undefined ? coperti : ''}
+                     required
+                     type="number"
                      name={'serviceNumber'}
                      error={errors['serviceNumber'] !== undefined}
-                     label="N. Coperti"
+                     label="Coperti"
                      onChange={handleChangeCoperti}
                      disabled={takeAway}
-                     slotProps={{ htmlInput: { size: 8 } }}
+                     slotProps={{ htmlInput: { size: 8, min: 0 } }}
                      sx={{ ml: 0, mr: 2}}
+                     helperText={ errors['serviceNumber'] ?? ''}
           />
+
           <FormControlLabel
               label="Asporto"
               control={
@@ -295,6 +309,9 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
               startIcon={<SaveOutlined/>}
               onClick= {() => handleSave()}
           >{ isNewOrder() ? 'Crea' : 'Aggiorna'}</Button>
+          <Button size="small"  color="success"
+                  disabled={differences || isNewOrder()}
+                  onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
             <Button
               size="small"
               disabled={!differences}
@@ -308,11 +325,10 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                     handleCancel()
                   }
                 });
-
               }}
               startIcon={<CancelOutlined/>}
             >Annulla</Button>
-          <OrderPrint disabled={differences || isNewOrder() } order={order} products={productsTable}/>
+
           <Button size="small"
                   variant="contained"
                   disabled={ isNewOrder() }
@@ -321,6 +337,11 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                   startIcon={<DeleteOutlined/>}
           >Elimina</Button>
         </Box>
+        { ! (differences || isNewOrder()) &&
+          <div ref={contentRef} className="printContent print-container">
+            <OrderPrint order={order} products={productsTable}/>
+          </div>
+        }
     </>
   );
 }

@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 // @ts-ignore
 export const EmptyOrder: Order = {
   products: [],
-  serviceNumber: 1,
+  serviceNumber: undefined,
   serviceCost: 0.5,
   customer: '',
   takeAway: false,
@@ -73,6 +73,11 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         }
         setStoredProducts(_storedProducts)
     }, [products])
+
+    React.useEffect(() => {
+        setStoredOrder(order)
+    }, [order])
+
 
 
     const deleteProductHandler = (product: Product) => {
@@ -253,6 +258,13 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         setStoredOrder(() => {
            // return (order.id === -1 ? EmptyOrder : order)
             return order
+        })
+        setStoredProducts(() => {
+            const _storedProducts: Record<number, Product> = {}
+            for (let i = 0; i< products.length; i++) {
+                _storedProducts[products[i].id] = products[i]
+            }
+            return _storedProducts
         })
         resetErrorsHandler()
     }

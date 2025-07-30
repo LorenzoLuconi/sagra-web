@@ -1,18 +1,14 @@
-import { Alert, Box, CircularProgress, Divider, IconButton, Paper, Typography } from "@mui/material";
-import { Course, Product } from "../../api/sagra/sagraSchemas.ts";
-import { useState } from "react";
+import {Alert, Box, CircularProgress, Divider, IconButton, Paper} from "@mui/material";
+import {Course, Product} from "../../api/sagra/sagraSchemas.ts";
+import {useState} from "react";
 import CoursesSelector from "../course/CoursesSelector.tsx";
-import { AppsOutlined, CachedOutlined, FormatListNumberedOutlined } from "@mui/icons-material";
+import {AppsOutlined, CachedOutlined, FormatListNumberedOutlined} from "@mui/icons-material";
 import ProductsOrderCard from "../product/ProductsOrderCard.tsx";
-import { useOrderStore } from "../../context/OrderStore.tsx";
+import {useOrderStore} from "../../context/OrderStore.tsx";
 import ProductsOrderList from "../product/ProductsOrderList.tsx";
-import {
-  fetchProductsSearch,
-  productsSearchQuery,
-  ProductsSearchQueryParams
-} from "../../api/sagra/sagraComponents.ts";
-import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "../../main.tsx";
+import {productsSearchQuery, ProductsSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
+import {useQuery} from "@tanstack/react-query";
+import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 
 const ProductsToOrder = () => {
@@ -91,6 +87,7 @@ const ProductsToOrder = () => {
           </IconButton>
         </Paper>
         <Paper variant="outlined" className="paper-bottom">
+          <>
           {type == 0 ? (
             <ProductsOrderCard
               addToOrder={handleAddProduct}
@@ -102,6 +99,7 @@ const ProductsToOrder = () => {
               products={products}
             />
           )}
+          </>
         </Paper>
       </Box>
     );
