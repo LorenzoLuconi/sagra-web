@@ -1,7 +1,8 @@
 import * as React from 'react'
 import {OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
-import {Box, CircularProgress, Paper, Typography} from "@mui/material";
+import {Box, Button, Card, CardActions, CardContent, CircularProgress, Paper, Typography, Tabs, Tab} from "@mui/material";
 import {Product, StatsOrder} from "../../api/sagra/sagraSchemas.ts";
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {convertDate} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
@@ -17,42 +18,7 @@ interface DayStatsI {
     day: string
     stats: StatsOrder
 }
-/*
-const data = [
-    { label: 'Group A', value: 400 },
-    { label: 'Group B', value: 300 },
-    { label: 'Group C', value: 300 },
-    { label: 'Group D', value: 200 },
-];
 
-const ddata = [
-    {
-        label: "Group A",
-        value: 16
-    },
-    {
-        label: "Group B",
-        value: 18
-    },
-    {
-        label: "Group C",
-        value: 16
-    },
-    {
-        label: "Group D",
-        value: 8
-    },
-
-]
-*/
-
-
-const settings = {
-    margin: { right: 5 },
-    width: 200,
-    height: 200,
-    hideLegend: true,
-};
 
 interface StatsFieldI {
     field: string
@@ -94,7 +60,7 @@ const DayStats: React.FC<DayStatsI> = (props) => {
 
 
     return (
-        <Paper sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '30%', padding: '5px', gap: '20px'}}>
+        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '5px', gap: '20px'}}>
             <Typography sx={{fontWeight: '700', fontSize: '2rem'}}>{convertDate('it', new Date(day))}</Typography>
 
             <Box sx={{display: 'flex', gap: '20px', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
@@ -112,13 +78,13 @@ const DayStats: React.FC<DayStatsI> = (props) => {
                 />
             </Box>
 
-        </Paper>
+        </Box>
     )
 
 }
 
-interface StatsViewI {
-    stats: StatsOrder
+interface ResponseStatsViewI {
+    stats: OrderStatsResponse
 }
 
 /*
@@ -126,20 +92,45 @@ interface StatsViewI {
  */
 
 
+interface StatsViewI {
+    stats: StatsOrder
+    day: string
+    onSelectedDay: (selected: string) => voidd
+}
+
 const OverviewDayStats: React.FC<StatsViewI> = (props) => {
-    const {stats} = props
+    const {stats, day} = props
     return (
-        <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start'}}>
+        <Card
+            sx={{
+                display: 'flex',
+                width: 'fit-content',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                padding: '10px'
+            }}
+        >
+            <CardContent>
             <StatsField field={'Numero Ordini'} value={stats.count}/>
             <StatsField field={'Totale Coperti'} value={stats.totalServiceNumber}/>
             <StatsField field={'Totale'} value={stats.totalAmount} isAmount/>
-        </Box>
+            </CardContent>
+            <CardActions>
+                <Button
+                    onClick={() => {props.onSelectedDay(day)}}
+                    size="small"
+                >
+                    Learn More
+                </Button>
+            </CardActions>
+        </Card>
     )
 }
 
 
-const StatsView: React.FC<StatsViewI> = (props) => {
+const StatsView: React.FC<ResponseStatsViewI> = (props) => {
     const {stats} = props
+    const [selectedDay, setSelectedDay] = React.useState<string | undefined>(undefined)
 
     const byDay = Object.keys(stats)
 
@@ -159,9 +150,15 @@ const StatsView: React.FC<StatsViewI> = (props) => {
 
             return (
                 <ProductsStore products={products}>
-                    <Paper sx={{display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap', gap: '20px'}}>
+                    <Paper sx={{display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap', gap: '20px', width: '100%'}}>
+                       <Box sx={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+
+
+
+
                         <Timeline
                             sx={{
+                                display: 'flex',
                                     [`& .${timelineOppositeContentClasses.root}`]: {
                                         flex: 0.2,
                                     }}}
@@ -173,17 +170,29 @@ const StatsView: React.FC<StatsViewI> = (props) => {
                         {byDay.map((day: string) => {
                             return (
 
-                                <TimelineItem key={day}>
-                                    <TimelineOppositeContent color="textSecondary">
-                                        <Typography>{convertDate('it', new Date(day))}</Typography>
+                                <TimelineItem key={day} >
+                                    <TimelineOppositeContent
+                                        sx={{display: 'flex', justifyContent: 'flex-end ', alignItems: 'center'}}
+                                        color="primary">
+
+                                        <Typography
+                                            sx={{fontWeight: 700}}
+                                        >{convertDate('it', new Date(day))}</Typography>
+
                                     </TimelineOppositeContent>
                                     <TimelineSeparator>
-                                        <TimelineConnector />
+                                        <TimelineConnector sx={{color: 'red'}}/>
                                         <TimelineDot/>
                                         <TimelineConnector />
                                     </TimelineSeparator>
-                                    <TimelineContent sx={{ py: '22px', px: 2 }}>
-                                        <OverviewDayStats stats={stats[day]}/>
+                                    <TimelineContent >
+                                        <OverviewDayStats
+                                            day={day}
+                                            stats={stats[day]}
+                                            onSelectedDay={(_selectedDay: string)=> {
+                                                setSelectedDay(_selectedDay)
+                                            }}
+                                        />
                                     </TimelineContent>
                                 </TimelineItem>
 
@@ -192,6 +201,16 @@ const StatsView: React.FC<StatsViewI> = (props) => {
                             )
                         })}
                         </Timeline>
+                           <Box>
+                           <Tabs>
+                               <Tab label={'Info'}></Tab>
+                               <Tab label={'Grafico'}/>
+                           </Tabs>
+                           <Paper sx={{width: '100%'}}>
+                               { selectedDay && <DayStats day={selectedDay} stats={stats[selectedDay]}/>}
+                           </Paper>
+                           </Box>
+                       </Box>
                     </Paper>
                 </ProductsStore>
             )
