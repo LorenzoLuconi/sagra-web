@@ -7,7 +7,7 @@ import {Toaster} from "react-hot-toast";
 import InfoIcon from '@mui/icons-material/Info';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import {Box, CircularProgress, createTheme, Theme} from "@mui/material";
+import {Box, CircularProgress} from "@mui/material";
 import UnmanagedPathView from "./view/UnmanagedPathView.tsx";
 import MonitorContainer from "./container/MonitorContainer.tsx";
 import {Logo} from "./layout/Logo.tsx";
@@ -23,7 +23,9 @@ import ProductQuantityUpdateContainer from "./container/product/ProductQuantityU
 import OrderPrint from "./container/order/OrderPrint.tsx";
 import StatsContainer from "./container/stats/StatsContainer.tsx";
 import {sagraTheme} from "./SagraTheme.ts";
-
+import {LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import 'dayjs/locale/it';
 
 
 const useRouter = () => {
@@ -157,7 +159,9 @@ export default function App() {
 
               }}
           />
-        <RouterProvider router={router}/>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'it'}>
+            <RouterProvider router={router}/>
+          </LocalizationProvider>
       </React.Suspense>
   )
 }
