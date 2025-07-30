@@ -26,6 +26,9 @@ import TimelineOppositeContent, {
     timelineOppositeContentClasses,
 } from '@mui/lab/TimelineOppositeContent';
 import {get} from "lodash";
+import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import 'dayjs/locale/it';
 
 interface DayStatsContainerI {
     day: string
@@ -126,6 +129,10 @@ const DayStatsContainer: React.FC<DayStatsContainerI> = (props) => {
     return (
         <Box sx={{p: 5, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '20px'}}>
             <Typography sx={{fontSize: '1.1rem', fontWeight: 700, color: 'primary'}}>{`Statistiche del giorno ${convertDate('it', new Date(day))}`}</Typography>
+
+                <DatePicker />
+
+
         <Tabs
             value={value}
             onChange={handleChange}
@@ -211,7 +218,6 @@ const OverviewDayStats: React.FC<StatsViewI> = (props) => {
     const {stats, day} = props
     const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-    console.log('OverviewDayStats: ', stats, day)
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -293,9 +299,6 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
                 <ProductsStore products={products}>
                     <Paper sx={{display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap', gap: '20px', width: '100%'}}>
                        <Box sx={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
-
-
-
 
                         <Timeline
                             sx={{
