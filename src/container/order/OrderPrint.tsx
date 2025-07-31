@@ -1,9 +1,6 @@
-import {useRef} from "react";
-import {useReactToPrint} from "react-to-print";
 import {
   Box,
-  Button,
-  Grid,
+  Grid, styled,
   Table,
   TableBody,
   TableCell,
@@ -12,12 +9,12 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
-import {PrintOutlined} from "@mui/icons-material";
 import {Logo} from "../../layout/Logo.tsx";
 import {Order, OrderedProduct, Product} from "../../api/sagra/sagraSchemas.ts";
-import {currency} from "../../utils";
+import { convertDate, currency, FULL_DATE_CONF } from "../../utils";
 import "./OrderPrint.css"
 import {DepartmentName} from "../department/DepartmentName.tsx";
+import * as React from "react";
 
 interface OrderPrintProps {
   order: Order
@@ -25,10 +22,29 @@ interface OrderPrintProps {
 }
 
 const TableStyle = {
-  border: '1px solid black',
-  borderRadius: '3px',
+  border: '1px solid #999',
+  borderRadius: '4px',
   width: '100%'
 }
+
+const TableCellCustomerStyle = {
+  fontSize: '1.0em'
+}
+
+const TableCellDepStyle = {
+  fontSize: '1.2em'
+}
+
+
+const StyledTableRow = styled(TableRow)(() => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: '#FAFAFA'
+  },
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+}));
 
 const OrderPrint = (props : OrderPrintProps ) => {
 
@@ -60,6 +76,14 @@ interface IFieldValue {
   value: string
 }
 
+const OrderPrintContainer = ( props: React.PropsWithChildren ) => {
+  return (
+    <Box sx={{ m: 3, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+      {props.children}
+    </Box>
+  )
+}
+
 
 const FieldValue = (props: IFieldValue) => {
   return (
@@ -68,7 +92,7 @@ const FieldValue = (props: IFieldValue) => {
         <Typography sx={{fontSize: '0.9em', textTransform: 'uppercase'}}>{props.field}:</Typography>
       </Box>
       <Box>
-        <Typography sx={{fontSize: '1.1em', fontWeight: 500}}>{props.value}</Typography>
+        <Typography sx={{fontSize: '1.0em', fontWeight: 500}}>{props.value}</Typography>
       </Box>
     </Box>
   )
@@ -79,13 +103,14 @@ interface OrderPrintPageCustomerProps {
   products: Record<number, Product>
 }
 
+
 const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
   const {order, products} = props;
 
 
   return (
     <>
-      <Box sx={{ m: 3}}>
+      <OrderPrintContainer>
         <OrderPrintLogo/>
         <OrderPrintInfo order={order} hideTable={true}/>
         <OrderPrintTitle title="Copia Cliente" />
@@ -101,23 +126,23 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
             </TableHead>
             <TableBody>
               <>
-              { order.products.map(p =>
-                <TableRow key={p.productId} sx={{p: 0}}>
-                  <TableCell><Typography sx={{ fontSize: '1.2em'}}>{products[p.productId]?.name}</Typography></TableCell>
-                  <TableCell align="center">{p.quantity}</TableCell>
-                  <TableCell align="right">{currency(p.price)}</TableCell>
-                  <TableCell align="right">{currency(p.price * p.quantity)}</TableCell>
-                </TableRow>
+              { order.products.map( p =>
+                <StyledTableRow key={p.productId}>
+                  <TableCell><Typography sx={{ ...TableCellCustomerStyle }}>{products[p.productId]?.name}</Typography></TableCell>
+                  <TableCell align="center"><Typography sx={{ ...TableCellCustomerStyle}}>{p.quantity}</Typography></TableCell>
+                  <TableCell align="right"><Typography sx={{ ...TableCellCustomerStyle}}>{currency(p.price)}</Typography></TableCell>
+                  <TableCell align="right"><Typography sx={{ ...TableCellCustomerStyle}}>{currency(p.price * p.quantity)}</Typography></TableCell>
+                </StyledTableRow>
               )}
               </>
               <>
               { order.serviceNumber > 0 &&
 
                 <TableRow >
-                  <TableCell><Typography sx={{ fontSize: '1.2em'}}>Coperti</Typography></TableCell>
+                  <TableCell><Typography sx={{ ...TableCellCustomerStyle}}>Coperti</Typography></TableCell>
                   <TableCell align="center">{order.serviceNumber}</TableCell>
-                  <TableCell align="right">{currency(order.serviceCost)}</TableCell>
-                  <TableCell align="right">{currency(order.serviceNumber * order.serviceCost)}</TableCell>
+                  <TableCell align="right"><Typography sx={{ ...TableCellCustomerStyle}}>{currency(order.serviceCost)}</Typography></TableCell>
+                  <TableCell align="right"><Typography sx={{ ...TableCellCustomerStyle}}>{currency(order.serviceNumber * order.serviceCost)}</Typography></TableCell>
                 </TableRow>
               }
               </>
@@ -128,7 +153,7 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
+      </OrderPrintContainer>
     </>
   )
 
@@ -159,7 +184,7 @@ const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
 
   return (
     <>
-      <Box sx={{ m: 3}}>
+      <OrderPrintContainer>
         <OrderPrintLogo/>
         <OrderPrintInfo order={order} />
         <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
@@ -178,16 +203,16 @@ const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
           <TableBody>
             <>
               { productsToPrint.map(p =>
-                <TableRow key={p.productId} sx={{p: 0}}>
-                  <TableCell ><Typography sx={{ fontSize: '1.2em'}}>{products[p.productId].name}</Typography></TableCell>
-                  <TableCell align="center">{p.quantity}</TableCell>
-                </TableRow>
+                <StyledTableRow key={p.productId} sx={{p: 0}}>
+                  <TableCell ><Typography sx={{ ...TableCellDepStyle}}>{products[p.productId].name}</Typography></TableCell>
+                  <TableCell align="center"><Typography sx={{ ...TableCellDepStyle}}>{p.quantity}</Typography></TableCell>
+                </StyledTableRow>
               )}
             </>
           </TableBody>
           </Table>
         </TableContainer>
-      </Box>
+      </OrderPrintContainer>
     </>
   )
 
@@ -195,7 +220,7 @@ const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
 
 const OrderPrintLogo = () => {
   return (
-    <Box sx={{display: 'flex', columnGap: 5, justifyContent: 'flex-start'}}>
+    <Box sx={{display: 'flex', columnGap: 5, justifyContent: 'flex-start', width: '100%'}}>
       <Logo sx={{fontSize: '6vh', color: 'text.primary', verticalAlign: 'middle'}} />
       <Typography sx={{fontSize: '1.8em', color: 'text.primary', pt: 3}}>Sagra San Pio X</Typography>
     </Box>
@@ -216,7 +241,7 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
         <Grid size={7}>
           <FieldValue field="Numero" value={order.id.toString()}/>
           <FieldValue field="Nome" value={order.customer}/>
-          <FieldValue field="Data" value={order.created}/>
+          <FieldValue field="Data" value={convertDate('it', new Date(order.created), FULL_DATE_CONF)}/>
           <FieldValue field="Note" value={order.note ?? '-'}/>
         </Grid>
         <Grid size={5}>
