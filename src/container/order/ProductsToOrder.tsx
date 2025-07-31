@@ -86,7 +86,7 @@ const ProductsToOrder = () => {
             <CachedOutlined onClick={() => handlRefreshProducts()} />
           </IconButton>
         </Paper>
-        <Paper variant="outlined" className="paper-bottom">
+        <Paper variant="outlined" className="paper-bottom" sx={{ p: 1, pb: 2}}>
           <>
           {type == 0 ? (
             <ProductsOrderCard
