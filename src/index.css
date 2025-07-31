@@ -7,30 +7,26 @@ body {
     background: #ffffff !important;
 }
 
+.paper-grey {
+    background: #f8f8f8 !important;
+}
+
 .paper-top {
-border-bottom-right-radius: 0  !important;
-border-bottom-left-radius: 0 !important;
-margin-bottom: 0 !important;
-border-bottom: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    margin-bottom: 0 !important;
+    border-bottom: 0 !important;
 }
 
 .paper-middle {
-border-radius: 0 !important;
-border-bottom: 0 !important;
-margin-top: 0 !important;
-margin-bottom: 0 !important;
+    border-radius: 0 !important;
+    border-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .paper-bottom {
-border-top-left-radius: 0 !important;
-border-top-right-radius: 0  !important;
-margin-top: 0 !important;
-}
-
-
-.paper-linked-bottom {
-border-bottom-right-radius: 0  !important;
-border-bottom-left-radius: 0 !important;
-margin-top: 0 !important;
-border-bottom: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    margin-top: 0 !important;
 }

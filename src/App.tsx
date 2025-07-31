@@ -2,7 +2,7 @@ import * as React from 'react'
 import MainLayout from "./layout/MainLayout.tsx";
 import Header from "./layout/Header.tsx";
 import {createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider} from "react-router-dom";
-import Orders from "./container/order/Orders.tsx";
+import OrderList from "./container/order/OrderList.tsx";
 import {Toaster} from "react-hot-toast";
 import InfoIcon from '@mui/icons-material/Info';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -20,12 +20,13 @@ import ProductContainer from "./container/product/ProductContainer.tsx";
 import OrderNew from "./container/order/OrderNew.tsx";
 import {OrderStore} from "./context/OrderStore.tsx";
 import ProductQuantityUpdateContainer from "./container/product/ProductQuantityUpdateContainer.tsx";
-import OrderPrint from "./container/order/OrderPrint.tsx";
 import StatsContainer from "./container/stats/StatsContainer.tsx";
 import {sagraTheme} from "./SagraTheme.ts";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import 'dayjs/locale/it';
+import OrderListContainer from "./container/order/OrderListContainer.tsx";
+
 
 
 const useRouter = () => {
@@ -66,7 +67,7 @@ const useRouter = () => {
                   },
                     {
                         path: '/orders',
-                        element: <Orders/>
+                        element: <OrderListContainer />
                     },
                     {
                         path: '/orders/new',
@@ -77,10 +78,6 @@ const useRouter = () => {
                         element: <OrderEdit/>
                     },
 
-                  {
-                    path: '/orders/:orderId/print',
-                    element: <OrderPrint />
-                  },
                     {
                       path: '/departments',
                       element: <DepartmentContainer/>
