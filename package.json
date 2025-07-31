@@ -31,7 +31,8 @@
     "react-hot-toast": "^2.5.2",
     "react-router": "^7.6.3",
     "react-router-dom": "^7.6.3",
-    "react-to-print": "^3.1.1"
+    "react-to-print": "^3.1.1",
+    "write-excel-file": "^2.3.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
