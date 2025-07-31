@@ -299,7 +299,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
                      onChange={handleChangeNote}
                      />
         </Box>
-        <Box sx={{ mt: 1, display: "flex", justifyContent: "space-between", gap: 1,
+        <Box sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 2,
                   p: 2
         }}>
           <Button
