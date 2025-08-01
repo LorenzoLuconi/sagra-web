@@ -1,5 +1,3 @@
-// import React from 'react'
-
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchProductDelete, productsSearchQuery, ProductsSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
 import {
@@ -15,7 +13,7 @@ import {
   Typography
 } from "@mui/material";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
-import { DeleteOutlined, EditOutlined, LinkOutlined } from "@mui/icons-material";
+import {DeleteOutlined, EditOutlined, LinkOutlined, SettingsOutlined} from "@mui/icons-material";
 import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
 import { useConfirm } from "material-ui-confirm";
@@ -107,17 +105,17 @@ const ProductsList = (props : IProductList) => {
     return (
       <form>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: 'background.default' }}>
             <TableRow>
               <TableCell>Nome Prodotto</TableCell>
               <TableCell>Portata</TableCell>
               <TableCell>Reparto</TableCell>
               <TableCell align='right'>Prezzo</TableCell>
               <TableCell>Prodotto Collegato</TableCell>
-              <TableCell align='center'>Azioni</TableCell>
+              <TableCell align='center' sx={{ width: '90px'}}><SettingsOutlined /></TableCell>
             </TableRow>
           </TableHead>
-          <TableBody className="divide-y">
+          <TableBody sx={{ backgroundColor: 'background.default' }}>
             {products.map((product: Product) => {
               return (
                 <TableRow key={product.id} selected={props.selected?.id === product.id}>

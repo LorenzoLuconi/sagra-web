@@ -116,9 +116,9 @@ export type OrderRequest = {
    */
   serviceNumber: number;
   /**
-   * @format int64
+   * @minimum 0
    */
-  discountId?: number;
+  discountRate?: number;
   /**
    * @minItems 1
    */

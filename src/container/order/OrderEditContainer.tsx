@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useQueries } from "@tanstack/react-query";
 import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import { CircularProgress, Grid, Paper, Typography } from "@mui/material";
+import {CircularProgress, Grid, Paper, Typography, useTheme} from "@mui/material";
 import { OrderStore } from "../../context/OrderStore.tsx";
 import ProductsToOrder from "./ProductsToOrder.tsx";
 import ErrorInfo from "../../view/ErrorInfo.tsx";
@@ -16,6 +16,7 @@ interface OrderEditContainerProps {
 
  const OrderEditContainer: React.FC<OrderEditContainerProps> = (props) => {
   const { order } = props;
+  const theme = useTheme();
 
   const combinedQueries = useQueries({
     queries: order.products.map((product) => {
@@ -50,25 +51,31 @@ interface OrderEditContainerProps {
 
             {
               order.id > 0 &&
-              <Paper variant="outlined" sx={{ p: 0.5, textAlign: 'center', backgroundColor: '#D9D9D9' }} className="paper-top">
+              <Paper variant="outlined"
+                     sx={{ p: 0.5, textAlign: 'center', backgroundColor: theme.sagra.panelBackground, filter: 'brightness(85%)' }}
+                     className="paper-top">
                 <Typography sx={{fontWeight: 500, fontSize: '1.1em'}}>Ordine n. {order.id}</Typography>
               </Paper>
             }
 
-            <Paper variant="outlined" sx={{ p: 0.5 }} className="paper-middle">
+            <Paper variant="outlined"
+                   sx={{ p: 0.5, backgroundColor: theme.sagra.panelBackground }}
+                   className="paper-middle">
               <OrderEditTotal />
             </Paper>
 
-            <Paper variant="outlined" sx={{ p: 0.5 }} className="paper-middle">
+            <Paper variant="outlined"
+                   sx={{ p: 0.5, backgroundColor: theme.sagra.panelBackground }}
+                   className="paper-middle">
               <OrderEditProducts />
             </Paper>
 
             <Paper
               variant="outlined"
-              sx={{ padding: 2 }}
+              sx={{ padding: 2, backgroundColor: theme.sagra.panelBackground }}
               className="paper-bottom"
             >
-              <OrderEditForm order={order} />
+              <OrderEditForm />
             </Paper>
           </Grid>
         </Grid>

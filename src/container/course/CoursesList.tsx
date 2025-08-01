@@ -26,7 +26,7 @@ import {
   Check,
   Close,
   DeleteOutlined,
-  EditOutlined,
+  EditOutlined, SettingsOutlined,
 } from "@mui/icons-material";
 import { queryClient } from "../../main.tsx";
 import { green, red } from "@mui/material/colors";
@@ -92,109 +92,107 @@ const CoursesList = () => {
     },
   });
 
-  if (coursesQuery.isFetched) {
-
-    const courses = coursesQuery.data;
-
-    if (courses) {
-      if (courses.length < 1) {
-        return <Typography>Nessuna portata presente</Typography>
-      }
-
-      return (
-        <form>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nome Portata</TableCell>
-                <TableCell>Azione</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody className="divide-y">
-              {courses.map((course: Course) => {
-                return (
-                  <TableRow key={course.id} selected={selected == course.id}>
-                    {(() => {
-                      if (selected == course.id) {
-                        return (
-                          <TableCell>
-                            <TextField
-                              required
-                              value={nameEdit}
-                              size="small"
-                              onChange={handleChange}
-                              slotProps={{ htmlInput: { size: 32 } }}
-                            />
-                            <IconButton
-                              aria-label="Salva modifica"
-                              onClick={() => {
-                                const request: CourseRequest = {
-                                  name: nameEdit,
-                                };
-                                courseUpdate.mutate({
-                                  courseId: course.id,
-                                  courseRequest: request,
-                                });
-                                resetState();
-                              }}
-                            >
-                              <Check sx={{ color: green[700] }} />
-                            </IconButton>
-                            <IconButton
-                              aria-label="Annulla modifica"
-                              onClick={() => {
-                                resetState();
-                              }}
-                            >
-                              <Close sx={{ color: red[700] }} />
-                            </IconButton>
-                          </TableCell>
-                        );
-                      } else {
-                        return <TableCell sx={{ fontSize: '1.2em' }}>{course.name}</TableCell>;
-                      }
-                    })()}
-                    <TableCell>
-                      <IconButton
-                        aria-label="edit"
-                        onClick={() => {
-                          setSelected(course.id);
-                          setNameEdit(course.name);
-                        }}
-                      >
-                        <EditOutlined />
-                      </IconButton>
-
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => {
-                          resetState();
-                          coursesDelete.mutate(course.id as number);
-                        }}
-                      >
-                        <DeleteOutlined />
-                      </IconButton>
-
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </form>
-      );
-    }
-  }
-
   if (coursesQuery.isError) {
     return <Alert severity="error">Si è verificato un errore prelevando la lista delle portate: {coursesQuery.error.message}</Alert>
   }
 
-  return (
-    <Box sx={{ display: "flex" }}>
-      <CircularProgress />
-    </Box>
-  );
+  if (coursesQuery.isPending) {
+    return (
+        <Box sx={{display: "flex"}}>
+          <CircularProgress/>
+        </Box>
+    );
+  }
+
+    const courses = coursesQuery.data;
+
+    if (courses && courses.length < 1)
+        return <Typography>Nessuna portata presente</Typography>
+
+    return (
+      <>
+        <Table>
+          <TableHead sx={{ backgroundColor: "background.default" }}>
+            <TableRow>
+              <TableCell>Nome Portata</TableCell>
+              <TableCell sx={{ width: '100px'}} align="center"><SettingsOutlined/></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody sx={{ backgroundColor: "background.default" }}>
+            {courses.map((course: Course) => {
+              return (
+                <TableRow key={course.id} selected={selected == course.id}>
+                  {(() => {
+                    if (selected == course.id) {
+                      return (
+                        <TableCell>
+                          <TextField
+                            required
+                            value={nameEdit}
+                            size="small"
+                            onChange={handleChange}
+                            slotProps={{ htmlInput: { size: 32 } }}
+                          />
+                          <IconButton
+                            aria-label="Salva modifica"
+                            onClick={() => {
+                              const request: CourseRequest = {
+                                name: nameEdit,
+                              };
+                              courseUpdate.mutate({
+                                courseId: course.id,
+                                courseRequest: request,
+                              });
+                              resetState();
+                            }}
+                          >
+                            <Check sx={{ color: green[700] }} />
+                          </IconButton>
+                          <IconButton
+                            aria-label="Annulla modifica"
+                            onClick={() => {
+                              resetState();
+                            }}
+                          >
+                            <Close sx={{ color: red[700] }} />
+                          </IconButton>
+                        </TableCell>
+                      );
+                    } else {
+                      return <TableCell sx={{ fontSize: '1.2em' }}>{course.name}</TableCell>;
+                    }
+                  })()}
+                  <TableCell align="center">
+                    <IconButton
+                      aria-label="edit"
+                      onClick={() => {
+                        setSelected(course.id);
+                        setNameEdit(course.name);
+                      }}
+                    >
+                      <EditOutlined />
+                    </IconButton>
+
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => {
+                        resetState();
+                        coursesDelete.mutate(course.id as number);
+                      }}
+                    >
+                      <DeleteOutlined />
+                    </IconButton>
+
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </>
+    );
+
+
 };
 
 export default CoursesList;

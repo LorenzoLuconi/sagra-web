@@ -164,7 +164,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
 
 
                         <Divider />
-                        <MenuItem disabled onClick={() => {navigate('/stats')}}>
+                        <MenuItem  onClick={() => {navigate('/stats')}}>
                             <AssessmentOutlined />
                             Statistiche
                         </MenuItem>
