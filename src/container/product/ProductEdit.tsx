@@ -40,7 +40,7 @@ interface ErrorMessages {
 
 const ProductEdit = (props: IProductEdit) => {
   const [name, setName] = React.useState(props.selected?.name ?? "");
-  const [price, setPrice] = React.useState<number>(props.selected?.price??0);
+  const [price, setPrice] = React.useState<number|undefined>(props.selected?.price);
   const [departmentId, setDepartmentId] = React.useState<number>(
     props.selected?.departmentId ?? 0,
   );
@@ -54,7 +54,7 @@ const ProductEdit = (props: IProductEdit) => {
 
   const resetState = () => {
     setName("");
-    setPrice( 0 );
+    setPrice( undefined );
     setDepartmentId(0);
     setCourseId(0);
     setParentId(0);
@@ -91,7 +91,13 @@ const ProductEdit = (props: IProductEdit) => {
 
   const handleChangePrice =
     React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-      setPrice(+event.currentTarget.value);
+      const value = Number.parseFloat(event.target.value)
+
+      if ( ! isNaN(value)) {
+        setPrice(value);
+      } else {
+        setPrice(undefined);
+      }
     }, [setPrice],
   );
 
@@ -175,7 +181,7 @@ const ProductEdit = (props: IProductEdit) => {
     }
 
     if (! price || price <= 0) {
-      errorMessages.price = "Prezzo obbligatorio, deve essere un numero maggiore di 0";
+      errorMessages.price = "Prezzo obbligatorio, deve essere un importo maggiore di 0";
       valid = false;
     }
 
@@ -247,15 +253,16 @@ const ProductEdit = (props: IProductEdit) => {
             type="number"
             size="small"
             required
-            value={price}
+            value={price !== undefined ? price : ''}
             label="Prezzo"
+            placeholder="es. 4.50"
             slotProps={{
               input: {
                 startAdornment: (
                   <InputAdornment position="start">€</InputAdornment>
                 ),
               },
-              htmlInput: { size: 10, step: 0.1 },
+              htmlInput: { size: 10, step: 0.1, min: 0 },
             }}
             onChange={handleChangePrice}
             error={!!errorMessage.price}
