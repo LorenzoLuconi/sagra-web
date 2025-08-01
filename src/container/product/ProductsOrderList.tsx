@@ -10,7 +10,8 @@ import {
 import { Product } from "../../api/sagra/sagraSchemas.ts";
 import { currency } from "../../utils";
 import ProductQuantity from "./ProductQuantity.tsx";
-import { IProductsOrder, productAvailable } from "./IProductsOrder.tsx";
+import { IProductsOrder } from "./IProductsOrder.tsx";
+import {productBackgroundColor, productAvailable} from "./produtils.ts";
 
 const ProductsOrderList = (props: IProductsOrder) => {
   const {products, addToOrder} = props;
@@ -31,12 +32,12 @@ const ProductsOrderList = (props: IProductsOrder) => {
             <>
             {products.map((product: Product) => {
               return (
-                <TableRow
+                <TableRow hover={productAvailable(product)}
                   key={product.id}
                   sx={(theme) => ({
                     minWidth: 200,
                     cursor: productAvailable(product) ? 'pointer' : 'default',
-                    backgroundColor: (! productAvailable(product) ? theme.sagra.productSoldOut : ( product.availableQuantity < 10 ? theme.sagra.productAlmostSoldOut : theme.sagra.productCard))
+                    backgroundColor: productBackgroundColor(product, theme)
                   })}
                   onClick={() => {
                     if ( productAvailable(product) )
