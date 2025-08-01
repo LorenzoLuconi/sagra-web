@@ -1,4 +1,4 @@
-import {Discount, OrderedProduct} from "../../api/sagra/sagraSchemas.ts";
+import {OrderedProduct} from "../../api/sagra/sagraSchemas.ts";
 import {Box, Button, Divider, Menu, MenuItem, Typography} from "@mui/material";
 import {currency} from "../../utils";
 import {useOrderStore} from "../../context/OrderStore.tsx";
@@ -9,7 +9,7 @@ import {useQuery} from "@tanstack/react-query";
 
 const OrderEditTotal = () => {
 
-  const {order, updateOrderField} = useOrderStore()
+  const {order, updateOrderField, originalOrder} = useOrderStore()
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -17,17 +17,9 @@ const OrderEditTotal = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleUpdateDiscount = ( discount?: Discount) => {
-    console.log("Selezionato nuovo sconto: ", discount);
-    // FIXME l'aggiornamento dello sconto non è applicato e occorre impostare un discountId, richiede modifica dello store
-    if ( ! discount ) {
-      updateOrderField('discountRate', 0)
-    } else if ( discount.rate !== order.discountRate ) {
-      // Sconto modificato
-      updateOrderField('discountRate', discount.rate)
-    }
-
-    setAnchorEl(null);
+  const handleUpdateDiscount = (rate? : number) => {
+      updateOrderField('discountRate', rate);
+      setAnchorEl(null);
   };
 
   const discountsSearchConf = discountsSearchQuery({});
@@ -74,13 +66,20 @@ const OrderEditTotal = () => {
                     },
                   }}
               >
-                { order.discountRate ? // FIXME occorre accedere all'ordine originale che non è nello store al momento
-                      <MenuItem key={"orig-discount"} onClick={() =>  setAnchorEl(null)}>{`Mantieni sconto attuale (${order.discountRate}%)`}</MenuItem>
-                  : ''
+                { originalOrder.discountRate ?
+                    <>
+                      <MenuItem key={"orig-discount"} onClick={() =>  handleUpdateDiscount(originalOrder.discountRate)}>{`Mantieni sconto attuale (${originalOrder.discountRate}%)`}</MenuItem>
+                      <Divider />
+                      <MenuItem key={"no-discount"} onClick={() => handleUpdateDiscount() }>Nessuno sconto</MenuItem>
+                    </>
+                  : <>
+                      <MenuItem key={"orig-discount"} onClick={() => handleUpdateDiscount() }>Mantieni nessuno sconto</MenuItem>
+                      <Divider />
+                    </>
                 }
-                <MenuItem key={"no-discount"} onClick={() => handleUpdateDiscount() }>Nessuno sconto</MenuItem>
+
                 { discountsQuery.data?.map( (d) =>
-                  <MenuItem key={d.id} onClick={() => handleUpdateDiscount(d)}>{`${d.name} (${d.rate}%)`}</MenuItem>
+                  <MenuItem key={d.id} onClick={() => handleUpdateDiscount(d.rate)}>{`${d.name} (${d.rate}%)`}</MenuItem>
                 )}
 
               </Menu>

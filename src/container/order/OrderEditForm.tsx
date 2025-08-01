@@ -231,8 +231,10 @@ const OrderEditForm: React.FC = () => {
       orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
       orderToSend.note = order.note
       orderToSend.products = cloneDeep(order.products)
-        // FIXME: manca gestione dello sconto
-      console.log('Order2Send: ', orderToSend)
+        if ( order.discountRate )
+            orderToSend.discountRate = order.discountRate
+
+        console.log('Order2Send: ', orderToSend)
 
       if (! isNewOrder()) {
         updateOrder.mutate(orderToSend)
