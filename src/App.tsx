@@ -71,7 +71,7 @@ const useRouter = () => {
                     },
                     {
                         path: '/orders/new',
-                        element:  <OrderStore products={[]}><OrderNew/></OrderStore>
+                        element:  <OrderNew/>
                     },
                     {
                       path: '/orders/:orderId',
