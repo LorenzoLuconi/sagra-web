@@ -230,7 +230,6 @@ const ProductEdit = (props: IProductEdit) => {
     if (departments && courses && products) {
       return (
         <Box
-          component="form"
           sx={{ "& .MuiTextField-root": { mb: 2, display: "block" } }}
         >
           <TextField
