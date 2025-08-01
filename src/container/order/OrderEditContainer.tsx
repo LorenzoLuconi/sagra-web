@@ -75,7 +75,7 @@ interface OrderEditContainerProps {
               sx={{ padding: 2, backgroundColor: theme.sagra.panelBackground }}
               className="paper-bottom"
             >
-              <OrderEditForm order={order} />
+              <OrderEditForm />
             </Paper>
           </Grid>
         </Grid>
