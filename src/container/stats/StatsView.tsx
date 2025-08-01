@@ -8,27 +8,27 @@ import {
     CardContent,
     CircularProgress,
     Paper,
-    Typography,
-    Tabs,
+    Popover,
     Tab,
-    TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Popover
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Tabs,
+    Typography
 } from "@mui/material";
 import {Product, StatsOrder, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
-import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {convertDate} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
-import Timeline from '@mui/lab/Timeline';
-import TimelineItem from '@mui/lab/TimelineItem';
-import {TimelineConnector, TimelineContent, TimelineDot, TimelineSeparator} from "@mui/lab";
-import TimelineOppositeContent, {
-    timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
-import {cloneDeep, get} from "lodash";
+import {get} from "lodash";
 import {DatePicker} from "@mui/x-date-pickers";
 import dayjs, {Dayjs} from 'dayjs'
-import writeXlsxFile, {Schema, SheetData} from "write-excel-file";
+import writeXlsxFile from "write-excel-file";
+import toast from "react-hot-toast";
 
 interface DayStatsContainerI {
     day: string
@@ -331,7 +331,7 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
             </Box>
 
             <TableContainer component={Box}>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <Table sx={{ minWidth: 650 }} size={'small'} aria-label="total table">
                     <TableHead>
                         <TableRow>
                             <TableCell>Prodotto</TableCell>
@@ -363,16 +363,35 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
 
 const buildProcutsData = (fullOrder: Record<number, StatsOrderedProducts>, productsTable: Record<number, Product>) => {
     const productKeys = Object.keys(fullOrder) as number[]
-    const res = productKeys.map((productId: number) => {
+    const rows = productKeys.map((productId: number) => {
         return (
+
+[
             {
-                count: fullOrder[productId].count,
-                totalAmount: fullOrder[productId].totalAmount,
-                productName: productsTable[productId].name
+                type: String,
+                value: productsTable[productId].name,
+
+            },
+                {
+                    type: Number,
+                    value: fullOrder[productId].count
+                },
+                {
+                    type: Number,
+                    value: fullOrder[productId].totalAmount,
+                    format: '#,## €'
             }
+        ]
             )
     })
-    return res
+
+    return rows
+}
+
+interface XLSDataI {
+    productName: string
+    count: number
+    totalAmount: number
 }
 
 const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
@@ -393,8 +412,6 @@ const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
     }
 
 
-    console.log('TotalInfo: ', productsTable)
-
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
         <TotalTabularInfo
@@ -403,26 +420,34 @@ const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
         />
             <Button
                 onClick={() => {
-                    const data = buildProcutsData(productsTable, products)
+                    const _data = buildProcutsData(productsTable, products)
 
-                    console.log('XLS_DATA: ', data)
+                    const HEADER = [
+                        {
+                            value: 'Nome Prodotto',
+                            fontWeight: 'bold'
+                        },
+                        {
+                            value: 'Quantità',
+                            fontWeight: 'bold'
+                        },
+                        {
+                            value: 'Totale',
+                            fontWeight: 'bold'
+                        }
+                    ]
 
-                    const SCHEMA = [
-                        {column: 'Prodotto', type: String, value: stat => stat.productName},
-                        {column: 'Numero', type: Number, value: stat => stat.count},
-                        {column: 'Importo Totale', type: Number, value: stat => stat.totalAmount},
-                    ] as Schema<unknown>[]
-                    /*
-                                        writeXlsxFile(
-                                            data as Object[][],
-                                            {
-                                                SCHEMA,
-                                                fileName: 'file.xlsx'}
-                                        ).then(() => {
-                                            console.log('Salvato')
-                                        }).catch((error) => {console.log('Errore: ', error)})
+                    const data = [HEADER, ..._data];
 
-                    */
+                    writeXlsxFile(data, {
+                        fileName: "file.xlsx",
+                    }).then(() => {
+                        toast.success('File excel generato con successo')
+                    }).catch(() => {
+                        toast.error('Si è verificato un errore nella generazione del file excel')
+                    })
+
+
 
                 }}
             >

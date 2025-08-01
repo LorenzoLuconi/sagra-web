@@ -32,14 +32,9 @@ import { useConfirm } from "material-ui-confirm";
 import { useReactToPrint } from "react-to-print";
 
 
-export interface OrderEditProps {
-  order: Order;
-}
+const OrderEditForm: React.FC = () => {
 
-const OrderEditForm: React.FC<OrderEditProps> = (props) => {
-  const {order: storedOrder} = props
-
-  const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore, isNewOrder} = useOrderStore();
+  const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore, isNewOrder, originalOrder} = useOrderStore();
   const navigate = useNavigate()
   const [customer, setCustomer] = useState(order.customer);
   const [takeAway, setTakeAway] = useState(order.takeAway);
@@ -49,14 +44,14 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const differences = !isEqual(storedOrder, order)
+  const differences = !isEqual(originalOrder, order)
 
   const handleCancel = () => {
     resetStore()
-    setCustomer(storedOrder.customer)
-    setCoperti(storedOrder.serviceNumber)
-    setNote(storedOrder.note ?? '');
-    setTakeAway(storedOrder.takeAway);
+    setCustomer(originalOrder.customer)
+    setCoperti(originalOrder.serviceNumber)
+    setNote(originalOrder.note ?? '');
+    setTakeAway(originalOrder.takeAway);
   }
 
   const ordersSearchConf = ordersSearchQuery({});
@@ -129,7 +124,7 @@ const OrderEditForm: React.FC<OrderEditProps> = (props) => {
 
     const updateOrder = useMutation({
       mutationFn: (data: OrderRequest) => {
-          return fetchOrderUpdate({body: data, pathParams: {orderId: storedOrder?.id??0}})
+          return fetchOrderUpdate({body: data, pathParams: {orderId: originalOrder?.id??0}})
       },
       onError: (error: OrderRequest) => {
           console.log('error: ', error as ErrorWrapper<unknown>)

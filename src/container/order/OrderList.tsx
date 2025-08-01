@@ -1,27 +1,26 @@
 import * as React from "react";
-import { ordersSearchQuery } from "../../api/sagra/sagraComponents.ts";
-import { convertDate, currency, getQueryObj, TIME_CONF } from "../../utils";
-import { useLocation, useNavigate } from "react-router";
+import { ordersSearchQuery, OrdersSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
+import { convertDate, currency, TIME_CONF } from "../../utils";
+import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Box,
+  Alert,
+  Box, CircularProgress,
   Collapse,
-  IconButton,
-  Paper,
+  IconButton, Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
+  Typography
 } from "@mui/material";
 import { Order, OrderedProduct } from "../../api/sagra/sagraSchemas.ts";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
   EditOutlined,
-  PrintOutlined,
   SettingsOutlined,
 } from "@mui/icons-material";
 import TakeAwayIcon from "../../icons/TakeAwayIcon.tsx";
@@ -42,7 +41,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
     <>
       <TableRow
       >
-        <TableCell>
+        <TableCell sx={{ width: "30px" }}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -51,9 +50,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell>
-          {order.takeAway ? <TakeAwayIcon color={"info"} /> : <></>}
-        </TableCell>
+
         <TableCell align="center">{order.id}</TableCell>
         <TableCell align="center">{convertDate("it", createdDate)}</TableCell>
         <TableCell align="center">
@@ -64,23 +61,23 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
           {order.discountRate ? order.discountRate + "%" : ""}
         </TableCell>
         <TableCell align="right">{currency(order.totalAmount)}</TableCell>
+        <TableCell sx={{ width: "30px" }}>
+          {order.takeAway ? <TakeAwayIcon color={"info"} /> : <></>}
+        </TableCell>
         <TableCell align="center">
-          <IconButton disabled>
-            <PrintOutlined />
-          </IconButton>
           <IconButton onClick={() => navigate("/orders/" + order.id)}>
             <EditOutlined />
           </IconButton>
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell sx={{ paddingBottom: 0, paddingTop: 0, backgroundColor: '#F5F5F5'}} colSpan={9}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
+            <Box sx={{ paddingBottom: 2, margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
                 Prodotti Ordinati
               </Typography>
-              <Table size="small" aria-label="purchases" >
+              <Table size="small" >
                 <TableHead>
                   <TableRow>
                     <TableCell>Prodotto</TableCell>
@@ -89,12 +86,12 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                     <TableCell align="right">SubTotale</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody sx={{ borderBottom: 'unset' }}>
+                <TableBody sx={{ borderBottom: 'none' }}>
                   {order.products.map(
                     (product: OrderedProduct, idx: number) => {
                       const subTotal = product.price * product.quantity;
                       return (
-                        <TableRow key={idx} sx={{ backgroundColor: 'background.default' }}>
+                        <TableRow key={idx} >
                           <TableCell>
                             <ProductName productId={product.productId} />
                           </TableCell>
@@ -115,7 +112,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                   {(() => {
                     if (order.serviceNumber > 0)
                       return (
-                        <TableRow sx={{ backgroundColor: 'background.default' }}>
+                        <TableRow >
                           <TableCell>Coperti</TableCell>
                           <TableCell align="center">
                             {order.serviceNumber}
@@ -151,75 +148,89 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
   );
 };
 
-const Orders = (): React.ReactElement => {
-  const location = useLocation();
-  const search = new URLSearchParams(location.search);
-  const searchObj = getQueryObj(search, {
-    customer: "string",
-    username: "string",
-    created: "string",
-    page: "number",
-    size: "number",
-    sort: "string",
-  });
-
-  const ordersConf = ordersSearchQuery({ queryParams: searchObj });
+interface OrderListProps {
+  searchQueryParam: OrdersSearchQueryParams
+}
+const OrderList = (props: OrderListProps): React.ReactElement => {
+  console.log("Ricerca ordini, parametri: ", props.searchQueryParam)
+  const ordersConf = ordersSearchQuery({ queryParams: props.searchQueryParam });
 
   const ordersData = useQuery({
     queryKey: ordersConf.queryKey,
     queryFn: ordersConf.queryFn,
   });
 
-  if (ordersData.isFetched) {
-    console.log("Orders: ", ordersData.data);
-    const orders = ordersData.data;
-    return (
-      <TableContainer component={Paper}>
-        <Table stickyHeader aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCell></TableCell>
-              <TableCell align="center">#</TableCell>
-              <TableCell align="center">Data</TableCell>
-              <TableCell align="center">Ora</TableCell>
-              <TableCell>Nome</TableCell>
-              <TableCell align="center">Sconto</TableCell>
-              <TableCell align="right">Totale</TableCell>
-              <TableCell align="center">
-                <SettingsOutlined />
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {orders &&
-              orders.map((o: Order, idx: number) => (
-                <OrderRow key={idx} order={o} />
-              ))}
+  const searchQueryParamsString = () => {
+    if ( props.searchQueryParam.created || props.searchQueryParam.customer ) {
+      let result = " con parametri di ricerca: "
 
-            {orders === undefined && <span>Empty</span>}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      if ( props.searchQueryParam.created )
+        result = result  + `data creazione = '${props.searchQueryParam.created}'`;
+
+      if ( props.searchQueryParam.customer)
+        result = result  + `${props.searchQueryParam.created?',' : ''} nome cliente = '${props.searchQueryParam.customer}'`;
+
+      return result;
+    }
+
+    return '';
+  }
+
+  if ( ordersData.isPending)
+    return (
+      <Box sx={{ display: "flex" }}>
+        <CircularProgress />
+      </Box>
     );
 
-    //return <span>Orders</span>
+
+  if ( ordersData.isError )
+    return <Alert severity="error">Si è verificato un errore prelevando la lista degli ordini: {ordersData.error.message}</Alert>
+
+  const orders = ordersData.data;
+
+  if ( ! orders || orders.length == 0) {
+    return (
+        <Paper variant='outlined' sx={{p: 1}}>
+          <Typography sx={{p: 1}}>{`Nessun ordine trovato ${searchQueryParamsString()}`}</Typography>
+        </Paper>
+    )
   }
 
-  if (ordersData.isError) {
-    return <span>Error</span>;
-  }
-
-  return <span>Loading...</span>;
-};
-
-export const TakeAway = (props) => {
   return (
-    <img
-      src={"/public/take-away.svg"}
-      alt={"Asporto"}
-      style={{ height: "30px", width: "auto", ...props }}
-    />
+    <>
+      <Paper variant='outlined' sx={{p: 1, mb: 2}}>
+        <Typography sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini ${searchQueryParamsString()}`}</Typography>
+      </Paper>
+    <TableContainer>
+      <Table stickyHeader aria-label="collapsible table">
+        <TableHead>
+          <TableRow>
+            <TableCell />
+            <TableCell align="center">#</TableCell>
+            <TableCell align="center">Data</TableCell>
+            <TableCell align="center">Ora</TableCell>
+            <TableCell>Nome</TableCell>
+            <TableCell align="center">Sconto</TableCell>
+            <TableCell align="right">Totale</TableCell>
+            <TableCell></TableCell>
+            <TableCell align="center">
+              <SettingsOutlined />
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody sx={{ backgroundColor: "background.default" }}>
+          {orders &&
+            orders.map((o: Order, idx: number) => (
+              <OrderRow key={idx} order={o} />
+            ))}
+
+          {orders === undefined && <span>Empty</span>}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    </>
   );
 };
-export default Orders;
+
+export default OrderList;

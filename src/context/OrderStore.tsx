@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 
 // @ts-ignore
 export const EmptyOrder: Order = {
-  products: [],
+  products: [] as Product[],
   serviceNumber: undefined,
   serviceCost: 0.5,
   customer: '',
@@ -16,6 +16,7 @@ export const EmptyOrder: Order = {
 
 interface OrderContextI {
     order: Order
+    originalOrder: Order
     resetStore: () => void
     updateOrderField: (field: string, value: unknown) => void
     products: Record<number, Product>
@@ -33,6 +34,7 @@ interface OrderContextI {
 
 export const OrderContext = React.createContext<OrderContextI>({
     order : EmptyOrder,
+    originalOrder : EmptyOrder,
     products: [],
     errors: {},
 
@@ -62,6 +64,7 @@ interface OrderStoreI extends React.PropsWithChildren {
 
 export const OrderStore: React.FC<OrderStoreI> = (props) => {
     const {products, order} = props
+    const originalOrder = order;
     const [storedOrder, setStoredOrder] = React.useState<Order>(order)
     const [storedProducts, setStoredProducts] = React.useState<Record<number, Product>>({} as Record<number, Product>)
     const [storedErrors, setStoredErrors] = React.useState<OrderErrorT>({})
@@ -75,7 +78,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
     }, [products])
 
     React.useEffect(() => {
-        setStoredOrder(order)
+        setStoredOrder(cloneDeep(order))
     }, [order])
 
 
@@ -231,6 +234,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
             if (_order === undefined) {
                 _order = EmptyOrder as Order
             }
+
             set(_order, field,  value)
 
             console.log('PRIMA: ', storedOrder, _order)
@@ -278,6 +282,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
         <OrderContext.Provider
             value={{
                 order: storedOrder,
+                originalOrder: originalOrder,
                 products: storedProducts??[],
                 errors: storedErrors,
                 resetStore: resetStoreHandler,
@@ -302,6 +307,7 @@ export const useOrderStore = () => {
     const storeContext = React.useContext(OrderContext)
     return {
         order: storeContext.order,
+        originalOrder: storeContext.originalOrder,
         products: storeContext.products,
         errors: storeContext.errors,
         resetStore: storeContext.resetStore,
