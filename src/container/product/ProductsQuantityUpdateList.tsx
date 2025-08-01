@@ -20,6 +20,7 @@ import {Product} from "../../api/sagra/sagraSchemas.ts";
 import ProductQuantity from "./ProductQuantity.tsx";
 import {useState} from "react";
 import ProductQuantityUpdateDialog from "./ProductQuantityUpdateDialog.tsx";
+import {productBackgroundColor} from "./produtils.ts";
 
 interface IProductsQuantityUpdateListProps {
     courseId?: number;
@@ -36,8 +37,7 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
     }
 
     const handleClick = (product: Product) => {
-        if (!product.sellLocked)
-            setSelectedProduct(product);
+        setSelectedProduct(product);
     }
 
     const handleCloseDialog = () => {
@@ -105,8 +105,8 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
                                 <TableRow key={product.id}
                                           sx={(theme) => ({
                                               minWidth: 200,
-                                              cursor: !product.sellLocked ? 'pointer' : 'default',
-                                              backgroundColor: !product.sellLocked ? theme.palette.background.paper : 'grey.300'
+                                              cursor: 'pointer',
+                                              backgroundColor: productBackgroundColor(product, theme),
                                           })}
                                           onClick={() => handleClick(product)}>
                                     <TableCell sx={{fontSize: "1.0em"}}>
@@ -115,7 +115,7 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
                                     <TableCell align="center" sx={{fontSize: "1.0em"}}>
                                         {product.initialQuantity}
                                     </TableCell>
-                                    <TableCell align="center" sx={{fontSize: "1.0em"}}>
+                                    <TableCell align="center" sx={{fontSize: "1.0em", alignItems: 'center'}}>
                                         <ProductQuantity product={product}/>
                                     </TableCell>
                                 </TableRow>

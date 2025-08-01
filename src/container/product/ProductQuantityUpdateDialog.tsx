@@ -10,12 +10,12 @@ import {
   DialogTitle, TextField, Typography
 } from "@mui/material";
 import {
-  fetchProductInitQuantity, fetchProductUpdateQuantity,
+  fetchProductInitQuantity, fetchProductSellLock, fetchProductSellUnlock, fetchProductUpdateQuantity,
   ordersCountQuery,
   OrdersSearchQueryParams, productsSearchQuery
 } from "../../api/sagra/sagraComponents.ts";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CancelOutlined, SaveOutlined } from "@mui/icons-material";
+import {CancelOutlined, LockOpenOutlined, LockOutlined, SaveOutlined} from "@mui/icons-material";
 import { useState } from "react";
 import * as React from "react";
 import { queryClient } from "../../main.tsx";
@@ -78,6 +78,46 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
           toast.success(`Quantità disponibile variata '${p.name}' di ${quantity}, nuova disponibilità: ${p.availableQuantity}`);
           props.closeDialogHandler();
         });
+    },
+    onError: (error: Error) => {
+      setErrorQuantity(true)
+      toast.error(error.message);
+    },
+  });
+
+  const productSellUnlock = useMutation({
+    mutationFn: () => {
+      return fetchProductSellUnlock({
+        pathParams: { productId: product.id },
+      });
+    },
+    onSuccess: (p) => {
+      queryClient
+          .invalidateQueries({ queryKey: productSearchQueryConf.queryKey })
+          .then(() => {
+            toast.success(`Il prodotto '${p.name}' è stato sbloccato ed è vendibile`);
+            props.closeDialogHandler();
+          });
+    },
+    onError: (error: Error) => {
+      setErrorQuantity(true)
+      toast.error(error.message);
+    },
+  });
+
+  const productSelLock = useMutation({
+    mutationFn: () => {
+      return fetchProductSellLock({
+        pathParams: { productId: product.id },
+      });
+    },
+    onSuccess: (p) => {
+      queryClient
+          .invalidateQueries({ queryKey: productSearchQueryConf.queryKey })
+          .then(() => {
+            toast.success(`Il prodotto '${p.name}' è stato bloccato e non è più vendibile`);
+            props.closeDialogHandler();
+          });
     },
     onError: (error: Error) => {
       setErrorQuantity(true)
@@ -193,7 +233,17 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
               <Button variant="contained" startIcon={<SaveOutlined />}
                       onClick={ () => productUpdateQuantity.mutate() }
               >Varia Quantità</Button>
-              <Button variant="contained" startIcon={<CancelOutlined />} onClick={props.closeDialogHandler}>Annulla</Button>
+              {
+                product.sellLocked ?
+                    <Button variant='contained' color="success" startIcon={<LockOpenOutlined/>}
+                            onClick={ () => productSellUnlock.mutate()}
+                    >Sblocca</Button>
+                    : <Button variant='contained' color="warning" startIcon={<LockOutlined />}
+                      onClick={ () => productSelLock.mutate()}>Blocca</Button>
+              }
+              <Button variant="contained" startIcon={<CancelOutlined/>}
+                      onClick={props.closeDialogHandler}>Annulla</Button>
+
             </DialogActions>
           </>
         }
