@@ -28,7 +28,7 @@ interface IProductQuantityUpdateDialog {
 const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
   const { product } = props;
 
-  const [quantity, setQuantity] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number|undefined>(undefined);
   const [errorQuantity, setErrorQuantity] = useState(false);
 
   // const resetState = () => {
@@ -38,7 +38,12 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
 
   const handleChangeQuantity =
     React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-      setQuantity(+event.currentTarget.value);
+      const value = Number.parseInt(event.target.value)
+      if ( ! isNaN(value)) {
+        setQuantity(value);
+      } else {
+        setQuantity(undefined);
+      }
     }, [setQuantity],
   );
 
@@ -140,22 +145,23 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
       return <></>
 
     return (
-      <form>
+      <>
         <ProductQuantityInfo product={product} />
         <Alert severity="warning">Non sono presenti degli ordini in data odierna, pertanto la quantità inserita vale come quantità assoluta iniziale</Alert>
         <Box sx={{mt: 2, ml: 2}}>
           <TextField
             type="number"
+            required
             label="Quantità iniziale"
-            value={quantity}
+            value={quantity !== undefined ? quantity : ''}
             onChange={handleChangeQuantity}
-            error={errorQuantity}
+            error={ errorQuantity }
             slotProps={{ htmlInput: { size: 10, min: 0 } }}
             placeholder={product.initialQuantity + ""}
-            helperText="Inserire il valore assoluto quantità disponibile prodotto"
+            helperText="Inserire il valore assoluto, maggiore di 0, di quantità disponibile prodotto"
           />
         </Box>
-      </form>
+      </>
     )
   }
 
@@ -170,8 +176,9 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
         <Box sx={{mt: 2, ml: 2}}>
           <TextField
             type="number"
+            required
             label="Variazione quantità"
-            value={quantity}
+            value={quantity !== undefined ? quantity : ''}
             error={errorQuantity}
             onChange={handleChangeQuantity}
             slotProps={{ htmlInput: { size: 10 } }}
@@ -179,6 +186,23 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
           />
         </Box>
       </>
+    )
+  }
+
+  const commonButtons = () => {
+    return (
+        <>
+          {
+            product.sellLocked ?
+                <Button variant='contained' color="success" startIcon={<LockOpenOutlined/>}
+                        onClick={ () => productSellUnlock.mutate()}
+                >Sblocca</Button>
+                : <Button variant='contained' color="warning" startIcon={<LockOutlined />}
+                          onClick={ () => productSelLock.mutate()}>Blocca</Button>
+          }
+          <Button variant="contained" startIcon={<CancelOutlined/>}
+                  onClick={props.closeDialogHandler}>Annulla</Button>
+        </>
     )
   }
 
@@ -220,9 +244,14 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
             <DialogContent>{formInitialQuantity()}</DialogContent>
             <DialogActions>
               <Button variant="contained" startIcon={<SaveOutlined />}
-                      onClick={ () => productInitQuantity.mutate() }
+                      onClick={ () => {
+                        if ( quantity !== undefined && quantity > 0 )
+                          productInitQuantity.mutate()
+                        else
+                          setErrorQuantity(true)
+                      }}
               >Inizializza Quantità</Button>
-              <Button variant="contained" startIcon={<CancelOutlined />} onClick={props.closeDialogHandler}>Annulla</Button>
+              { commonButtons() }
             </DialogActions>
           </>
           :
@@ -231,28 +260,23 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
             <DialogContent>{formUpdateQuantity()}</DialogContent>
             <DialogActions>
               <Button variant="contained" startIcon={<SaveOutlined />}
-                      onClick={ () => productUpdateQuantity.mutate() }
+                      onClick={ () => {
+                        if ( quantity !== undefined && quantity !== 0 )
+                          productUpdateQuantity.mutate()
+                        else
+                          setErrorQuantity(true)
+                      }}
               >Varia Quantità</Button>
-              {
-                product.sellLocked ?
-                    <Button variant='contained' color="success" startIcon={<LockOpenOutlined/>}
-                            onClick={ () => productSellUnlock.mutate()}
-                    >Sblocca</Button>
-                    : <Button variant='contained' color="warning" startIcon={<LockOutlined />}
-                      onClick={ () => productSelLock.mutate()}>Blocca</Button>
-              }
-              <Button variant="contained" startIcon={<CancelOutlined/>}
-                      onClick={props.closeDialogHandler}>Annulla</Button>
-
+              { commonButtons() }
             </DialogActions>
           </>
         }
       </Dialog>
     );
   }
-
-
 };
+
+
 
 interface IProductQuantityInfo {
   product: Product;
