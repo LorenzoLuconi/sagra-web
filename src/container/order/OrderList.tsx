@@ -8,7 +8,6 @@ import {
   Box, CircularProgress,
   Collapse,
   IconButton,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -72,13 +71,13 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell sx={{ paddingBottom: 0, paddingTop: 0, backgroundColor: '#F5F5F5'}} colSpan={9}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
+            <Box sx={{ paddingBottom: 2, margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
                 Prodotti Ordinati
               </Typography>
-              <Table size="small" aria-label="purchases" >
+              <Table size="small" >
                 <TableHead>
                   <TableRow>
                     <TableCell>Prodotto</TableCell>
@@ -87,12 +86,12 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                     <TableCell align="right">SubTotale</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody sx={{ borderBottom: 'unset' }}>
+                <TableBody sx={{ borderBottom: 'none' }}>
                   {order.products.map(
                     (product: OrderedProduct, idx: number) => {
                       const subTotal = product.price * product.quantity;
                       return (
-                        <TableRow key={idx} sx={{ backgroundColor: 'background.default' }}>
+                        <TableRow key={idx} >
                           <TableCell>
                             <ProductName productId={product.productId} />
                           </TableCell>
@@ -113,7 +112,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
                   {(() => {
                     if (order.serviceNumber > 0)
                       return (
-                        <TableRow sx={{ backgroundColor: 'background.default' }}>
+                        <TableRow >
                           <TableCell>Coperti</TableCell>
                           <TableCell align="center">
                             {order.serviceNumber}
@@ -161,6 +160,22 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
     queryFn: ordersConf.queryFn,
   });
 
+  const searchQueryParamsString = () => {
+    if ( props.searchQueryParam.created || props.searchQueryParam.customer ) {
+      let result = " con parametri di ricerca: "
+
+      if ( props.searchQueryParam.created )
+        result = result  + `data creazione = '${props.searchQueryParam.created}'`;
+
+      if ( props.searchQueryParam.customer)
+        result = result  + `${props.searchQueryParam.created?',' : ''} nome cliente = '${props.searchQueryParam.customer}'`;
+
+      return result;
+    }
+
+    return '';
+  }
+
   if ( ordersData.isPending)
     return (
       <Box sx={{ display: "flex" }}>
@@ -174,28 +189,22 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
 
   const orders = ordersData.data;
 
-  const searchQueryParamsString = () => {
-      if ( props.searchQueryParam.created || props.searchQueryParam.customer ) {
-        let result = " con parametri di ricerca: "
-
-        if ( props.searchQueryParam.created )
-          result = result  + `data creazione = '${props.searchQueryParam.created}'`;
-
-        if ( props.searchQueryParam.customer)
-          result = result  + `${props.searchQueryParam.created?',' : ''} nome cliente = '${props.searchQueryParam.customer}'`;
-
-        return result;
-      }
-
-      return '';
+  if ( ! orders || orders.length == 0) {
+    return (
+        <Box  sx={{ width: "100%", p: 1, mb: '2px', backgroundColor: "background.default" }}>
+          <Typography sx={{p: 1}}>{`Nessun ordine trovato ${searchQueryParamsString()}`}</Typography>
+        </Box>
+    )
   }
 
   return (
     <>
 
+      <Box  sx={{ width: "100%", p: 1, mb: '2px', backgroundColor: "background.default" }}>
+        <Typography sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini ${searchQueryParamsString()}`}</Typography>
+      </Box>
     <TableContainer>
       <Table stickyHeader aria-label="collapsible table">
-        <caption style={{ captionSide: 'top', backgroundColor: '#fff', borderBottom: '1px solid #DDD'}}><Typography sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini ${searchQueryParamsString()}`}</Typography></caption>
         <TableHead>
           <TableRow>
             <TableCell />

@@ -11,6 +11,14 @@ body {
     background: #f8f8f8 !important;
 }
 
+#order-search-bar .MuiPickersOutlinedInput-notchedOutline {
+    border: none !important;
+}
+
+#order-search-bar .MuiPickersInputBase-sectionsContainer {
+    width: 100px !important;
+}
+
 .paper-top {
     border-bottom-right-radius: 0 !important;
     border-bottom-left-radius: 0 !important;

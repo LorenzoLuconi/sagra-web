@@ -51,8 +51,7 @@ const OrderListContainer = () => {
 
   const [searchParam, setSearchParam] = useState<OrdersSearchQueryParams>( () => createSearchParam() )
 
-  const handleClickSearch = (event: React.MouseEvent<HTMLElement>) => {
-    // TODO da completare
+  const handleClickSearch = () => {
     setSearchParam(createSearchParam());
   }
 
@@ -70,19 +69,20 @@ const OrderListContainer = () => {
       </Box>
 
 
-      <Paper variant="outlined"  sx={{p: 2, display: 'flex', justifyContent: 'center'}} className="paper-top paper-grey">
+      <Paper id="order-search-bar" variant="outlined"  sx={{p: 2, display: 'flex', justifyContent: 'center'}} className="paper-top paper-grey">
 
         <Paper
           component="form"
-          sx={{ backgroundColor: '#fff', p: '2px 4px', display: 'flex', alignItems: 'center', width: '70%' }}
+          sx={{ backgroundColor: '#fff', p: '2px 4px', display: 'flex', alignItems: 'center', width: '60%', minWidth: '500px' }}
         >
 
           <InputBase
-            sx={{ ml: 1, flex: 1 }}
+            sx={{ ml: 1, flex: 1, width: '200px' }}
             placeholder="Nome cliente"
             value={searchByCustomer}
             onChange={handleChangeCustomer}
             inputProps={{ 'aria-label': 'search by customer' }}
+
           />
           <IconButton sx={{ p: '10px' }} aria-label="menu" onClick={() => setSearchByCustomer('')}>
             <Close />
