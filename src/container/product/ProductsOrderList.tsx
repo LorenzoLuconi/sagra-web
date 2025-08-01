@@ -36,7 +36,7 @@ const ProductsOrderList = (props: IProductsOrder) => {
                   sx={(theme) => ({
                     minWidth: 200,
                     cursor: productAvailable(product) ? 'pointer' : 'default',
-                    backgroundColor: (! productAvailable(product) ? theme.palette.background.productSoldOut : ( product.availableQuantity < 10 ? theme.palette.background.productAlmostSoldOut : theme.palette.background.productCard))
+                    backgroundColor: (! productAvailable(product) ? theme.sagra.productSoldOut : ( product.availableQuantity < 10 ? theme.sagra.productAlmostSoldOut : theme.sagra.productCard))
                   })}
                   onClick={() => {
                     if ( productAvailable(product) )

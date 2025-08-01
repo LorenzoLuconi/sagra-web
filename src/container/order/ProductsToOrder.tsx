@@ -1,4 +1,4 @@
-import {Alert, Box, CircularProgress, Divider, IconButton, Paper} from "@mui/material";
+import {Alert, Box, CircularProgress, Divider, IconButton, Paper, useTheme} from "@mui/material";
 import {Course, Product} from "../../api/sagra/sagraSchemas.ts";
 import {useState} from "react";
 import CoursesSelector from "../course/CoursesSelector.tsx";
@@ -12,6 +12,7 @@ import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 
 const ProductsToOrder = () => {
+  const theme = useTheme();
   const [selectedCourse, setSelectedCourse] = useState<Course | undefined>(undefined);
   const [type, setType] = useState(0);
 
@@ -70,10 +71,12 @@ const ProductsToOrder = () => {
 
     return (
       <Box>
-        <Paper variant="outlined" sx={{ p: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2, backgroundColor: theme.sagra.panelBackground }}>
           <CoursesSelector handleClick={handleSelectCourse} />
         </Paper>
-        <Paper variant="outlined" sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }} className="paper-top">
+        <Paper variant="outlined"
+               sx={{ display: "flex", justifyContent: "flex-end", mt: 1, backgroundColor: theme.sagra.panelBackground }}
+               className="paper-top">
 
           <IconButton>
             <AppsOutlined onClick={() => setType(0)} />
@@ -86,7 +89,8 @@ const ProductsToOrder = () => {
             <CachedOutlined onClick={() => handlRefreshProducts()} />
           </IconButton>
         </Paper>
-        <Paper variant="outlined" className="paper-bottom" sx={{ p: 1, pb: 2}}>
+        <Paper variant="outlined" className="paper-bottom"
+               sx={{ p: 1, pb: 2, backgroundColor: theme.sagra.panelBackground}}>
           <>
           {type == 0 ? (
             <ProductsOrderCard

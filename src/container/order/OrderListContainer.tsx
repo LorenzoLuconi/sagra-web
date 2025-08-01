@@ -1,11 +1,12 @@
 import {  Close, LibraryBooksOutlined } from "@mui/icons-material";
 import {
   Box,
-  Divider,
+  Divider, FormControlLabel,
   IconButton,
   InputBase,
   Paper,
-  Typography
+  Switch,
+  Typography, useTheme
 } from "@mui/material";
 import OrderList from "./OrderList.tsx";
 import SearchIcon from '@mui/icons-material/Search';
@@ -19,6 +20,7 @@ import dayjs from "dayjs";
 
 const OrderListContainer = () => {
 
+  const theme = useTheme();
   const location = useLocation();
   const search = new URLSearchParams(location.search);
   const searchObj = getQueryObj(search, {
@@ -69,15 +71,17 @@ const OrderListContainer = () => {
       </Box>
 
 
-      <Paper id="order-search-bar" variant="outlined"  sx={{p: 2, display: 'flex', justifyContent: 'center'}} className="paper-top paper-grey">
+      <Paper id="order-search-bar" variant="outlined"
+             sx={{p: 2, display: 'flex', justifyContent: 'center', backgroundColor: theme.sagra.panelBackground }}
+             className="paper-top">
 
         <Paper
           component="form"
-          sx={{ backgroundColor: '#fff', p: '2px 4px', display: 'flex', alignItems: 'center', width: '60%', minWidth: '500px' }}
+          sx={{  p: '2px 4px', display: 'flex', alignItems: 'center', width: '70%', minWidth: '600px' }}
         >
 
           <InputBase
-            sx={{ ml: 1, flex: 1, width: '200px' }}
+            sx={{ ml: 1, flex: 1 }}
             placeholder="Nome cliente"
             value={searchByCustomer}
             onChange={handleChangeCustomer}
@@ -94,13 +98,18 @@ const OrderListContainer = () => {
                         field: { clearable: true },
                       }}
           />
+          <Divider sx={{ display: 'none', height: 28, m: 0.5 }} orientation="vertical" />
+          <FormControlLabel sx={{ display: 'none'}} control={<Switch defaultChecked />} label="Solo ordini utente" />
           <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
           <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleClickSearch}>
             <SearchIcon />
           </IconButton>
+
         </Paper>
       </Paper>
-      <Paper variant="outlined" sx={{ p: 3, mb: 2}} className="paper-bottom paper-grey">
+      <Paper variant="outlined"
+             sx={{ p: 3, mb: 2, backgroundColor: theme.sagra.panelBackground }}
+             className="paper-bottom">
         <OrderList searchQueryParam={searchParam}/>
       </Paper>
     </>

@@ -25,7 +25,7 @@ const ProductsOrderCard = (props : IProductsOrder) => {
                               return ({
                             minWidth: 200,
                             maxWidth: 200,
-                            backgroundColor: (! productAvailable(product) ? theme.palette.status.productSoldOut : ( product.availableQuantity < 10 ? theme.palette.status.productAlmostSoldOut : theme.palette.background.productCard))
+                            backgroundColor: (! productAvailable(product) ? theme.sagra.productSoldOut : ( product.availableQuantity < 10 ? theme.sagra.productAlmostSoldOut : theme.sagra.productCard))
                           })}}
                           onClick={(event) => {
                             event.preventDefault();

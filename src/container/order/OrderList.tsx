@@ -7,7 +7,7 @@ import {
   Alert,
   Box, CircularProgress,
   Collapse,
-  IconButton,
+  IconButton, Paper,
   Table,
   TableBody,
   TableCell,
@@ -191,18 +191,17 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
 
   if ( ! orders || orders.length == 0) {
     return (
-        <Box  sx={{ width: "100%", p: 1, mb: '2px', backgroundColor: "background.default" }}>
+        <Paper variant='outlined' sx={{p: 1}}>
           <Typography sx={{p: 1}}>{`Nessun ordine trovato ${searchQueryParamsString()}`}</Typography>
-        </Box>
+        </Paper>
     )
   }
 
   return (
     <>
-
-      <Box  sx={{ width: "100%", p: 1, mb: '2px', backgroundColor: "background.default" }}>
+      <Paper variant='outlined' sx={{p: 1, mb: 2}}>
         <Typography sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini ${searchQueryParamsString()}`}</Typography>
-      </Box>
+      </Paper>
     <TableContainer>
       <Table stickyHeader aria-label="collapsible table">
         <TableHead>
@@ -220,7 +219,7 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
             </TableCell>
           </TableRow>
         </TableHead>
-        <TableBody sx={{ backgroundColor: 'white' }}>
+        <TableBody sx={{ backgroundColor: "background.default" }}>
           {orders &&
             orders.map((o: Order, idx: number) => (
               <OrderRow key={idx} order={o} />

@@ -7,16 +7,12 @@ body {
     background: #ffffff !important;
 }
 
-.paper-grey {
-    background: #f8f8f8 !important;
-}
-
 #order-search-bar .MuiPickersOutlinedInput-notchedOutline {
     border: none !important;
 }
 
 #order-search-bar .MuiPickersInputBase-sectionsContainer {
-    width: 100px !important;
+    width: 120px !important;
 }
 
 .paper-top {
