@@ -29,7 +29,8 @@ const ProductContainer = () => {
                 </Typography>
             </Box>
 
-            <Paper variant="outlined" sx={{padding: 2, mb: 1, backgroundColor: theme.sagra.panelBackground}}>
+            <Paper variant="outlined" sx={{padding: 2, mb: 1, backgroundColor: theme.sagra.panelBackground}}
+                className="paper-round">
                 <ProductEdit
                     key={selected?.id}
                     selected={selected}

@@ -90,7 +90,8 @@ const MonitorContainer = () => {
             </Box>
             <Grid container spacing={2}>
                 <Grid size={7}>
-                    <Paper variant="outlined" sx={{p: 2, backgroundColor: theme.sagra.panelBackground }}>
+                    <Paper variant="outlined" sx={{p: 2, backgroundColor: theme.sagra.panelBackground }}
+                            className="paper-round">
                         <MonitorsList currentMonitor={monitor} monitors={monitors} selectMonitor={selectMonitor}/>
                     </Paper>
                 </Grid>

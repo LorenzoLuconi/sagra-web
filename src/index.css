@@ -15,7 +15,11 @@ body {
     width: 120px !important;
 }
 
+.paper-round {
+    border-radius: 10px !important;
+}
 .paper-top {
+    border-radius: 10px !important;
     border-bottom-right-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
     margin-bottom: 0 !important;
@@ -30,6 +34,7 @@ body {
 }
 
 .paper-bottom {
+    border-radius: 10px !important;
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
     margin-top: 0 !important;
