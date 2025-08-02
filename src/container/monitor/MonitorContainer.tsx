@@ -53,6 +53,14 @@ const MonitorContainer = () => {
         queryFn: monitorConf.queryFn
     })
 
+    const selectMonitor = (monitor: Monitor) => {
+        setMonitor(monitor);
+    }
+
+    const cancelSelected = () => {
+        setMonitor(undefined);
+    }
+
 
     if (monitorData.isError) {
         return <Alert severity="error">Si è verificato un errore prelevando la lista dei monitor: {monitorData.error.message}</Alert>
@@ -66,19 +74,10 @@ const MonitorContainer = () => {
         );
     }
 
-    const selectMonitor = (monitor: Monitor) => {
-        setMonitor(monitor);
-    }
-
-    const cancelSelected = () => {
-        setMonitor(undefined);
-    }
-
-
     const monitors = monitorData.data;
 
-    if (! monitors || monitors.length < 1) {
-        return <Typography>Nessuno reparto presente</Typography>
+    if (! monitors ) {
+        return <Alert severity="error">Si è verificato un errore prelevando la lista dei monitor: {monitorData.error.message}</Alert>
     }
 
 
@@ -333,8 +332,10 @@ const ProductAutocomplete = (props: ProductAutocompleteProps) => {
 
     if ( ! products || products.length < 1) {
         return (
-            <Typography>Nessun prodotto disponibile</Typography>
-        )
+            <Alert severity="warning">
+                Nessun prodotto disponibile
+            </Alert>
+        );
     }
 
     return (
