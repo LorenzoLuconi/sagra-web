@@ -15,7 +15,7 @@ import {
     IconButton,
     Paper,
     TextField,
-    Typography
+    Typography, useTheme
 } from "@mui/material";
 import MonitorsList from "./MonitorsList.tsx";
 import { useState } from "react";
@@ -40,12 +40,11 @@ interface ErrorMessage {
     products?: string;
 }
 
-const sticazzi = '#f8f8f8';
-const whiteSticazzi = '#fff';
 
 const MonitorContainer = () => {
 
     const [monitor, setMonitor] = useState<Monitor|undefined>(undefined);
+    const theme = useTheme();
 
     const monitorConf = monitorSearchQuery({})
 
@@ -91,11 +90,11 @@ const MonitorContainer = () => {
             </Box>
             <Grid container spacing={2}>
                 <Grid size={7}>
-                    <Paper variant="outlined" sx={{p: 2, backgroundColor: sticazzi }}>
-                        <MonitorsList monitors={monitors} selectMonitor={selectMonitor}/>
+                    <Paper variant="outlined" sx={{p: 2, backgroundColor: theme.sagra.panelBackground }}>
+                        <MonitorsList currentMonitor={monitor} monitors={monitors} selectMonitor={selectMonitor}/>
                     </Paper>
                 </Grid>
-                <Grid size={5}>
+                <Grid size={5} sx={{minWidth: '450px'}}>
                     {
                         monitor &&
                         <MonitorEdit key={monitor?.id} monitor={monitor} cancel={cancelSelected}/>
@@ -115,6 +114,8 @@ const MonitorEdit = (props: MonitorEditProps ) => {
 
     const {monitor} = props;
     const confirm = useConfirm();
+
+    const theme = useTheme();
 
     const [name, setName] = useState<string>(monitor.name ?? '');
     const [products, setProducts] = useState(monitor.products);
@@ -250,7 +251,7 @@ const MonitorEdit = (props: MonitorEditProps ) => {
     return (
         <>
             <Paper variant="outlined"
-               sx={{ p: 2, backgroundColor: sticazzi,
+               sx={{ p: 2, backgroundColor: theme.sagra.panelBackground,
                    "& .MuiTextField-root": { mb: 2, display: "block" } }}
                className="paper-top">
                 <TextField
@@ -285,7 +286,7 @@ const MonitorEdit = (props: MonitorEditProps ) => {
                     <Button variant="contained" startIcon={<CancelOutlined/>} onClick={() => props.cancel()}>Annulla</Button>
                 </Box>
             </Paper>
-            <Paper variant="outlined" sx={{ backgroundColor: sticazzi }}
+            <Paper variant="outlined" sx={{ backgroundColor: theme.sagra.panelBackground }}
                    className="paper-bottom">
                 { errorMessage.products &&
                     <Alert severity="error">{errorMessage.products}</Alert>
@@ -362,6 +363,7 @@ const MonitoredProducts = (props: MonitoredProductsProps) => {
 
     const {products, updateProducts} = props;
     const prodSize = products.length;
+    const theme = useTheme();
 
 
     const moveProducts = (from: number, to: number) => {
@@ -384,13 +386,21 @@ const MonitoredProducts = (props: MonitoredProductsProps) => {
         updateProducts(arr)
     }
 
+    if ( products.length < 1 ) {
+        return (
+            <Box sx={{ p: 1, pt: 2, pb: 2}}>
+                <Typography>Nessun prodotto presente nel monitor</Typography>
+            </Box>
+        )
+    }
+
     return (
         <Box sx={{ p: 1}}>
             { products.map( (pid, idx) => {
                 return (
                     <Box key={idx} sx={{mt: 0.5, pl: 1, pr: 1, display: 'flex',
                         justifyContent: 'space-between', alignItems: 'center',
-                        backgroundColor: whiteSticazzi }}>
+                        backgroundColor: theme.palette.background.default }}>
                         <Typography sx={{ fontSize: '1.1em'}}><ProductName productId={pid}/></Typography>
                         <Box sx={{ display: 'flex', width: '150px' }}>
                             <Box sx={{ width: '50px'}}>

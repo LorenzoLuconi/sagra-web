@@ -1,16 +1,19 @@
 import * as React from 'react'
 import {Monitor} from "../../api/sagra/sagraSchemas.ts";
-import {Box, Card, CardContent, Typography} from "@mui/material";
+import {Box, Card, CardActions, CardContent, IconButton, Typography} from "@mui/material";
 import MonitorOutlinedIcon from '@mui/icons-material/MonitorOutlined';
-import { AddCircleOutlined } from '@mui/icons-material';
+import {AddCircleOutlined, VisibilityOutlined} from '@mui/icons-material';
+import {useNavigate} from "react-router";
 
 interface MonitorListProps {
-    monitors: Monitor[]
+    monitors: Monitor[],
+    currentMonitor?: Monitor,
     selectMonitor: (monitor: Monitor) => void
 }
 
 const MonitorsList: React.FC<MonitorListProps> = (props) => {
-    const {monitors, selectMonitor} = props
+    const {monitors, selectMonitor, currentMonitor} = props
+    const navigate = useNavigate()
 
 
     return (
@@ -29,17 +32,21 @@ const MonitorsList: React.FC<MonitorListProps> = (props) => {
                         sx={{cursor: 'pointer'}}
                         onClick={() => { selectMonitor(monitor)}}
                     >
-                        <CardContent sx={{display: 'flex', width: '80px', height: '110px', flexDirection: 'column', alignItems: 'center'}}>
-                            <MonitorOutlinedIcon color={"success"} sx={{fontSize: '4rem'}}/>
-                            <Typography sx={{textTransform: 'uppercase', fontWeight: 700, fontSize: '2.5ch'}}>{monitor.name}</Typography>
+                        <CardContent sx={{display: 'flex', width: '150px', height: '90px', flexDirection: 'column', alignItems: 'center'}}>
+                            <MonitorOutlinedIcon color={currentMonitor && currentMonitor.id === monitor.id ? "error" : "success"} sx={{fontSize: '4rem'}}/>
+                            <Typography sx={{textTransform: 'uppercase', fontWeight: 700, fontSize: '1.2em', textAlign: "center"}}>{monitor.name}</Typography>
                         </CardContent>
+                        <CardActions sx={{ display: "flex", justifyContent: "center"}}>
+                            <IconButton onClick={() => navigate(`/monitors/${monitor.id}/view`)}><VisibilityOutlined sx={{ fontSize: '1.5em'}}/></IconButton>
+                        </CardActions>
                     </Card>
                 )
             })}
             <Card variant="outlined" sx={{cursor: 'pointer'}}
                 onClick={ () => selectMonitor({ products: [] as number[]} as Monitor)}>
-                <CardContent sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '80px', height: '110px'}}>
-                    <AddCircleOutlined color={"success"} sx={{fontSize: '4rem'}}/>
+                <CardContent sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100px', height: '150px'}}>
+                    <AddCircleOutlined color={currentMonitor && currentMonitor.id === undefined ? "error" : "success" }
+                                       sx={{fontSize: '4rem' }}/>
                 </CardContent>
             </Card>
         </Box>
