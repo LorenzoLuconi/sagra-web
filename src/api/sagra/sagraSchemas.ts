@@ -116,6 +116,7 @@ export type OrderRequest = {
    */
   serviceNumber: number;
   /**
+   * @maximum 100
    * @minimum 0
    */
   discountRate?: number;

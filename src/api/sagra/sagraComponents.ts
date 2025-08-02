@@ -789,14 +789,14 @@ export const useMonitorById = <TData = Schemas.Monitor,>(
   });
 };
 
-export type UpdateMonitorPathParams = {
+export type MonitorUpdatePathParams = {
   /**
    * @format int64
    */
   monitorId: number;
 };
 
-export type UpdateMonitorError = Fetcher.ErrorWrapper<
+export type MonitorUpdateError = Fetcher.ErrorWrapper<
   | {
       status: 400;
       payload: Schemas.ErrorResource;
@@ -811,30 +811,30 @@ export type UpdateMonitorError = Fetcher.ErrorWrapper<
     }
 >;
 
-export type UpdateMonitorVariables = {
+export type MonitorUpdateVariables = {
   body: Schemas.Monitor;
-  pathParams: UpdateMonitorPathParams;
+  pathParams: MonitorUpdatePathParams;
 } & SagraContext["fetcherOptions"];
 
-export const fetchUpdateMonitor = (
-  variables: UpdateMonitorVariables,
+export const fetchMonitorUpdate = (
+  variables: MonitorUpdateVariables,
   signal?: AbortSignal,
 ) =>
   sagraFetch<
     Schemas.Monitor,
-    UpdateMonitorError,
+    MonitorUpdateError,
     Schemas.Monitor,
     {},
     {},
-    UpdateMonitorPathParams
+    MonitorUpdatePathParams
   >({ url: "/v1/monitors/{monitorId}", method: "put", ...variables, signal });
 
-export const useUpdateMonitor = (
+export const useMonitorUpdate = (
   options?: Omit<
     reactQuery.UseMutationOptions<
       Schemas.Monitor,
-      UpdateMonitorError,
-      UpdateMonitorVariables
+      MonitorUpdateError,
+      MonitorUpdateVariables
     >,
     "mutationFn"
   >,
@@ -842,11 +842,11 @@ export const useUpdateMonitor = (
   const { fetcherOptions } = useSagraContext();
   return reactQuery.useMutation<
     Schemas.Monitor,
-    UpdateMonitorError,
-    UpdateMonitorVariables
+    MonitorUpdateError,
+    MonitorUpdateVariables
   >({
-    mutationFn: (variables: UpdateMonitorVariables) =>
-      fetchUpdateMonitor(deepMerge(fetcherOptions, variables)),
+    mutationFn: (variables: MonitorUpdateVariables) =>
+      fetchMonitorUpdate(deepMerge(fetcherOptions, variables)),
     ...options,
   });
 };
