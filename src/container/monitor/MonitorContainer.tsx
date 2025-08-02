@@ -11,7 +11,7 @@ import {
     Box,
     Button,
     CircularProgress,
-    FormControl,
+    FormControl, Grid,
     IconButton,
     Paper,
     TextField,
@@ -25,7 +25,7 @@ import {
     CancelOutlined,
     DeleteOutlined,
     KeyboardArrowDown,
-    KeyboardArrowUp,
+    KeyboardArrowUp, MonitorOutlined,
     SaveOutlined
 } from "@mui/icons-material";
 import * as React from "react";
@@ -85,13 +85,23 @@ const MonitorContainer = () => {
 
     return (
         <>
-        <Paper variant="outlined" sx={{p: 2, m: 1, backgroundColor: sticazzi }}>
-            <MonitorsList monitors={monitors} selectMonitor={selectMonitor}/>
-        </Paper>
-            {
-                monitor &&
-                    <MonitorEdit key={monitor?.id} monitor={monitor} cancel={cancelSelected}/>
-            }
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1, alignItems: 'center'}}>
+                <MonitorOutlined />
+                <Typography sx={{ml: 1, fontWeight: 700, fontSize: '1.5em'}}>Monitors</Typography>
+            </Box>
+            <Grid container spacing={2}>
+                <Grid size={7}>
+                    <Paper variant="outlined" sx={{p: 2, backgroundColor: sticazzi }}>
+                        <MonitorsList monitors={monitors} selectMonitor={selectMonitor}/>
+                    </Paper>
+                </Grid>
+                <Grid size={5}>
+                    {
+                        monitor &&
+                        <MonitorEdit key={monitor?.id} monitor={monitor} cancel={cancelSelected}/>
+                    }
+                </Grid>
+            </Grid>
         </>
     )
 }
@@ -375,10 +385,10 @@ const MonitoredProducts = (props: MonitoredProductsProps) => {
     }
 
     return (
-        <Box >
+        <Box sx={{ p: 1}}>
             { products.map( (pid, idx) => {
                 return (
-                    <Box key={idx} sx={{mt: 0.5, p: 1, display: 'flex', width: '100%',
+                    <Box key={idx} sx={{mt: 0.5, pl: 1, pr: 1, display: 'flex',
                         justifyContent: 'space-between', alignItems: 'center',
                         backgroundColor: whiteSticazzi }}>
                         <Typography sx={{ fontSize: '1.1em'}}><ProductName productId={pid}/></Typography>

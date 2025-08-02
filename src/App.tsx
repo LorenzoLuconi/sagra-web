@@ -31,10 +31,7 @@ const useRouter = () => {
 
     return (
         createBrowserRouter([
-            {
-                path: '/monitors',
-                element: <MonitorContainer/>
-            },
+
             {
                 path: '/monitors/:monitorId/view',
                 element: <MonitorView/>
@@ -97,13 +94,14 @@ const useRouter = () => {
                         path: '/stats',
                         element: <StatsContainer/>
                     },
-
+                    {
+                        path: '/monitors',
+                        element: <MonitorContainer/>
+                    },
                     {
                         path: '*',
                         element: <UnmanagedPathView/>
                     }
-
-
                 ]
             }
         ] as RouteObject[])
