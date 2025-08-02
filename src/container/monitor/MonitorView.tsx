@@ -1,6 +1,6 @@
 import * as React from "react"
 import {MonitorProductView} from "../../api/sagra/sagraSchemas.ts";
-import {Alert, Box, CircularProgress, Paper, Typography} from "@mui/material";
+import {Alert, Box, CircularProgress, Paper, Typography, useTheme} from "@mui/material";
 import {convertDate, TIME_CONF} from "../../utils";
 import {useParams} from "react-router";
 import {monitorViewQuery} from "../../api/sagra/sagraComponents.ts";
@@ -11,6 +11,7 @@ const MonitorView: React.FC = () => {
 
     const params = useParams()
     const monitorId: number = params.monitorId ? +(params.monitorId) : 0
+    const theme = useTheme();
 
     const monitorViewConf = monitorViewQuery({pathParams: {monitorId: monitorId}})
     const monitorQuery = useQuery({
@@ -35,6 +36,16 @@ const MonitorView: React.FC = () => {
     const monitor = monitorQuery.data
     const products = monitor.products ?? [] as MonitorProductView[]
 
+    const productBackGroundColor = (availableQuantity: number, idx: number) => {
+        if ( availableQuantity <= 0 ) {
+            return theme.sagra.productSoldOut;
+        } else if ( availableQuantity < 10 ) {
+            return theme.sagra.productAlmostSoldOut;
+        } else {
+            return (idx % 2 == 0 ? '#efefef': 'transparent')
+        }
+    }
+
     return (
 
             <Paper sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '93vh', padding: '20px', gap: '20px'}}>
@@ -49,13 +60,14 @@ const MonitorView: React.FC = () => {
                             Prodotto
                         </Typography>
                         <Typography sx={{fontWeight: 400, textTransform: 'uppercase', fontSize: '3ch'}}>
-                            Quantità
+                            Quantità D/I
                         </Typography>
                     </Box>
 
                 {products.map((product: MonitorProductView, idx: number) => {
                     return (
-                        <Box key={idx} sx={{display: 'flex', justifyContent: 'space-between', backgroundColor: (idx%2==0?'#efefef': 'transparent'), padding: '10px'}}>
+                        <Box key={idx} sx={{display: 'flex', justifyContent: 'space-between', padding: '10px',
+                            backgroundColor: productBackGroundColor(product.availableQuantity, idx)}}>
                             <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch'}}>
                                 {product.name}
                             </Typography>

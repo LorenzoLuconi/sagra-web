@@ -6,7 +6,7 @@ import {Toaster} from "react-hot-toast";
 import InfoIcon from '@mui/icons-material/Info';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import {Box, CircularProgress} from "@mui/material";
+import {Box, CircularProgress, ThemeProvider} from "@mui/material";
 import UnmanagedPathView from "./view/UnmanagedPathView.tsx";
 import MonitorContainer from "./container/monitor/MonitorContainer.tsx";
 import {Logo} from "./layout/Logo.tsx";
@@ -34,7 +34,7 @@ const useRouter = () => {
 
             {
                 path: '/monitors/:monitorId/view',
-                element: <MonitorView/>
+                element:  <ThemeProvider theme={sagraTheme[currentTheme]}><MonitorView/></ThemeProvider>
             },
             {
                 path: "/",
