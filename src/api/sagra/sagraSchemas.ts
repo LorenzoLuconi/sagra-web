@@ -291,7 +291,7 @@ export type StatsOrderedProducts = {
    *
    * @format int64
    */
-  count: number;
+  totalQuantity: number;
 };
 
 export type Count = {

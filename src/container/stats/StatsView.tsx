@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import {Product, StatsOrder, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
-import {convertDate} from "../../utils";
+import {convertDate, currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
 import {get} from "lodash";
@@ -43,11 +43,10 @@ interface StatsFieldI {
 }
 
 const StatsField: React.FC<StatsFieldI> = (props) => {
-    const amountString = props.isAmount ? ' €': ''
     return (
         <Box sx={{display: 'flex', gap: '10px', alignItems: 'center'}}>
             <Typography sx={{fontWeight: 800}}>{props.field}</Typography>
-            <Typography>{`${props.value}${amountString}`}</Typography>
+            <Typography>{props.isAmount ? currency(props.value) : props.value}</Typography>
         </Box>
     )
 }
@@ -69,7 +68,7 @@ const TabularInfo: React.FC<DayStatsContainerI> = (props) => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Prodotto</TableCell>
-                            <TableCell align="right">Quantità</TableCell>
+                            <TableCell align="center">Quantità</TableCell>
                             <TableCell align="right">Importo</TableCell>
                         </TableRow>
                     </TableHead>
@@ -82,8 +81,8 @@ const TabularInfo: React.FC<DayStatsContainerI> = (props) => {
                                 <TableCell component="th" scope="row">
                                     {storedProducts[product.productId].name}
                                 </TableCell>
-                                <TableCell align="right">{product.count}</TableCell>
-                                <TableCell align="right">{product.totalAmount}</TableCell>
+                                <TableCell align="center">{product.totalQuantity}</TableCell>
+                                <TableCell align="right">{currency(product.totalAmount)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -287,7 +286,7 @@ const collectDayInfo = (dayStats: StatsOrder, productsTable: Record<number, Stat
         } else {
             productsTable[p.productId] = {
                 productId: p.productId,
-                count: productsTable[p.productId].count + p.count,
+                totalQuantity: productsTable[p.productId].totalAmount + p.totalQuantity,
                 totalAmount: productsTable[p.productId].totalAmount + p.totalAmount
             } as StatsOrderedProducts
         }
@@ -348,8 +347,8 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                 <TableCell component="th" scope="row">
                                     {products[productId].name}
                                 </TableCell>
-                                <TableCell align="right">{productsInOrder[productId].count}</TableCell>
-                                <TableCell align="right">{productsInOrder[productId].totalAmount}</TableCell>
+                                <TableCell align="right">{productsInOrder[productId].totalQuantity}</TableCell>
+                                <TableCell align="right">{currency(productsInOrder[productId].totalAmount)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -374,7 +373,7 @@ const buildProcutsData = (fullOrder: Record<number, StatsOrderedProducts>, produ
             },
                 {
                     type: Number,
-                    value: fullOrder[productId].count
+                    value: fullOrder[productId].totalQuantity
                 },
                 {
                     type: Number,
