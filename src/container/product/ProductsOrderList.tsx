@@ -17,7 +17,6 @@ const ProductsOrderList = (props: IProductsOrder) => {
   const {products, addToOrder} = props;
 
   return (
-      <form>
         <Table>
           <TableHead>
             <TableRow>
@@ -59,7 +58,6 @@ const ProductsOrderList = (props: IProductsOrder) => {
             </>
           </TableBody>
         </Table>
-      </form>
     );
 }
 
