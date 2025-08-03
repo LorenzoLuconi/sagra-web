@@ -66,16 +66,12 @@ const OrderEditTotal = () => {
                     },
                   }}
               >
-                { originalOrder.discountRate ?
-                    <>
-                      <MenuItem key={"orig-discount"} onClick={() =>  handleUpdateDiscount(originalOrder.discountRate)}>{`Mantieni sconto attuale (${originalOrder.discountRate}%)`}</MenuItem>
-                      <Divider />
+                <MenuItem key={"orig-discount"} onClick={() =>  handleUpdateDiscount(originalOrder.discountRate)}>{
+                  originalOrder.discountRate ? `Mantieni sconto attuale (${originalOrder.discountRate}%)` : 'Mantieni nessuno sconto'}
+                </MenuItem>
+                <Divider />
+                { originalOrder.discountRate &&
                       <MenuItem key={"no-discount"} onClick={() => handleUpdateDiscount() }>Nessuno sconto</MenuItem>
-                    </>
-                  : <>
-                      <MenuItem key={"orig-discount"} onClick={() => handleUpdateDiscount() }>Mantieni nessuno sconto</MenuItem>
-                      <Divider />
-                    </>
                 }
 
                 { discountsQuery.data?.map( (d) =>
