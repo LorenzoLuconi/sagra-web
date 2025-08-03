@@ -30,7 +30,7 @@ const OrderEditTotal = () => {
 
   const total = () => {
     let t = 0;
-    if (order.serviceNumber) {
+    if (order.serviceNumber && ! order.takeAway) {
       t = order.serviceCost * order.serviceNumber;
     }
 
