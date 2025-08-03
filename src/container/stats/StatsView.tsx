@@ -286,7 +286,7 @@ const collectDayInfo = (dayStats: StatsOrder, productsTable: Record<number, Stat
         } else {
             productsTable[p.productId] = {
                 productId: p.productId,
-                totalQuantity: productsTable[p.productId].totalAmount + p.totalQuantity,
+                totalQuantity: productsTable[p.productId].totalQuantity + p.totalQuantity,
                 totalAmount: productsTable[p.productId].totalAmount + p.totalAmount
             } as StatsOrderedProducts
         }
