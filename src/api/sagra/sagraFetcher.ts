@@ -1,5 +1,5 @@
 import { SagraContext } from "./sagraContext";
-import {manageErrorResponse} from "../../utils";
+import {headerFromToken, manageErrorResponse} from "../../utils";
 
 const baseUrl = "http://localhost:8080";
 
@@ -59,6 +59,33 @@ export async function sagraFetch<
       delete requestHeaders["Content-Type"];
     }
 
+    let authHeader = {}
+
+      console.log('RequestHeader: ', requestHeaders)
+
+    if (
+        requestHeaders['authorization'] === undefined || ((requestHeaders['authorization'] !== undefined) &&
+            !requestHeaders['authorization']
+                .toLowerCase()
+                .startsWith('bearer'))
+    )
+    {
+      console.log('Devo mettere header')
+
+    const token: string | undefined = (window as unknown)['token'] as string | undefined;
+
+      console.log('sagraFetcher: ', token)
+
+      if (token !== undefined) {
+        authHeader = headerFromToken(token);
+        // console.log('AuthHeader: ', authHeader);
+        // console.log('Full Header: ', {headers: {...requestHeaders, ...authHeader}})
+      }
+    }
+
+    console.log('AuthHeader: ', authHeader)
+
+
     const response = await window.fetch(
       `${baseUrl}${resolveUrl(url, queryParams, pathParams)}`,
       {
@@ -69,7 +96,7 @@ export async function sagraFetch<
             ? body
             : JSON.stringify(body)
           : undefined,
-        headers: requestHeaders,
+        headers: {...requestHeaders, ...authHeader}
       } as Request,
     );
 

@@ -1,8 +1,6 @@
-import {ErrorResourceNotEnoughQuantity, Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
+import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
-import { isNaN } from "lodash";
 import toast from "react-hot-toast";
-import {queryClient} from "../main.tsx";
 
 export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<string, string>) => {
     const res: any = {}
@@ -155,3 +153,15 @@ export const manageError = (error: ErrorWrapper<unknown>) => {
     toast.error(`${payload.message}`)
 }
 
+
+export const headerFromToken = (token?: string) => {
+    if (token) {
+        return (
+            {
+                'authorization': `Bearer ${token}`
+            }
+        )
+    } else {
+        return ({})
+    }
+}

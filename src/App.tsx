@@ -24,7 +24,8 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import 'dayjs/locale/it';
 import OrderListContainer from "./container/order/OrderListContainer.tsx";
 import MonitorView from "./container/monitor/MonitorView.tsx";
-
+import AuthProvider, {ProtectedComponent} from "./context/AuthProvider.tsx";
+import Login from './container/login/Login.tsx'
 
 const useRouter = () => {
     const [currentTheme, setCurrentTheme] = React.useState('light')
@@ -37,11 +38,22 @@ const useRouter = () => {
                 element:  <ThemeProvider theme={sagraTheme[currentTheme]}><MonitorView/></ThemeProvider>
             },
             {
+              path: '/login',
+              element: <Login/>
+            },
+            {
                 path: "/",
                 element: (
-                    <MainLayout theme={sagraTheme[currentTheme]} header={<Header changeTheme={(theme: string) => {
-                        setCurrentTheme(theme)
-                    }}/>} body={<Outlet/>} footer={<div>footer</div>}/>
+                    <MainLayout
+                        theme={sagraTheme[currentTheme]}
+                        header={
+                            <Header changeTheme={(theme: string) => {
+                                setCurrentTheme(theme)
+                                }}
+                            />
+                        }
+                        body={<ProtectedComponent><Outlet/></ProtectedComponent>}
+                        footer={<div>footer</div>}/>
                 ),
                 errorElement: <span>Error</span>,
                 children: [
@@ -152,7 +164,9 @@ export default function App() {
                 }}
             />
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'it'}>
-                <RouterProvider router={router}/>
+                <AuthProvider>
+                    <RouterProvider router={router}/>
+                </AuthProvider>
             </LocalizationProvider>
         </React.Suspense>
     )
