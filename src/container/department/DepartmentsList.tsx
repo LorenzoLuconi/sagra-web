@@ -98,7 +98,7 @@ const DepartmentsList = () => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 

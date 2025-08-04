@@ -25,6 +25,8 @@ import {
   fetchProductUpdate,
   productsSearchQuery,
 } from "../../api/sagra/sagraComponents.ts";
+import {manageError} from "../../utils";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 interface IProductEdit {
   selected?: Product;
@@ -138,7 +140,7 @@ const ProductEdit = (props: IProductEdit) => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 
@@ -166,7 +168,7 @@ const ProductEdit = (props: IProductEdit) => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 
