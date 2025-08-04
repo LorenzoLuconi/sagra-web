@@ -161,7 +161,7 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                     <TableHead>
                         <TableRow>
                             <TableCell>Prodotto</TableCell>
-                            <TableCell align="right">Quantità</TableCell>
+                            <TableCell align="center">Quantità</TableCell>
                             <TableCell align="right">Importo</TableCell>
                         </TableRow>
                     </TableHead>
@@ -174,8 +174,8 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                 <TableCell component="th" scope="row">
                                     {products[+productId].name}
                                 </TableCell>
-                                <TableCell align="right">{productsInOrder[+productId].count}</TableCell>
-                                <TableCell align="right">{productsInOrder[+productId].totalAmount}</TableCell>
+                                <TableCell align="center">{productsInOrder[+productId].totalQuantity}</TableCell>
+                                <TableCell align="right">{currency(productsInOrder[+productId].totalAmount)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -221,7 +221,7 @@ const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
     const {products} = useProducts()
     const dayKeys = Object.keys(stats)
 
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 
@@ -379,7 +379,7 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
     const {stats} = props
     const [value, setValue] = React.useState(0)
 
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 
