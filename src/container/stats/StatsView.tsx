@@ -3,12 +3,8 @@ import {OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComp
 import {
     Box,
     Button,
-    Card,
-    CardActions,
-    CardContent,
     CircularProgress,
     Paper,
-    Popover,
     Tab,
     Table,
     TableBody,
@@ -21,12 +17,13 @@ import {
 } from "@mui/material";
 import {Product, StatsOrder, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
-import {convertDate, currency} from "../../utils";
+import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
 import {get} from "lodash";
-import {DatePicker} from "@mui/x-date-pickers";
-import dayjs, {Dayjs} from 'dayjs'
+import {DatePicker, DatePickerSlotProps} from "@mui/x-date-pickers";
+import * as dayjs from 'dayjs'
+import {Dayjs} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
 
@@ -58,47 +55,6 @@ interface PiePair {
     value: number
 }
 
-const TabularInfo: React.FC<DayStatsContainerI> = (props) => {
-    const {day, stats} = props
-    const {products} = stats
-    const {products: storedProducts} = useProducts()
-
-    return (
-        <Box sx={{display: 'flex', flexDirection: 'column', gap: '30px'}}>
-            <TableContainer component={Box}>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Prodotto</TableCell>
-                            <TableCell align="center">Quantità</TableCell>
-                            <TableCell align="right">Importo</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {products.map((product) => (
-                            <TableRow
-                                key={product.productId}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                                <TableCell component="th" scope="row">
-                                    {storedProducts[product.productId].name}
-                                </TableCell>
-                                <TableCell align="center">{product.totalQuantity}</TableCell>
-                                <TableCell align="right">{currency(product.totalAmount)}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start'}}>
-                <StatsField field={'Numero Ordini'} value={stats.count}/>
-                <StatsField field={'Totale Coperti'} value={stats.totalServiceNumber}/>
-                <StatsField field={'Totale'} value={stats.totalAmount} isAmount/>
-            </Box>
-        </Box>
-    )
-}
-
 interface TabPanelI extends React.PropsWithChildren {
     value: number
     index: number
@@ -118,89 +74,6 @@ const TabPanel: React.FC<TabPanelI>  = (props) => {
     );
 }
 
-
-const DayStatsContainer: React.FC<DayStatsContainerI> = (props) => {
-    const {stats, day} = props
-    const [value, setValue] = React.useState(0)
-
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
-
-    return (
-        <Box sx={{p: 5, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '20px'}}>
-            <Typography sx={{fontSize: '1.1rem', fontWeight: 700, color: 'primary'}}>{`Statistiche del giorno ${convertDate('it', new Date(day))}`}</Typography>
-
-            <DatePicker />
-
-
-            <Tabs
-                value={value}
-                onChange={handleChange}
-            >
-                <Tab label={'Info'}></Tab>
-                <Tab label={'Grafico Prodotti'}/>
-                <Tab label={'Grafico Incassi'}/>
-            </Tabs>
-            <TabPanel value={value} index={0}>
-                <TabularInfo day={day} stats={stats}/>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                <DayStats day={day} stats={stats} field={'count'}/>
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                <DayStats day={day} stats={stats} field={'totalAmount'}/>
-            </TabPanel>
-        </Box>
-    )
-}
-
-
-interface DayStatsI extends DayStatsContainerI {
-    field: string
-}
-const DayStats: React.FC<DayStatsI> = (props) => {
-    const {day, stats, field} = props
-    const {products} = stats
-    const {products: storedProducts} = useProducts()
-
-    console.log('StoresProducts: ', storedProducts)
-
-    console.log('Products: ', products)
-    const data: PiePair[] = []
-
-    for (let i = 0; i<products.length; i++) {
-        console.log('Prodotto: ', products[i])
-        const {productId} = products[i]
-        data.push({label: `${storedProducts[productId].name}`, value: get(products[i], field)})
-    }
-
-
-
-    return (
-        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '5px', gap: '20px'}}>
-            <Typography sx={{fontWeight: '700', fontSize: '2rem'}}>{convertDate('it', new Date(day))}</Typography>
-
-            <Box sx={{display: 'flex', gap: '20px', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
-                <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start'}}>
-                    <StatsField field={'Numero Ordini'} value={stats.count}/>
-                    <StatsField field={'Totale Coperti'} value={stats.totalServiceNumber}/>
-                    <StatsField field={'Totale'} value={stats.totalAmount} isAmount/>
-                </Box>
-                <PieChart
-                    width={400}
-                    height={400}
-                    hideLegend={false}
-                    sx={{fontFamily: 'Roboto'}}
-                    series={[{ innerRadius: 100, outerRadius: 200, data, arcLabel: 'value' } as PieSeries]}
-                />
-            </Box>
-
-        </Box>
-    )
-
-}
-
 interface ResponseStatsViewI {
     stats: OrderStatsResponse
 }
@@ -210,70 +83,6 @@ interface ResponseStatsViewI {
  */
 
 
-interface StatsViewI {
-    stats: StatsOrder
-    day: string
-}
-
-const OverviewDayStats: React.FC<StatsViewI> = (props) => {
-    const {stats, day} = props
-    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const open = Boolean(anchorEl);
-    const id = open ? 'simple-popover' : undefined;
-
-    return (
-        <Card
-            sx={{
-                display: 'flex',
-                width: 'fit-content',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                padding: '10px'
-            }}
-        >
-            <CardContent>
-                <StatsField field={'Numero Ordini'} value={stats.count}/>
-                <StatsField field={'Totale Coperti'} value={stats.totalServiceNumber}/>
-                <StatsField field={'Totale'} value={stats.totalAmount} isAmount/>
-            </CardContent>
-            <CardActions>
-                <Button
-                    aria-describedby={id}
-                    onClick={handleClick}
-                    size="small"
-                >
-                    Apri Statistiche
-                </Button>
-                <Popover
-                    id={id}
-                    open={open}
-                    anchorEl={anchorEl}
-                    onClose={handleClose}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                        vertical: 'center',
-                        horizontal: 'left',
-                    }}
-                >
-                    <DayStatsContainer stats={stats} day={day}/>
-                </Popover>
-            </CardActions>
-        </Card>
-    )
-}
 
 const collectDayInfo = (dayStats: StatsOrder, productsTable: Record<number, StatsOrderedProducts>) => {
     const {products} = dayStats
@@ -384,7 +193,7 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
 }
 
 
-const buildProcutsData = (fullOrder: Record<number, StatsOrderedProducts>, productsTable: Record<number, Product>) => {
+const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, productsTable: Record<number, Product>) => {
     const productKeys = Object.keys(fullOrder) as number[]
     const rows = productKeys.map((productId: number) => {
         return (
@@ -411,11 +220,6 @@ const buildProcutsData = (fullOrder: Record<number, StatsOrderedProducts>, produ
     return rows
 }
 
-interface XLSDataI {
-    productName: string
-    count: number
-    totalAmount: number
-}
 
 const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
     const {stats} = props
@@ -476,7 +280,7 @@ const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
                 />
                 <Button
                     onClick={() => {
-                        const _data = buildProcutsData(productsTable, products)
+                        const _data = buildProductsData(productsTable, products)
 
                         const HEADER = [
                             {
@@ -567,12 +371,9 @@ const AllDaysStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
     return (
         <Box   id={'order-search-bar'}>
             <DatePicker
-
                 value={dayjs(selectedDay)}
-                        onChange={ (v) => setSelectedDay(v ? v.format( 'YYYY-MM-DD') : '')}
-                        slotProps={{
-                            field: { clearable: true },
-                        }}
+                onChange={ (v) => setSelectedDay(v ? v.format( 'YYYY-MM-DD') : '')}
+                slotProps={{field: { clearable: true }} as DatePickerSlotProps<true>}
             />
             {component}
         </Box>
@@ -582,14 +383,11 @@ const AllDaysStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
 
 const StatsView: React.FC<ResponseStatsViewI> = (props) => {
     const {stats} = props
-    const [selectedDay, setSelectedDay] = React.useState<string | undefined>(undefined)
     const [value, setValue] = React.useState(0)
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
-
-    const byDay = Object.keys(stats)
 
     const productsConf = productsSearchQuery({});
 
