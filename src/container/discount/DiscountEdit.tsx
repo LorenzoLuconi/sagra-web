@@ -10,6 +10,8 @@ import {
   fetchDiscountCreate,
   fetchUpdateDiscount,
 } from "../../api/sagra/sagraComponents.ts";
+import {manageError} from "../../utils";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 interface IDiscountEdit {
   selected?: Discount;
@@ -65,7 +67,7 @@ export const DiscountEdit = (props: IDiscountEdit) => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 
@@ -93,7 +95,7 @@ export const DiscountEdit = (props: IDiscountEdit) => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 

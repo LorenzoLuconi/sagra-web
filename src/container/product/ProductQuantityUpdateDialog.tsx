@@ -20,6 +20,8 @@ import { useState } from "react";
 import * as React from "react";
 import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
+import {manageError} from "../../utils";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 interface IProductQuantityUpdateDialog {
   product: Product;
@@ -65,7 +67,7 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 
@@ -86,7 +88,7 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
     },
     onError: (error: Error) => {
       setErrorQuantity(true)
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 
@@ -106,7 +108,7 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
     },
     onError: (error: Error) => {
       setErrorQuantity(true)
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 
@@ -126,7 +128,7 @@ const ProductQuantityUpdateDialog = (props: IProductQuantityUpdateDialog) => {
     },
     onError: (error: Error) => {
       setErrorQuantity(true)
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 

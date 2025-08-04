@@ -31,6 +31,8 @@ import {
 import { queryClient } from "../../main.tsx";
 import { green, red } from "@mui/material/colors";
 import toast from "react-hot-toast";
+import {manageError} from "../../utils";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 const CoursesList = () => {
 
@@ -68,7 +70,7 @@ const CoursesList = () => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 
@@ -88,7 +90,7 @@ const CoursesList = () => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 

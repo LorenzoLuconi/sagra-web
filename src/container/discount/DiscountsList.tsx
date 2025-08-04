@@ -22,6 +22,8 @@ import {DeleteOutlined, EditOutlined, SettingsOutlined} from "@mui/icons-materia
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 import {useConfirm} from "material-ui-confirm";
+import {manageError} from "../../utils";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 
 interface IDiscountsList {
@@ -50,7 +52,7 @@ const DiscountsList = (props: IDiscountsList) => {
                 });
         },
         onError: (error: Error) => {
-            toast.error(error.message);
+            manageError(error as ErrorWrapper<unknown>)
         },
     });
 

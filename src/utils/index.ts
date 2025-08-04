@@ -1,6 +1,8 @@
-import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
+import {ErrorResourceNotEnoughQuantity, Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
 import { isNaN } from "lodash";
+import toast from "react-hot-toast";
+import {queryClient} from "../main.tsx";
 
 export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<string, string>) => {
     const res: any = {}
@@ -146,3 +148,10 @@ export const testOrderProductAvailability = (product: Product, quantity: number,
         const diff = orderQuantity - originalQuantity
         return (diff <= product.availableQuantity)
 }
+
+export const manageError = (error: ErrorWrapper<unknown>) => {
+    const {status, payload} = error.stack
+    console.log('Status: ', status, payload)
+    toast.error(`${payload.message}`)
+}
+

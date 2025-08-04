@@ -9,6 +9,8 @@ import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
 import { Box, Button, TextField } from "@mui/material";
 import { AddCircle } from "@mui/icons-material";
+import {manageError} from "../../utils";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 export const CourseEdit = () => {
 
@@ -39,7 +41,7 @@ export const CourseEdit = () => {
       });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     }
   });
 

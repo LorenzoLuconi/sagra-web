@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { CancelOutlined, DeleteOutlined, PrintOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
-import {checkOrderErrors} from "../../utils";
+import {checkOrderErrors, manageError} from "../../utils";
 import toast from "react-hot-toast";
 import { cloneDeep, isEqual } from "lodash";
 import {useMutation} from "@tanstack/react-query";
@@ -70,7 +70,7 @@ const OrderEditForm: React.FC = () => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+        manageError(error as ErrorWrapper<unknown>)
     },
   });
 

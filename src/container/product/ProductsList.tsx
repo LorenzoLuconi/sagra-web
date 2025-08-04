@@ -17,10 +17,11 @@ import {DeleteOutlined, EditOutlined, LinkOutlined, SettingsOutlined} from "@mui
 import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
 import { useConfirm } from "material-ui-confirm";
-import { currency } from "../../utils";
+import {currency, manageError} from "../../utils";
 import { ProductName } from "./ProductName.tsx";
 import { DepartmentName } from "../department/DepartmentName.tsx";
 import { CourseName } from "../course/CourseName.tsx";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 
 interface IProductList {
@@ -64,7 +65,7 @@ const ProductsList = (props : IProductList) => {
         });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      manageError(error as ErrorWrapper<unknown>)
     },
   });
 

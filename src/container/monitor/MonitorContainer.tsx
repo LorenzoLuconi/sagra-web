@@ -34,6 +34,8 @@ import toast from "react-hot-toast";
 import {queryClient} from "../../main.tsx";
 import {useConfirm} from "material-ui-confirm";
 import {isEqual} from "lodash";
+import {manageError} from "../../utils";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 interface ErrorMessage {
     name?: string;
@@ -157,7 +159,8 @@ const MonitorEdit = (props: MonitorEditProps ) => {
         },
         onError: (error) => {
             console.log("Errore durante l'aggiornamento del monitor: ", error, monitor, products, name);
-            toast.error(`Si è verificato un errore nell'aggiornamento del monitor: ${error.message}`)
+            toast.error("Si è verificato un errore nell'aggiornamento del monitor")
+            manageError(error as ErrorWrapper<unknown>)
         },
         onSuccess: (monitor: Monitor) => {
             const monitorConf = monitorSearchQuery({});
@@ -179,7 +182,8 @@ const MonitorEdit = (props: MonitorEditProps ) => {
         },
         onError: (error) => {
             console.log("Errore durante la cancellazione del monitor: ", error, monitor, products, name);
-            toast.error(`Si è verificato un errore cancellando il monitor: ${error.message}`)
+            toast.error("Si è verificato un errore cancellando il monitor")
+            manageError(error as ErrorWrapper<unknown>)
         },
         onSuccess: () => {
             const monitorConf = monitorSearchQuery({});
@@ -201,7 +205,8 @@ const MonitorEdit = (props: MonitorEditProps ) => {
         },
         onError: (error) => {
             console.log("Errore durante la creazione del monitor: ", error, products, name);
-            toast.error(`Si è verificato un errore nella creazione del monitor: ${error.message}`)
+            toast.error("Si è verificato un errore nella creazione del monitor")
+            manageError(error as ErrorWrapper<unknown>)
         },
         onSuccess: (monitor: Monitor) => {
             const monitorConf = monitorSearchQuery({});
