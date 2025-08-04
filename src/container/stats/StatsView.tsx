@@ -22,15 +22,9 @@ import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
 import {get} from "lodash";
 import {DatePicker, DatePickerSlotProps} from "@mui/x-date-pickers";
-import * as dayjs from 'dayjs'
-import {Dayjs} from 'dayjs'
+import dayjs, {Dayjs} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
-
-interface DayStatsContainerI {
-    day: string
-    stats: StatsOrder
-}
 
 
 interface StatsFieldI {
