@@ -1,3 +1,4 @@
+import * as React from "react"
 import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
 import toast from "react-hot-toast";
@@ -165,3 +166,26 @@ export const headerFromToken = (token?: string) => {
         return ({})
     }
 }
+
+const getStorageValue = (key: string, defaultValue?: unknown) => {
+    // getting stored value
+    const saved = localStorage.getItem(key) ?? undefined;
+    console.log('GetStorageValue: ', typeof saved, (saved !== undefined))
+    const initial = (saved !== undefined && saved !== 'undefined') ? JSON.parse(saved) : undefined;
+    return initial ?? defaultValue;
+}
+
+export const useLocalStorage = (key: string, defaultValue?: unknown) => {
+    const [value, setValue] = React.useState(() => {
+        return getStorageValue(key, defaultValue);
+    });
+
+    React.useEffect(() => {
+        // storing input name
+        if (value !== undefined) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+    }, [key, value]);
+
+    return [value, setValue];
+};

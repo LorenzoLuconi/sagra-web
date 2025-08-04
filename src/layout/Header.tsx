@@ -32,6 +32,7 @@ import {
     WorkspacesOutlined
 } from "@mui/icons-material";
 import MaterialUISwitch from "../view/MaterialUISwitch.tsx";
+import {useApplicationStore} from "../context/ApplicationStore.tsx";
 
 const RedButton = styled(Button)<ButtonProps>(({ theme }) => ({
     color: theme.palette.getContrastText(red[700]),
@@ -92,9 +93,16 @@ interface HeaderI {
 const Header: React.FC<HeaderI> = (props): React.ReactElement => {
 
     const [selection, setSelection] = React.useState(undefined);
+    const {get,set} = useApplicationStore()
+
     const navigate = useNavigate()
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+
+    const username = get('username')
+
+    console.log('Username: ', username)
+
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -174,7 +182,8 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             Monitor
                         </MenuItem>
                     </StyledMenu>
-                    <IconButton disabled>
+                    <IconButton>
+                        <>{username}</>
                         <AccountCircleOutlined />
                     </IconButton>
                     <MaterialUISwitch onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {

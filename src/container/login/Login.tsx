@@ -1,4 +1,4 @@
-import {Button, Container, Paper, TextField} from "@mui/material";
+import {Box, Button, Container, Paper, TextField, Typography} from "@mui/material";
 import * as React from "react";
 import {useState} from "react";
 import {sagraFetch} from "../../api/sagra/sagraFetcher.ts";
@@ -7,6 +7,8 @@ import {useMutation} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {useAuth} from "../../context/AuthProvider.tsx";
 import {useLocation, useNavigate} from "react-router";
+import {Logo} from "../../layout/Logo.tsx";
+import {useApplicationStore} from "../../context/ApplicationStore.tsx";
 
 export type LoginRequest = {
     username: string;
@@ -24,6 +26,7 @@ const Login  = () => {
     const search = new URLSearchParams(location.search);
     const redirect = search.get('redirect') ?? '/'
     const {setToken} = useAuth()
+    const {set} = useApplicationStore()
     const navigate = useNavigate()
     const handleChangeUsername =
         React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
@@ -57,6 +60,7 @@ const Login  = () => {
         onSuccess: (data, variables, context) => {
             console.log('Login Data: ', data)
             setToken(data.token)
+            set('username', data.username)
             toast.success(`Login effettuato con successo`);
             navigate(`${redirect}`)
         },
@@ -66,8 +70,11 @@ const Login  = () => {
     });
 
     return (
-        <Container sx={{alignItems: "center"}}>
-            <Paper elevation={2} sx={{width: "300px", display: "flex", flexDirection: "column", gap: 2, p: 3}}>
+        <Box sx={{display: 'flex', flexDirection: 'column',
+            alignItems: "center", justifyContent: 'center', height: '100vh', width: '100vw'}}>
+            <Paper elevation={2} sx={{width: "300px", display: "flex", flexDirection: "column", alignItems: 'center', gap: 2, p: 3}}>
+                <Logo sx={{width:'100px',  height:'100px', color: '#5f5f5f'}}/>
+                <Typography sx={{fontSize: '2rem', fontWeight: 200,  color: '#afafaf'}}>Accedi all'Account</Typography>
                 <TextField label="Username"
                            value={username}
                            onChange={handleChangeUsername}
@@ -78,7 +85,7 @@ const Login  = () => {
                            fullWidth/>
                 <Button onClick={() => loginPost.mutate()}>Login</Button>
             </Paper>
-        </Container>
+        </Box>
     )
 }
 export default Login

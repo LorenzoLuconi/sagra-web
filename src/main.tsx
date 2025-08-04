@@ -8,6 +8,7 @@ import "./index.css";
 
 import {QueryClient} from '@tanstack/react-query'
 import MainComponent from "./MainComponent.tsx";
+import ApplicationStore from "./context/ApplicationStore.tsx";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +23,7 @@ export const queryClient = new QueryClient({
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+
         <MainComponent/>
   </React.StrictMode>,
 );
