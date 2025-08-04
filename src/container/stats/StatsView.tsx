@@ -159,7 +159,7 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
 
 
     const {products} = useProducts()
-    const [prodOrderBy, setProdOrderBy] = useState<ProductsOrderBy>(ProductsOrderBy.name)
+    const [prodOrderBy, setProdOrderBy] = useState<ProductsOrderBy>(ProductsOrderBy.totalAmount)
     const [orderDirection, setOrderDirection] = useState<OrderDirection>(OrderDirection.desc)
 
 
