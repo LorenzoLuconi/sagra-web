@@ -11,7 +11,7 @@ import {
     TableCell,
     TableContainer,
     TableHead,
-    TableRow,
+    TableRow, TableSortLabel,
     Tabs,
     Typography
 } from "@mui/material";
@@ -20,11 +20,12 @@ import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
-import {get} from "lodash";
+import {get, orderBy, sortBy} from "lodash";
 import {DatePicker, DatePickerSlotProps} from "@mui/x-date-pickers";
 import dayjs, {Dayjs} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
+import {useMemo, useState} from "react";
 
 
 interface StatsFieldI {
@@ -126,7 +127,6 @@ const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
     const data: PiePair[] = []
 
     for (let i = 0; i<productsK.length; i++) {
-        console.log('Prodotto: ', productsK[i])
         const {productId} = productsStats[+productsK[i]]
         data.push({
             label: `${products[productId].name}`,
@@ -144,13 +144,48 @@ const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
  )
 }
 
+enum OrderDirection {
+    asc = "asc",
+    desc = "desc"
+}
 
 const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedProducts>, summary: SummaryI}> = (props) => {
     const {productsInOrder, summary} = props
+    enum ProductsOrderBy {
+        name = "name",
+        totalQuantity = "totalQuantity",
+        totalAmount = "totalAmount",
+    }
+
 
     const {products} = useProducts()
+    const [prodOrderBy, setProdOrderBy] = useState<ProductsOrderBy>(ProductsOrderBy.name)
+    const [orderDirection, setOrderDirection] = useState<OrderDirection>(OrderDirection.desc)
 
-    const productIds = Object.keys(productsInOrder) as number[]
+
+    const productsIds = () => {
+        const values = Object.values(productsInOrder);
+        switch (prodOrderBy) {
+            case ProductsOrderBy.totalQuantity:
+            case ProductsOrderBy.totalAmount:
+                return orderBy(values, prodOrderBy, orderDirection).map( v => v.productId);
+            case ProductsOrderBy.name: {
+                const valuesToOrder = values.map(p => {
+                    return {
+                        productId: p.productId,
+                        name: products[p.productId].name,
+                    }
+                });
+
+                return orderBy(valuesToOrder, prodOrderBy, orderDirection).map( v => v.productId);
+            }
+        }
+    }
+
+    const handleChangeOrder = (field: ProductsOrderBy) => {
+        setProdOrderBy(field)
+        setOrderDirection(orderDirection === OrderDirection.desc ? OrderDirection.asc : OrderDirection.desc)
+    }
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', gap: '30px'}}>
@@ -160,13 +195,28 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                 <Table sx={{ minWidth: 650 }} size={'small'} aria-label="total table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Prodotto</TableCell>
-                            <TableCell align="center">Quantità</TableCell>
-                            <TableCell align="right">Importo</TableCell>
+                            <TableCell sortDirection={orderDirection}>
+                                <TableSortLabel active={prodOrderBy === ProductsOrderBy.name} direction={orderDirection}
+                                                onClick={ () => handleChangeOrder(ProductsOrderBy.name) } >
+                                Prodotto
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell sortDirection={orderDirection} align="center">
+                                    <TableSortLabel active={prodOrderBy === ProductsOrderBy.totalQuantity} direction={orderDirection}
+                                                    onClick={ () => handleChangeOrder(ProductsOrderBy.totalQuantity) } >
+                                        Quantità
+                                    </TableSortLabel>
+                                </TableCell>
+                            <TableCell sortDirection={orderDirection} align="right">
+                                    <TableSortLabel active={prodOrderBy === ProductsOrderBy.totalAmount} direction={orderDirection}
+                                                    onClick={ () => handleChangeOrder(ProductsOrderBy.totalAmount) } >
+                                    Importo
+                                    </TableSortLabel>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {productIds.map((productId) => (
+                        {productsIds().map((productId) => (
                             <TableRow
                                 key={productId}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
