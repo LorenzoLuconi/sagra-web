@@ -2,7 +2,7 @@ import * as React from 'react'
 import {OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {
     Box,
-    Button,
+    Button, Card, CardContent, CardHeader, CardMedia,
     CircularProgress,
     Paper,
     Tab,
@@ -13,9 +13,10 @@ import {
     TableHead,
     TableRow, TableSortLabel,
     Tabs,
-    Typography
+    Typography,
+    useTheme
 } from "@mui/material";
-import {Product, StatsOrder, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
+import {Product, StatsOrder, StatsOrderDepartment, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
@@ -26,22 +27,56 @@ import dayjs, {Dayjs} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
 import {useMemo, useState} from "react";
+import {AreaPlot, BarPlot, ChartContainer, LineChart, lineElementClasses} from '@mui/x-charts';
 
+
+interface GraphStatsField {
+    labels: string[],
+    values: number[]
+}
 
 interface StatsFieldI {
     field: string
     value: number
+    description?: string
     isAmount?: boolean
     sx?: React.CSSProperties
+    graphData? : GraphStatsField
+}
+
+const cardStyle: React.CSSProperties = {
+    width: "250px", height: "250px", minWidth: "250px"
+};
+
+const cardTitle: React.CSSProperties = {
+    fontWeight: 500, fontSize: '0.8em'
+}
+
+const cardValue: React.CSSProperties = {
+    marginTop: 2, marginLeft: 1, fontSize: '1.5em', fontWeight: 800
 }
 
 const StatsField: React.FC<StatsFieldI> = (props) => {
    const value = props.isAmount ? currency(props.value): props.value
+
     return (
-        <Box sx={{display: 'flex', gap: '10px', alignItems: 'center', ...props.sx}}>
-            <Typography sx={{fontWeight: 800, ...props.sx}}>{props.field}</Typography>
-            <Typography sx={{...props.sx}}>{`${value}`}</Typography>
-        </Box>
+        <Card sx={{ ...cardStyle }}>
+            <CardContent>
+                <Typography component="div" sx={{ ...cardTitle }}>{props.field}</Typography>
+                <Typography component="div" sx={{ ...cardValue }}>{`${value}`}</Typography>
+                { props.description && <Typography component="div" sx={{ mt: 1, fontSize: '0.9em', fontWeight: 300 }}>{`${props.description}`}</Typography> }
+            </CardContent>
+            { props.graphData &&
+                <Box sx={{ height: "80px"}}>
+                    <ChartContainer
+                        series={[{ data: props.graphData.values, type: 'bar' }]}
+                        xAxis={[{ scaleType: 'band', data: props.graphData.labels }]}
+                    >
+                        <BarPlot />
+                    </ChartContainer>
+                 </Box>
+            }
+        </Card>
     )
 }
 
@@ -93,7 +128,8 @@ const collectDayInfo = (dayStats: StatsOrder, productsTable: Record<number, Stat
             productsTable[p.productId] = {
                 productId: p.productId,
                 totalQuantity: productsTable[p.productId].totalQuantity + p.totalQuantity,
-                totalAmount: productsTable[p.productId].totalAmount + p.totalAmount
+                totalAmount: productsTable[p.productId].totalAmount + p.totalAmount,
+
             } as StatsOrderedProducts
         }
     }
@@ -106,7 +142,10 @@ const collectDayInfo = (dayStats: StatsOrder, productsTable: Record<number, Stat
             totalAmount: dayStats.totalAmount,
             count: dayStats.count,
             totalServiceNumber: dayStats.totalServiceNumber,
-            table: productsTable
+            table: productsTable,
+            totalTakeAwayCount: dayStats.takeAway?.count ?? 0,
+            totalTakeAwayAmount: dayStats.takeAway?.totalAmount ?? 0,
+            departments: dayStats.departments
         }
     )
 
@@ -151,6 +190,7 @@ enum OrderDirection {
 
 const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedProducts>, summary: SummaryI}> = (props) => {
     const {productsInOrder, summary} = props
+    const theme = useTheme()
     enum ProductsOrderBy {
         name = "name",
         totalQuantity = "totalQuantity",
@@ -188,11 +228,10 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
     }
 
     return (
-        <Box sx={{display: 'flex', flexDirection: 'column', gap: '30px'}}>
-
+        <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
 
             <TableContainer component={Box}>
-                <Table sx={{ minWidth: 650 }} size={'small'} aria-label="total table">
+                <Table sx={{ minWidth: 650 ,backgroundColor: theme.palette.background.default }} size={'small'} aria-label="total table">
                     <TableHead>
                         <TableRow>
                             <TableCell sortDirection={orderDirection}>
@@ -265,8 +304,9 @@ const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, prod
 }
 
 
-const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
+const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
     const {stats} = props
+    const theme = useTheme();
     const [value, setValue] = React.useState(0)
     const {products} = useProducts()
     const dayKeys = Object.keys(stats)
@@ -278,107 +318,149 @@ const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
     let _totalServiceNumber = 0
     let _totalCount = 0;
     let _totalAmount = 0;
+    let _totalTakeAwayAmount = 0;
+    let _totalTakeAwayCount = 0;
+    // const _departments : Record<number, StatsOrderDepartment> = {}
     const productsTable: Record<number, StatsOrderedProducts> = {}
-    for (let i=0; i<dayKeys.length; i++) {
+    for (let i = 0; i < dayKeys.length; i++) {
         const day = dayKeys[i]
         const dayStats = stats[day]
-        const {totalAmount, totalServiceNumber, count} = collectDayInfo(dayStats, productsTable)
+        const {totalAmount, totalServiceNumber, count, totalTakeAwayCount, totalTakeAwayAmount, departments} = collectDayInfo(dayStats, productsTable)
         _totalServiceNumber += totalServiceNumber
         _totalAmount += totalAmount
         _totalCount += count
+        _totalTakeAwayAmount += totalTakeAwayAmount
+        _totalTakeAwayCount += totalTakeAwayCount
     }
 
-    const summary={totalServiceNumber: _totalServiceNumber, totalAmount: _totalAmount, count: _totalCount}
+    const summary = {totalServiceNumber: _totalServiceNumber, totalAmount: _totalAmount, count: _totalCount, totalTakeAwayAmount: _totalTakeAwayAmount, totalTakeAwayCount: _totalTakeAwayCount}
+
 
     return (
-<Box
-    sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}
->
-
-    <Box
-        sx={(theme) => (
-    {border: `1px solid transparent`, padding: '5px 10px', borderRadius: '10px',
-        background: `${theme.palette.secondary.main}`,
-        color: `${theme.palette.secondary.contrastText}`,
-        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '10px', width: '50%'}
-        )}>
-        <Box>
-        <StatsField sx={{fontSize: '1.2rem'}} field={'Numero Ordini'} value={summary.count}/>
-        </Box>
-        <StatsField
-            sx={{fontSize: '1.2rem'}}
-            field={'Totale Coperti'}
-            value={summary.totalServiceNumber}/>
-        <StatsField
-            sx={{fontSize: '1.2rem'}}
-            field={'Totale'}
-            value={summary.totalAmount} isAmount/>
-    </Box>
-
-    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '30px', width: '100%'}}>
-            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}>
-
-                <TotalTabularInfo
-                    productsInOrder={productsTable}
-                    summary={{totalServiceNumber: _totalServiceNumber, totalAmount: _totalAmount, count: _totalCount}}
+        <Paper variant="outlined" sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 1,
+            p: 2,
+            backgroundColor: theme.sagra.panelBackground,
+            borderRadius: '10px',
+        }}>
+            <Box
+                sx={() => (
+                    {
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        gap: 1
+                    }
+                )}>
+                <Box>
+                    <StatsField
+                        field={'Numero Ordini'}
+                        value={summary.count}
+                        description={summary.totalTakeAwayCount ? `Di cui ${summary.totalTakeAwayCount } da asporto` : ''}/>
+                </Box>
+                <StatsField
+                    field={'Totale Coperti'}
+                    value={summary.totalServiceNumber}/>
+                <StatsField
+                    field={'Totale Incasso'}
+                    value={summary.totalAmount}
+                    description={summary.totalTakeAwayAmount ? `Di cui ${currency(summary.totalTakeAwayAmount) } da asporto` : ''}
+                    isAmount
                 />
-                <Button
-                    onClick={() => {
-                        const _data = buildProductsData(productsTable, products)
-
-                        const HEADER = [
-                            {
-                                value: 'Nome Prodotto',
-                                fontWeight: 'bold'
-                            },
-                            {
-                                value: 'Quantità',
-                                fontWeight: 'bold'
-                            },
-                            {
-                                value: 'Totale',
-                                fontWeight: 'bold'
-                            }
-                        ]
-
-                        const data = [HEADER, ..._data];
-
-                        writeXlsxFile(data, {
-                            fileName: "file.xlsx",
-                        }).then(() => {
-                            toast.success('File excel generato con successo')
-                        }).catch(() => {
-                            toast.error('Si è verificato un errore nella generazione del file excel')
-                        })
-
-
-
-                    }}
-                >
-                    Esporta XLS
-                </Button>
+                <Card sx={{ ...cardStyle}} >
+                    <CardContent>
+                        <Typography sx={{ ...cardTitle}} >Statistiche Reparti</Typography>
+                        <PieChart
+                            width={160}
+                            height={160}
+                            hideLegend
+                            sx={{m: 2, fontFamily: 'Roboto'}}
+                            series={[{ innerRadius: 0, data: [{label: 'r1', value:100},{label: 't2', value: 130}], arcLabel: 'value' } as PieSeries]}
+                        />
+                    </CardContent>
+                </Card>
             </Box>
-            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}>
 
-            <Tabs
-                value={value}
-                onChange={handleChange}
-                textColor="secondary"
-                indicatorColor="secondary"
-            >
-                <Tab label={'Grafico Importi'}/>
-                <Tab label={'Grafico Prodotti'}/>
-            </Tabs>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: '30px',
+                width: '100%'
+            }}>
+                <Paper  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    p: 2,
+                }}>
+                    <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella prodotti venduti</Typography>
+                    <TotalTabularInfo
+                        productsInOrder={productsTable}
+                        summary={{
+                            totalServiceNumber: _totalServiceNumber,
+                            totalAmount: _totalAmount,
+                            count: _totalCount
+                        }}
+                    />
+                    <Button
+                        onClick={() => {
+                            const _data = buildProductsData(productsTable, products)
 
-            <TabPanel value={value} index={0}>
-                <StatsPieChart productsStats={productsTable} field={'totalAmount'}/>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                <StatsPieChart productsStats={productsTable} field={'count'}/>
-            </TabPanel>
+                            const HEADER = [
+                                {
+                                    value: 'Nome Prodotto',
+                                    fontWeight: 'bold'
+                                },
+                                {
+                                    value: 'Quantità',
+                                    fontWeight: 'bold'
+                                },
+                                {
+                                    value: 'Totale',
+                                    fontWeight: 'bold'
+                                }
+                            ]
+
+                            const data = [HEADER, ..._data];
+
+                            writeXlsxFile(data, {
+                                fileName: "file.xlsx",
+                            }).then(() => {
+                                toast.success('File excel generato con successo')
+                            }).catch(() => {
+                                toast.error('Si è verificato un errore nella generazione del file excel')
+                            })
+
+
+                        }}
+                    >
+                        Esporta XLS
+                    </Button>
+                </Paper>
+                <Paper  sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, p: 2 }}>
+
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        textColor="secondary"
+                        indicatorColor="secondary"
+                    >
+                        <Tab label={'Grafico Importi'}/>
+                        <Tab label={'Grafico Quantità'}/>
+                    </Tabs>
+
+                    <TabPanel value={value} index={0}>
+                        <StatsPieChart productsStats={productsTable} field={'totalAmount'}/>
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
+                        <StatsPieChart productsStats={productsTable} field={'count'}/>
+                    </TabPanel>
+                </Paper>
             </Box>
-        </Box>
-</Box>
+        </Paper>
     )
 }
 
@@ -447,7 +529,7 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
 
             return (
                 <ProductsStore products={products}>
-                    <Paper sx={{display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap', gap: '20px', width: '100%'}}>
+                    <Box sx={{display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap', gap: '20px', width: '100%'}}>
 
                         <Box sx={{display: 'flex', flexDirection: 'column', width: '100%'}}>
                             <Tabs
@@ -470,7 +552,7 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
 
                         </Box>
 
-                    </Paper>
+                    </Box>
                 </ProductsStore>
             )
         }

@@ -272,9 +272,49 @@ export type StatsOrder = {
    */
   count: number;
   /**
+   * Statistiche sugli ordini da asporto, solo se presenti
+   */
+  takeAway?: StatsOrderTakeAway;
+  /**
    * Dettagli dei prodotti ordinati
    */
   products: StatsOrderedProducts[];
+  /**
+   * Statistiche sui reparti
+   */
+  departments: StatsOrderDepartment[];
+};
+
+/**
+ * Statistiche sui reparti
+ */
+export type StatsOrderDepartment = {
+  /**
+   * Id reparto
+   *
+   * @format int64
+   */
+  id: number;
+  /**
+   * Totale importo del reparto
+   */
+  totalAmount: number;
+};
+
+/**
+ * Statistiche sugli ordini da asporto
+ */
+export type StatsOrderTakeAway = {
+  /**
+   * Numero di ordini da asporto
+   *
+   * @format int64
+   */
+  count: number;
+  /**
+   * Totale importo degli ordini da asport
+   */
+  totalAmount: number;
 };
 
 export type StatsOrderedProducts = {

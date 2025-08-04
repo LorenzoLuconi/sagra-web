@@ -40,7 +40,8 @@ export const convertDate = (locale: string, date: Date, dataConversion?: Intl.Da
     return new Intl.DateTimeFormat(locale, o).format(date);
 }
 
-export const currencyEuro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" });
+// NOTA BENE: de-DE è voluto perché it-IT il separatore migliaia lo metto solo se >= 10.000. Boh!
+export const currencyEuro = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
 
 export const currency = (value : number) : string => {
   return currencyEuro.format(value)
