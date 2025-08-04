@@ -40,13 +40,15 @@ interface StatsFieldI {
     field: string
     value: number
     isAmount?: boolean
+    sx?: React.CSSProperties
 }
 
 const StatsField: React.FC<StatsFieldI> = (props) => {
+   const value = props.isAmount ? currency(props.value): props.value
     return (
-        <Box sx={{display: 'flex', gap: '10px', alignItems: 'center'}}>
-            <Typography sx={{fontWeight: 800}}>{props.field}</Typography>
-            <Typography>{props.isAmount ? currency(props.value) : props.value}</Typography>
+        <Box sx={{display: 'flex', gap: '10px', alignItems: 'center', ...props.sx}}>
+            <Typography sx={{fontWeight: 800, ...props.sx}}>{props.field}</Typography>
+            <Typography sx={{...props.sx}}>{`${value}`}</Typography>
         </Box>
     )
 }
@@ -313,6 +315,33 @@ interface SummaryI {
     count: number
 }
 
+const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
+
+    const {productsStats, field} = props
+    const {products} = useProducts()
+    const productsK = Object.keys(productsStats)
+    const data: PiePair[] = []
+
+    for (let i = 0; i<productsK.length; i++) {
+        console.log('Prodotto: ', productsK[i])
+        const {productId} = productsStats[+productsK[i]]
+        data.push({
+            label: `${products[productId].name}`,
+            value: get( productsStats[+productsK[i]], field)
+        })
+    }
+    return (
+     <PieChart
+         width={500}
+         height={400}
+         hideLegend={false}
+         sx={{fontFamily: 'Roboto'}}
+         series={[{ innerRadius: 100, outerRadius: 200, data, arcLabel: 'value' } as PieSeries]}
+     />
+ )
+}
+
+
 const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedProducts>, summary: SummaryI}> = (props) => {
     const {productsInOrder, summary} = props
 
@@ -323,11 +352,6 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', gap: '30px'}}>
 
-            <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                <StatsField field={'Numero Ordini'} value={summary.count}/>
-                <StatsField field={'Totale Coperti'} value={summary.totalServiceNumber}/>
-                <StatsField field={'Totale'} value={summary.totalAmount} isAmount/>
-            </Box>
 
             <TableContainer component={Box}>
                 <Table sx={{ minWidth: 650 }} size={'small'} aria-label="total table">
@@ -345,10 +369,10 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 <TableCell component="th" scope="row">
-                                    {products[productId].name}
+                                    {products[+productId].name}
                                 </TableCell>
-                                <TableCell align="right">{productsInOrder[productId].totalQuantity}</TableCell>
-                                <TableCell align="right">{currency(productsInOrder[productId].totalAmount)}</TableCell>
+                                <TableCell align="right">{productsInOrder[+productId].count}</TableCell>
+                                <TableCell align="right">{productsInOrder[+productId].totalAmount}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -395,8 +419,14 @@ interface XLSDataI {
 
 const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
     const {stats} = props
+    const [value, setValue] = React.useState(0)
     const {products} = useProducts()
     const dayKeys = Object.keys(stats)
+
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    };
+
     let _totalServiceNumber = 0
     let _totalCount = 0;
     let _totalAmount = 0;
@@ -410,60 +440,142 @@ const TotalInfo: React.FC<{stats: OrderStatsResponse}> = (props) => {
         _totalCount += count
     }
 
+    const summary={totalServiceNumber: _totalServiceNumber, totalAmount: _totalAmount, count: _totalCount}
 
     return (
-        <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-        <TotalTabularInfo
-            productsInOrder={productsTable}
-            summary={{totalServiceNumber: _totalServiceNumber, totalAmount: _totalAmount, count: _totalCount}}
-        />
-            <Button
-                onClick={() => {
-                    const _data = buildProcutsData(productsTable, products)
+<Box
+    sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}
+>
 
-                    const HEADER = [
-                        {
-                            value: 'Nome Prodotto',
-                            fontWeight: 'bold'
-                        },
-                        {
-                            value: 'Quantità',
-                            fontWeight: 'bold'
-                        },
-                        {
-                            value: 'Totale',
-                            fontWeight: 'bold'
-                        }
-                    ]
-
-                    const data = [HEADER, ..._data];
-
-                    writeXlsxFile(data, {
-                        fileName: "file.xlsx",
-                    }).then(() => {
-                        toast.success('File excel generato con successo')
-                    }).catch(() => {
-                        toast.error('Si è verificato un errore nella generazione del file excel')
-                    })
-
-
-
-                }}
-            >
-                Esporta XLS
-            </Button>
+    <Box
+        sx={(theme) => (
+    {border: `1px solid transparent`, padding: '5px 10px', borderRadius: '10px',
+        background: `${theme.palette.secondary.main}`,
+        color: `${theme.palette.secondary.contrastText}`,
+        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '10px', width: '50%'}
+        )}>
+        <Box>
+        <StatsField sx={{fontSize: '1.2rem'}} field={'Numero Ordini'} value={summary.count}/>
         </Box>
+        <StatsField
+            sx={{fontSize: '1.2rem'}}
+            field={'Totale Coperti'}
+            value={summary.totalServiceNumber}/>
+        <StatsField
+            sx={{fontSize: '1.2rem'}}
+            field={'Totale'}
+            value={summary.totalAmount} isAmount/>
+    </Box>
+
+    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '30px', width: '100%'}}>
+            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}>
+
+                <TotalTabularInfo
+                    productsInOrder={productsTable}
+                    summary={{totalServiceNumber: _totalServiceNumber, totalAmount: _totalAmount, count: _totalCount}}
+                />
+                <Button
+                    onClick={() => {
+                        const _data = buildProcutsData(productsTable, products)
+
+                        const HEADER = [
+                            {
+                                value: 'Nome Prodotto',
+                                fontWeight: 'bold'
+                            },
+                            {
+                                value: 'Quantità',
+                                fontWeight: 'bold'
+                            },
+                            {
+                                value: 'Totale',
+                                fontWeight: 'bold'
+                            }
+                        ]
+
+                        const data = [HEADER, ..._data];
+
+                        writeXlsxFile(data, {
+                            fileName: "file.xlsx",
+                        }).then(() => {
+                            toast.success('File excel generato con successo')
+                        }).catch(() => {
+                            toast.error('Si è verificato un errore nella generazione del file excel')
+                        })
+
+
+
+                    }}
+                >
+                    Esporta XLS
+                </Button>
+            </Box>
+            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px'}}>
+
+            <Tabs
+                value={value}
+                onChange={handleChange}
+                textColor="secondary"
+                indicatorColor="secondary"
+            >
+                <Tab label={'Grafico Importi'}/>
+                <Tab label={'Grafico Prodotti'}/>
+            </Tabs>
+
+            <TabPanel value={value} index={0}>
+                <StatsPieChart productsStats={productsTable} field={'totalAmount'}/>
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+                <StatsPieChart productsStats={productsTable} field={'count'}/>
+            </TabPanel>
+            </Box>
+        </Box>
+</Box>
     )
 }
 
 const DayInfoStats: React.FC<{day: Dayjs, stats: OrderStatsResponse}> = (props) => {
-    return (
-        <span>Today</span>
-    )
+    const {day, stats} = props
+    const date = day.format('YYYY-MM-DD')
+    if (stats[date] !== undefined && stats[date].products.length >0) {
+
+    const subStats: OrderStatsResponse = {}
+    subStats[date] = stats[date]
+
+        return (
+            <TotalInfo stats={subStats}/>
+
+        )
+    } else {
+        return <Typography>No data</Typography>
+    }
 }
-const AllDaysStats = () => {
+const AllDaysStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
+    const {stats} = props
+    const [selectedDay, setSelectedDay] = React.useState(dayjs().format('YYYY-MM-DD'))
+
+    const subStats: OrderStatsResponse = {}
+    subStats[selectedDay] = stats[selectedDay]
+
+    let component = <Typography>No Data</Typography>
+
+    if (subStats[selectedDay] !== undefined && subStats[selectedDay].products.length > 0) {
+        component = <TotalInfo stats={subStats}/>
+
+    }
+
     return (
-        <span>AllDays</span>
+        <Box   id={'order-search-bar'}>
+            <DatePicker
+
+                value={dayjs(selectedDay)}
+                        onChange={ (v) => setSelectedDay(v ? v.format( 'YYYY-MM-DD') : '')}
+                        slotProps={{
+                            field: { clearable: true },
+                        }}
+            />
+            {component}
+        </Box>
     )
 }
 
@@ -495,7 +607,7 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
                 <ProductsStore products={products}>
                     <Paper sx={{display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap', gap: '20px', width: '100%'}}>
 
-                        <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                        <Box sx={{display: 'flex', flexDirection: 'column', width: '100%'}}>
                             <Tabs
                                 value={value}
                                 onChange={handleChange}
@@ -511,7 +623,7 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
                                 <DayInfoStats day={dayjs()} stats={stats} />
                             </TabPanel>
                             <TabPanel value={value} index={2}>
-                                <AllDaysStats />
+                                <AllDaysStats stats={stats}/>
                             </TabPanel>
 
                         </Box>
