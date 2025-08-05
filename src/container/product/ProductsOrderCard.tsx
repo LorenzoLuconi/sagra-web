@@ -29,10 +29,10 @@ const ProductsOrderCard = (props : IProductsOrder) => {
                             if ( productAvailable(product) )
                               addToOrder(product)}
                           }>
-
+                            <>
                           {
                               productAvailable(product) ?
-                                  <CardActionArea>
+                                  <CardActionArea sx={{height: '100%'}}>
                                       <ProductCardImage product={product}/>
                                       <ProductCardContent product={product} />
                                   </CardActionArea>
@@ -41,6 +41,7 @@ const ProductsOrderCard = (props : IProductsOrder) => {
                                         <ProductCardContent product={product} />
                                     </>
                           }
+                            </>
                     </Card>
                 )
               }
