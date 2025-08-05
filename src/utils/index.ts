@@ -2,6 +2,7 @@ import * as React from "react"
 import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
 import toast from "react-hot-toast";
+import {redirect} from "react-router";
 
 export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<string, string>) => {
     const res: any = {}
@@ -151,7 +152,17 @@ export const testOrderProductAvailability = (product: Product, quantity: number,
 export const manageError = (error: ErrorWrapper<unknown>) => {
     const {status, payload} = error.stack
     console.log('Status: ', status, payload)
-    toast.error(`${payload.message}`)
+    switch (status) {
+        case 401: {
+            toast.error('Verrai rediretto alla pagina di login')
+            toast.error('Utente non ha il permesso di accedere alla risorsa richiesta')
+            return redirect('/')
+            break
+        }
+        default:
+            toast.error(`${payload.message}`)
+    }
+
 }
 
 
