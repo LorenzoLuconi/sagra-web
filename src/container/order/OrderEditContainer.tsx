@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useQueries } from "@tanstack/react-query";
 import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import {CircularProgress, Grid, Paper, Typography, useTheme} from "@mui/material";
+import {Box, CircularProgress, Grid, Paper, Typography, useTheme} from "@mui/material";
 import { OrderStore } from "../../context/OrderStore.tsx";
 import ProductsToOrder from "./ProductsToOrder.tsx";
 import ErrorInfo from "../../view/ErrorInfo.tsx";
@@ -47,6 +47,7 @@ interface OrderEditContainerProps {
             <ProductsToOrder />
           </Grid>
           <Grid size={5}>
+              <Box sx={{display: 'flex', flexDirection: 'column', position: 'sticky', top: '10px'}}>
             <ErrorInfo />
 
             {
@@ -77,7 +78,9 @@ interface OrderEditContainerProps {
             >
               <OrderEditForm />
             </Paper>
+              </Box>
           </Grid>
+
         </Grid>
       </OrderStore>
     );
