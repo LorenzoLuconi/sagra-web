@@ -254,6 +254,31 @@ export type Course = {
   name: string;
 };
 
+export type AuthRequest = {
+  /**
+   * @minLength 1
+   */
+  username: string;
+  /**
+   * @minLength 1
+   */
+  password: string;
+};
+
+export type AuthResponse = {
+  access_token?: string;
+  /**
+   * @format int64
+   */
+  expires_in?: number;
+  token_type?: string;
+};
+
+export type UserResponse = {
+  username: string;
+  roles: ("admin" | "user")[];
+};
+
 export type StatsOrder = {
   /**
    * Numero totale dei coperti
@@ -272,9 +297,49 @@ export type StatsOrder = {
    */
   count: number;
   /**
+   * Statistiche sugli ordini da asporto, solo se presenti
+   */
+  takeAway?: StatsOrderTakeAway;
+  /**
    * Dettagli dei prodotti ordinati
    */
   products: StatsOrderedProducts[];
+  /**
+   * Statistiche sui reparti
+   */
+  departments: StatsOrderDepartment[];
+};
+
+/**
+ * Statistiche sui reparti
+ */
+export type StatsOrderDepartment = {
+  /**
+   * Id reparto
+   *
+   * @format int64
+   */
+  id: number;
+  /**
+   * Totale importo del reparto
+   */
+  totalAmount: number;
+};
+
+/**
+ * Statistiche sugli ordini da asporto
+ */
+export type StatsOrderTakeAway = {
+  /**
+   * Numero di ordini da asporto
+   *
+   * @format int64
+   */
+  count: number;
+  /**
+   * Totale importo degli ordini da asport
+   */
+  totalAmount: number;
 };
 
 export type StatsOrderedProducts = {

@@ -2466,6 +2466,149 @@ export const useCourseCreate = (
   });
 };
 
+export type LoginError = Fetcher.ErrorWrapper<{
+  status: 400;
+  payload: Schemas.ErrorResource;
+}>;
+
+export type LoginVariables = {
+  body: Schemas.AuthRequest;
+} & SagraContext["fetcherOptions"];
+
+/**
+ * Autenticazione tramite username e password, ritorna struttura contenente token JWT (access_token
+ */
+export const fetchLogin = (variables: LoginVariables, signal?: AbortSignal) =>
+  sagraFetch<Schemas.AuthResponse, LoginError, Schemas.AuthRequest, {}, {}, {}>(
+    { url: "/auth/token", method: "post", ...variables, signal },
+  );
+
+/**
+ * Autenticazione tramite username e password, ritorna struttura contenente token JWT (access_token
+ */
+export const useLogin = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.AuthResponse,
+      LoginError,
+      LoginVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    Schemas.AuthResponse,
+    LoginError,
+    LoginVariables
+  >({
+    mutationFn: (variables: LoginVariables) =>
+      fetchLogin(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
+export type AuthenticatedUserError = Fetcher.ErrorWrapper<{
+  status: 400;
+  payload: Schemas.ErrorResource;
+}>;
+
+export type AuthenticatedUserVariables = SagraContext["fetcherOptions"];
+
+export const fetchAuthenticatedUser = (
+  variables: AuthenticatedUserVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    Schemas.UserResponse,
+    AuthenticatedUserError,
+    undefined,
+    {},
+    {},
+    {}
+  >({ url: "/v1/user", method: "get", ...variables, signal });
+
+export function authenticatedUserQuery(variables: AuthenticatedUserVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<Schemas.UserResponse>;
+};
+
+export function authenticatedUserQuery(
+  variables: AuthenticatedUserVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<Schemas.UserResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function authenticatedUserQuery(
+  variables: AuthenticatedUserVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/user",
+      operationId: "authenticatedUser",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) =>
+            fetchAuthenticatedUser(variables, signal),
+  };
+}
+
+export const useSuspenseAuthenticatedUser = <TData = Schemas.UserResponse,>(
+  variables: AuthenticatedUserVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.UserResponse,
+      AuthenticatedUserError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<
+    Schemas.UserResponse,
+    AuthenticatedUserError,
+    TData
+  >({
+    ...authenticatedUserQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export const useAuthenticatedUser = <TData = Schemas.UserResponse,>(
+  variables: AuthenticatedUserVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.UserResponse,
+      AuthenticatedUserError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<
+    Schemas.UserResponse,
+    AuthenticatedUserError,
+    TData
+  >({
+    ...authenticatedUserQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
 export type OrderStatsQueryParams = {
   /**
    * @format date
@@ -2872,6 +3015,11 @@ export type QueryOperation =
       path: "/v1/courses";
       operationId: "coursesSearch";
       variables: CoursesSearchVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/v1/user";
+      operationId: "authenticatedUser";
+      variables: AuthenticatedUserVariables | reactQuery.SkipToken;
     }
   | {
       path: "/v1/stats/orders";
