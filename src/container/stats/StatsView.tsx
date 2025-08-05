@@ -72,9 +72,10 @@ const StatsField: React.FC<StatsFieldI> = (props) => {
                 { props.description && <Typography component="div" sx={{ mt: 1, fontSize: '0.9em', fontWeight: 300 }}>{`${props.description}`}</Typography> }
             </CardContent>
             { props.graphData &&
-                <Box sx={{ height: 80, mt: 1}}>
+                <Box sx={{ height: 100, mt: 1}}>
                     <BarChart
-                        series={[{ data: props.graphData.values, type: 'bar' }]}
+                        series={[{ data: props.graphData.values, type: 'bar',
+                            valueFormatter: (v) => v && props.isAmount ? currency(v) : `${v}` }]}
                         xAxis={[{ data: props.graphData.labels, position: 'none' }]}
                         yAxis={[{position: 'none'}]}
                         barLabel="value"
@@ -316,6 +317,11 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
 
     const summary = calculateSummary(stats)
 
+    const dayKeys = orderBy(Object.keys(stats));
+    const countGraph = { values: dayKeys.map(day => stats[day].count), labels: dayKeys};
+    const serviceGraph = { values: dayKeys.map(day => stats[day].totalServiceNumber), labels: dayKeys};
+    const totalAmountGraph = { values: dayKeys.map(day => stats[day].totalAmount), labels: dayKeys};
+
     return (
         <Paper variant="outlined" sx={{
             display: 'flex',
@@ -341,18 +347,19 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                         field={'Numero Ordini'}
                         value={summary.count}
                         description={summary.totalTakeAwayCount ? `Di cui ${summary.totalTakeAwayCount } da asporto` : ''}
-                        graphData={{ values: [1000,2000,1500], labels: ['Lunedì', 'Martedì', 'Mercoledì']}}
+                        graphData={countGraph}
                     />
                 </Box>
                 <StatsField
                     field={'Totale Coperti'}
-                    value={summary.totalServiceNumber}/>
+                    value={summary.totalServiceNumber}
+                    graphData={serviceGraph}/>
                 <StatsField
                     field={'Totale Incasso'}
                     value={summary.totalAmount}
                     description={summary.totalTakeAwayAmount ? `Di cui ${currency(summary.totalTakeAwayAmount) } da asporto` : ''}
-                    isAmount
-                />
+                    graphData={totalAmountGraph}
+                    isAmount />
                 <Card sx={{ ...cardStyle}} >
                     <CardContent>
                         <Typography sx={{ ...cardTitle, mb: 2}} >Statistiche Reparti</Typography>
