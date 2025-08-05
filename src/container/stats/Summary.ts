@@ -9,6 +9,7 @@ export interface SummaryI {
     totalTakeAwayAmount: number
     totalTakeAwayCount: number
     productsTable: Record<number, StatsOrderedProducts>
+    departments: Record<number, number>
 }
 
 const updateProductsTable = (dayStats: StatsOrder, productsTable: Record<number, StatsOrderedProducts>) => {
@@ -36,7 +37,8 @@ export const calculateSummary = (stats: OrderStatsResponse ) => {
         totalServiceNumber: 0,
         totalTakeAwayAmount: 0,
         totalTakeAwayCount: 0,
-        productsTable: {}
+        productsTable: {},
+        departments: {}
     }
 
     Object.values(stats).forEach((dayStats) => {
@@ -46,33 +48,16 @@ export const calculateSummary = (stats: OrderStatsResponse ) => {
         result.totalTakeAwayAmount += dayStats.takeAway?.totalAmount ?? 0
         result.totalTakeAwayCount += dayStats.takeAway?.count ?? 0
 
+        dayStats.departments.forEach(depStat => {
+            if ( result.departments[depStat.id] ) {
+                result.departments[depStat.id] += depStat.totalAmount
+            } else {
+                result.departments[depStat.id] = depStat.totalAmount
+            }
+        })
+
         updateProductsTable(dayStats, result.productsTable)
     })
-
-    // for (let i = 0; i < dayKeys.length; i++) {
-    //     const day = dayKeys[i]
-    //     const dayStats = stats[day]
-    //     const _daySummary= daySummary(dayStats, productsTable)
-    //     _totalServiceNumber += totalServiceNumber
-    //     _totalAmount += totalAmount
-    //     _totalCount += count
-    //     _totalTakeAwayAmount += totalTakeAwayAmount
-    //     _totalTakeAwayCount += totalTakeAwayCount
-    //     console.log("Departments init", departments)
-    //     if (departments) {
-    //         departments.forEach((dStat: StatsOrderDepartment) => {
-    //             const exTotalAmount = _departments[dStat.id]
-    //             if (exTotalAmount !== undefined) {
-    //                 console.log('exTotalAmount', exTotalAmount)
-    //                 console.log('totalAmount', dStat.totalAmount)
-    //                 _departments[dStat.id] = exTotalAmount + dStat.totalAmount
-    //             } else {
-    //                 _departments[dStat.id] = dStat.totalAmount
-    //             }
-    //             console.log("Departments Stats: ", _departments)
-    //         })
-    //     }
-    // }
 
     return result
 }

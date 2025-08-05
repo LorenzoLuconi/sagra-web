@@ -13,6 +13,11 @@ const OrderEdit = () => {
     pathParams: { orderId: orderId },
   });
 
+  useQuery({
+    queryKey: orderConf.queryKey,
+    queryFn: ({ queryKey }) => orderByIdQuery(queryKey[1]),
+  })
+
   const orderData = useQuery({
     queryKey: orderConf.queryKey,
     queryFn: orderConf.queryFn,

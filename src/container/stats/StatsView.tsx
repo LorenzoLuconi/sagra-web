@@ -20,12 +20,12 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import {Product, StatsOrder, StatsOrderDepartment, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
+import {Product, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
-import {get, orderBy, sum} from "lodash";
+import {get, orderBy } from "lodash";
 import {DatePicker, DatePickerSlotProps} from "@mui/x-date-pickers";
 import dayjs, {Dayjs} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
@@ -33,6 +33,7 @@ import toast from "react-hot-toast";
 import {BarChart, BarLabel} from '@mui/x-charts';
 import './Stats.css'
 import {calculateSummary, SummaryI} from "./Summary.ts";
+import DepartmentStats from "./DepartmentStats.tsx";
 
 interface GraphStatsField {
     labels: string[],
@@ -355,13 +356,7 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                 <Card sx={{ ...cardStyle}} >
                     <CardContent>
                         <Typography sx={{ ...cardTitle}} >Statistiche Reparti</Typography>
-                        <PieChart
-                            width={160}
-                            height={160}
-                            hideLegend
-                            sx={{m: 3, fontFamily: 'Roboto'}}
-                            series={[{ innerRadius: 0, data: [{label: 'r1', value:100},{label: 't2', value: 130}], arcLabel: 'value' } as PieSeries]}
-                        />
+                        <DepartmentStats summary={summary} width={160} height={160} />
                     </CardContent>
                 </Card>
             </Box>
