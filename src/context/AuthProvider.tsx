@@ -16,7 +16,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = (props) => {
     const [storedToken, setStoredToken] = React.useState<string|undefined>(undefined)
 
     const setTokenHandler = (t: string | undefined) => {
-        window['token'] = t
+        globalThis.token = t
         setStoredToken(t)
     }
 

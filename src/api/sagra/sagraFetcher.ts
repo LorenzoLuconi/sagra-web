@@ -72,7 +72,7 @@ export async function sagraFetch<
     {
       console.log('Devo mettere header')
 
-    const token: string | undefined = (window as unknown)['token'] as string | undefined;
+    const token: string | undefined = globalThis.token
 
       console.log('sagraFetcher: ', token)
 

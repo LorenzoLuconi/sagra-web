@@ -10,6 +10,8 @@ import {QueryClient} from '@tanstack/react-query'
 import MainComponent from "./MainComponent.tsx";
 import ApplicationStore from "./context/ApplicationStore.tsx";
 
+var token: string | undefined = undefined
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
