@@ -1,8 +1,11 @@
 import * as React from 'react'
+import {useState} from 'react'
 import {OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {
     Box,
-    Button, Card, CardContent, CardHeader, CardMedia,
+    Button,
+    Card,
+    CardContent,
     CircularProgress,
     Paper,
     Tab,
@@ -11,24 +14,24 @@ import {
     TableCell,
     TableContainer,
     TableHead,
-    TableRow, TableSortLabel,
+    TableRow,
+    TableSortLabel,
     Tabs,
     Typography,
     useTheme
 } from "@mui/material";
-import {Product, StatsOrder, StatsOrderDepartment, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
+import {Product, StatsOrder, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
-import {get, orderBy, sortBy} from "lodash";
+import {get, orderBy} from "lodash";
 import {DatePicker, DatePickerSlotProps} from "@mui/x-date-pickers";
 import dayjs, {Dayjs} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
-import {useMemo, useState} from "react";
-import { BarChart, BarPlot, BarSeries, ChartContainer, LineChart, lineElementClasses} from '@mui/x-charts';
-
+import {BarChart, BarLabel} from '@mui/x-charts';
+import './Stats.css'
 
 interface GraphStatsField {
     labels: string[],
@@ -67,12 +70,14 @@ const StatsField: React.FC<StatsFieldI> = (props) => {
                 { props.description && <Typography component="div" sx={{ mt: 1, fontSize: '0.9em', fontWeight: 300 }}>{`${props.description}`}</Typography> }
             </CardContent>
             { props.graphData &&
-                <Box sx={{ height: "80px", border: 1}}>
+                <Box sx={{ height: 80}}>
                     <BarChart
                         series={[{ data: props.graphData.values, type: 'bar' }]}
-                        xAxis={[{ scaleType: 'band', data: props.graphData.labels }]}
+                        xAxis={[{ data: props.graphData.labels, position: 'none' }]}
+                        yAxis={[{position: 'none'}]}
+                        barLabel="value"
+                        slots={{ barLabel: BarLabel  }}
                     >
-                        <BarPlot />
                     </BarChart>
                  </Box>
             }
@@ -211,7 +216,7 @@ const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
                     label: 'Importo',
                 },
             ]}
-            yAxis={[{ data: labels }]}
+            yAxis={[{ data: labels ,  position: 'none'}]}
         />
     )
 }
