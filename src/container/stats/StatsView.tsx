@@ -27,7 +27,7 @@ import dayjs, {Dayjs} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
 import {useMemo, useState} from "react";
-import {AreaPlot, BarPlot, ChartContainer, LineChart, lineElementClasses} from '@mui/x-charts';
+import { BarChart, BarPlot, BarSeries, ChartContainer, LineChart, lineElementClasses} from '@mui/x-charts';
 
 
 interface GraphStatsField {
@@ -67,13 +67,13 @@ const StatsField: React.FC<StatsFieldI> = (props) => {
                 { props.description && <Typography component="div" sx={{ mt: 1, fontSize: '0.9em', fontWeight: 300 }}>{`${props.description}`}</Typography> }
             </CardContent>
             { props.graphData &&
-                <Box sx={{ height: "80px"}}>
-                    <ChartContainer
+                <Box sx={{ height: "80px", border: 1}}>
+                    <BarChart
                         series={[{ data: props.graphData.values, type: 'bar' }]}
                         xAxis={[{ scaleType: 'band', data: props.graphData.labels }]}
                     >
                         <BarPlot />
-                    </ChartContainer>
+                    </BarChart>
                  </Box>
             }
         </Card>
@@ -181,6 +181,39 @@ const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
          series={[{ innerRadius: 100, outerRadius: 200, data, arcLabel: 'value' } as PieSeries]}
      />
  )
+}
+
+const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
+
+    const {productsStats, field} = props
+    const {products} = useProducts()
+
+    const values: number[] = []
+    const labels: string[] = []
+
+    Object.values(productsStats).sort((a, b) => (get(a, field) < get(b, field) ? 1 : get(a, field) < get(b, field) ? -1 : 0))
+        .forEach( (s) => {
+            values.push(get( productsStats[s.productId], field))
+            labels.push(products[s.productId].name)
+    });
+
+    return (
+        <BarChart
+            width={500}
+            height={600}
+            layout="horizontal"
+            hideLegend
+            sx={{fontFamily: 'Roboto'}}
+
+            series={[
+                {
+                    data: values,
+                    label: 'Importo',
+                },
+            ]}
+            yAxis={[{ data: labels }]}
+        />
+    )
 }
 
 enum OrderDirection {
@@ -341,7 +374,7 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 1,
+            gap: 2,
             p: 2,
             backgroundColor: theme.sagra.panelBackground,
             borderRadius: '10px',
@@ -352,14 +385,17 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: 'space-between',
-                        gap: 1
+                        flexWrap: 'wrap',
+                        gap: 2
                     }
                 )}>
                 <Box>
                     <StatsField
                         field={'Numero Ordini'}
                         value={summary.count}
-                        description={summary.totalTakeAwayCount ? `Di cui ${summary.totalTakeAwayCount } da asporto` : ''}/>
+                        description={summary.totalTakeAwayCount ? `Di cui ${summary.totalTakeAwayCount } da asporto` : ''}
+                        graphData={{ values: [1000,2000,1500], labels: ['Lunedì', 'Martedì', 'Mercoledì']}}
+                    />
                 </Box>
                 <StatsField
                     field={'Totale Coperti'}
@@ -377,7 +413,7 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                             width={160}
                             height={160}
                             hideLegend
-                            sx={{m: 2, fontFamily: 'Roboto'}}
+                            sx={{m: 3, fontFamily: 'Roboto'}}
                             series={[{ innerRadius: 0, data: [{label: 'r1', value:100},{label: 't2', value: 130}], arcLabel: 'value' } as PieSeries]}
                         />
                     </CardContent>
@@ -453,10 +489,10 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                     </Tabs>
 
                     <TabPanel value={value} index={0}>
-                        <StatsPieChart productsStats={productsTable} field={'totalAmount'}/>
+                        <StatsBarChart productsStats={productsTable} field={'totalAmount'}/>
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        <StatsPieChart productsStats={productsTable} field={'count'}/>
+                        <StatsBarChart productsStats={productsTable} field={'totalQuantity'}/>
                     </TabPanel>
                 </Paper>
             </Box>
