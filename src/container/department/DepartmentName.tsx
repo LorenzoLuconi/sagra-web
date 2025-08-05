@@ -1,6 +1,9 @@
 import * as React from "react";
 import { departmentByIdQuery } from "../../api/sagra/sagraComponents.ts";
 import { useQuery } from "@tanstack/react-query";
+import {CircularProgress} from "@mui/material";
+import ApiError from "../../view/ApiError.tsx";
+import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 
 export interface IDepartmentName {
   departmentId: number;
@@ -27,8 +30,8 @@ export const DepartmentName: React.FC<IDepartmentName> = (props) => {
   }
 
   if (departmentData.isError) {
-    return <>Error</>;
+    return <ApiError error={ departmentData.error as ErrorWrapper<Error>}/>
   }
 
-  return <>Loading</>;
+  return <CircularProgress/>;
 };
