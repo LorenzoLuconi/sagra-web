@@ -355,8 +355,8 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                 />
                 <Card sx={{ ...cardStyle}} >
                     <CardContent>
-                        <Typography sx={{ ...cardTitle}} >Statistiche Reparti</Typography>
-                        <DepartmentStats summary={summary} width={160} height={160} />
+                        <Typography sx={{ ...cardTitle, mb: 2}} >Statistiche Reparti</Typography>
+                        <DepartmentStats summary={summary} width={170} height={170} />
                     </CardContent>
                 </Card>
             </Box>

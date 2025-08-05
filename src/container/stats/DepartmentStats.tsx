@@ -5,7 +5,7 @@ import * as React from "react";
 import {departmentsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {useQuery} from "@tanstack/react-query";
 import {Alert, Box, CircularProgress} from "@mui/material";
-import {PieValueType} from "@mui/x-charts";
+import {DefaultizedPieValueType, PieValueType} from "@mui/x-charts";
 
 interface DepartmentStatsProps {
     summary: SummaryI
@@ -47,6 +47,14 @@ const DepartmentStats : React.FC<DepartmentStatsProps> = (props: DepartmentStats
         departmentMap[department.id] = department.name;
     })
 
+    const totalDepartments = Object.values(summary.departments).reduce((a, v) => a + v, 0);
+
+    const getArcLabel = (params: DefaultizedPieValueType) => {
+        const percent = params.value / totalDepartments;
+        return `${(percent * 100).toFixed(0)}%`;
+    };
+
+
     const departmentsSeries = Object.entries(summary.departments)
         .map( (entry) => {
                 return {
@@ -65,8 +73,9 @@ const DepartmentStats : React.FC<DepartmentStatsProps> = (props: DepartmentStats
             sx={{ fontFamily: 'Roboto'}}
             series={[
                 {
-                    innerRadius: 0,
+                    innerRadius: 30,
                     data: departmentsSeries,
+                    arcLabel: getArcLabel,
                     valueFormatter: (v) => currency(v.value)
                 } as PieSeries
             ]}
