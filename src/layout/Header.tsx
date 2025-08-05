@@ -12,7 +12,7 @@ import {
     MenuProps,
     Paper,
     SelectChangeEvent,
-    styled,
+    styled, Typography,
 } from "@mui/material";
 import {red} from "@mui/material/colors";
 import {useNavigate} from "react-router";
@@ -29,10 +29,13 @@ import {
     RestaurantOutlined,
     SettingsOutlined,
     WarehouseOutlined,
-    WorkspacesOutlined
+    WorkspacesOutlined,
+    LogoutOutlined
 } from "@mui/icons-material";
 import MaterialUISwitch from "../view/MaterialUISwitch.tsx";
 import {useApplicationStore} from "../context/ApplicationStore.tsx";
+import DropdownMenu from "./DropdownMenu.tsx";
+import {useAuth} from "../context/AuthProvider.tsx";
 
 const RedButton = styled(Button)<ButtonProps>(({ theme }) => ({
     color: theme.palette.getContrastText(red[700]),
@@ -94,6 +97,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
 
     const [selection, setSelection] = React.useState(undefined);
     const {get,set} = useApplicationStore()
+    const {setToken} = useAuth()
 
     const navigate = useNavigate()
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -182,10 +186,17 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             Monitor
                         </MenuItem>
                     </StyledMenu>
-                    <IconButton>
-                        <>{username}</>
-                        <AccountCircleOutlined />
-                    </IconButton>
+                    <DropdownMenu id={'user-menu-id'} name={username??''} icon={<AccountCircleOutlined/>}>
+                        <MenuItem
+                            onClick={() => {
+
+                                navigate('/logout')
+                            }}
+                        >
+                            <LogoutOutlined/>
+                            Esci
+                        </MenuItem>
+                    </DropdownMenu>
                     <MaterialUISwitch onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
                         console.log('event: ', event)
                         console.log('checked: ', checked)

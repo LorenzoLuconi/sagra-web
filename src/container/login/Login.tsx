@@ -1,4 +1,4 @@
-import {Box, Button, Container, Paper, TextField, Typography} from "@mui/material";
+import {Box, Button, Paper, TextField, Typography} from "@mui/material";
 import * as React from "react";
 import {useState} from "react";
 import {sagraFetch} from "../../api/sagra/sagraFetcher.ts";
@@ -62,6 +62,7 @@ const Login  = () => {
             setToken(data.token)
             set('username', data.username)
             toast.success(`Login effettuato con successo`);
+            console.log('Navigate: ', redirect)
             navigate(`${redirect}`)
         },
         onError: (error: Error) => {

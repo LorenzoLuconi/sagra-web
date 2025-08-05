@@ -3,19 +3,19 @@ import {useLocation, useNavigate} from "react-router";
 
 interface AuthContextI {
     token?: string
-    setToken: (token: string) => void
+    setToken: (token: string | undefined) => void
 }
 export const AuthContext = React.createContext<AuthContextI>({
     token: undefined,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setToken: (token: string) => {}
+    setToken: (token?: string) => {}
 })
 
 const AuthProvider: React.FC<React.PropsWithChildren> = (props) => {
-    const {token, children} = props
-    const [storedToken, setStoredToken] = React.useState<string|undefined>(token)
+    const { children} = props
+    const [storedToken, setStoredToken] = React.useState<string|undefined>(undefined)
 
-    const setTokenHandler = (t: string) => {
+    const setTokenHandler = (t: string | undefined) => {
         window['token'] = t
         setStoredToken(t)
     }

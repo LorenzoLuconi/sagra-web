@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {cloneDeep} from "lodash";
 
-type ApplicationType = string | number | boolean | object
+type ApplicationType = string | number | boolean | object | undefined
 
 interface ApplicicationContextI {
     set: (key: string, value: ApplicationType) => void
