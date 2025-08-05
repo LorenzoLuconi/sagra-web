@@ -20,18 +20,19 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import {Product, StatsOrder, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
+import {Product, StatsOrder, StatsOrderDepartment, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
-import {get, orderBy} from "lodash";
+import {get, orderBy, sum} from "lodash";
 import {DatePicker, DatePickerSlotProps} from "@mui/x-date-pickers";
 import dayjs, {Dayjs} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
 import {BarChart, BarLabel} from '@mui/x-charts';
 import './Stats.css'
+import {calculateSummary, SummaryI} from "./Summary.ts";
 
 interface GraphStatsField {
     labels: string[],
@@ -70,7 +71,7 @@ const StatsField: React.FC<StatsFieldI> = (props) => {
                 { props.description && <Typography component="div" sx={{ mt: 1, fontSize: '0.9em', fontWeight: 300 }}>{`${props.description}`}</Typography> }
             </CardContent>
             { props.graphData &&
-                <Box sx={{ height: 80}}>
+                <Box sx={{ height: 80, mt: 1}}>
                     <BarChart
                         series={[{ data: props.graphData.values, type: 'bar' }]}
                         xAxis={[{ data: props.graphData.labels, position: 'none' }]}
@@ -119,49 +120,8 @@ interface ResponseStatsViewI {
 
 
 
-const collectDayInfo = (dayStats: StatsOrder, productsTable: Record<number, StatsOrderedProducts>) => {
-    const {products} = dayStats
-
-    console.log('collectDayInfo: ', products)
-
-    for (let i=0; i<products.length; i++) {
-        const p = products[i]
-        const productInTable = productsTable[p.productId]
-        if (productInTable === undefined) {
-            productsTable[p.productId] = p
-        } else {
-            productsTable[p.productId] = {
-                productId: p.productId,
-                totalQuantity: productsTable[p.productId].totalQuantity + p.totalQuantity,
-                totalAmount: productsTable[p.productId].totalAmount + p.totalAmount,
-
-            } as StatsOrderedProducts
-        }
-    }
-
-    console.log('CollectsInfo ', productsTable)
 
 
-    return (
-        {
-            totalAmount: dayStats.totalAmount,
-            count: dayStats.count,
-            totalServiceNumber: dayStats.totalServiceNumber,
-            table: productsTable,
-            totalTakeAwayCount: dayStats.takeAway?.count ?? 0,
-            totalTakeAwayAmount: dayStats.takeAway?.totalAmount ?? 0,
-            departments: dayStats.departments
-        }
-    )
-
-
-}
-
-interface SummaryI {
-    totalServiceNumber: number
-    totalAmount: number
-    count: number
-}
 
 const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
 
@@ -205,7 +165,7 @@ const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
     return (
         <BarChart
             width={500}
-            height={600}
+            height={31*values.length}
             layout="horizontal"
             hideLegend
             sx={{fontFamily: 'Roboto'}}
@@ -315,16 +275,15 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
 
 
 const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, productsTable: Record<number, Product>) => {
-    const productKeys = Object.keys(fullOrder) as number[]
+    const productKeys = Object.keys(fullOrder)
     const rows = productKeys.map((productId: number) => {
         return (
+            [
+                {
+                    type: String,
+                    value: productsTable[productId].name,
 
-[
-            {
-                type: String,
-                value: productsTable[productId].name,
-
-            },
+                },
                 {
                     type: Number,
                     value: fullOrder[productId].totalQuantity
@@ -333,13 +292,15 @@ const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, prod
                     type: Number,
                     value: fullOrder[productId].totalAmount,
                     format: '#,## €'
-            }
-        ]
-            )
+                }
+            ]
+        )
     })
 
     return rows
 }
+
+
 
 
 const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
@@ -347,32 +308,12 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
     const theme = useTheme();
     const [value, setValue] = React.useState(0)
     const {products} = useProducts()
-    const dayKeys = Object.keys(stats)
 
     const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 
-    let _totalServiceNumber = 0
-    let _totalCount = 0;
-    let _totalAmount = 0;
-    let _totalTakeAwayAmount = 0;
-    let _totalTakeAwayCount = 0;
-    // const _departments : Record<number, StatsOrderDepartment> = {}
-    const productsTable: Record<number, StatsOrderedProducts> = {}
-    for (let i = 0; i < dayKeys.length; i++) {
-        const day = dayKeys[i]
-        const dayStats = stats[day]
-        const {totalAmount, totalServiceNumber, count, totalTakeAwayCount, totalTakeAwayAmount, departments} = collectDayInfo(dayStats, productsTable)
-        _totalServiceNumber += totalServiceNumber
-        _totalAmount += totalAmount
-        _totalCount += count
-        _totalTakeAwayAmount += totalTakeAwayAmount
-        _totalTakeAwayCount += totalTakeAwayCount
-    }
-
-    const summary = {totalServiceNumber: _totalServiceNumber, totalAmount: _totalAmount, count: _totalCount, totalTakeAwayAmount: _totalTakeAwayAmount, totalTakeAwayCount: _totalTakeAwayCount}
-
+    const summary = calculateSummary(stats)
 
     return (
         <Paper variant="outlined" sx={{
@@ -439,16 +380,12 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                 }}>
                     <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella prodotti venduti</Typography>
                     <TotalTabularInfo
-                        productsInOrder={productsTable}
-                        summary={{
-                            totalServiceNumber: _totalServiceNumber,
-                            totalAmount: _totalAmount,
-                            count: _totalCount
-                        }}
+                        productsInOrder={summary.productsTable}
+                        summary={summary}
                     />
                     <Button
                         onClick={() => {
-                            const _data = buildProductsData(productsTable, products)
+                            const _data = buildProductsData(summary.productsTable, products)
 
                             const HEADER = [
                                 {
@@ -481,7 +418,7 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                         Esporta XLS
                     </Button>
                 </Paper>
-                <Paper  sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, p: 2 }}>
+                <Paper  sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', gap: 1, p: 2 }}>
 
                     <Tabs
                         value={value}
@@ -494,10 +431,10 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                     </Tabs>
 
                     <TabPanel value={value} index={0}>
-                        <StatsBarChart productsStats={productsTable} field={'totalAmount'}/>
+                        <StatsBarChart productsStats={summary.productsTable} field={'totalAmount'}/>
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        <StatsBarChart productsStats={productsTable} field={'totalQuantity'}/>
+                        <StatsBarChart productsStats={summary.productsTable} field={'totalQuantity'}/>
                     </TabPanel>
                 </Paper>
             </Box>
