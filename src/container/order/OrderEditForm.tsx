@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { CancelOutlined, DeleteOutlined, PrintOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
-import {checkOrderErrors, manageError} from "../../utils";
+import {checkOrderErrors} from "../../utils";
 import toast from "react-hot-toast";
 import { cloneDeep, isEqual } from "lodash";
 import {useMutation} from "@tanstack/react-query";

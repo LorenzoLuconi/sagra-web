@@ -1,5 +1,5 @@
 
-type ProductViewT = 'list' | 'grid'
+export type ProductViewT = 'list' | 'grid'
 
 export interface UserPreferencesI {
     productView: ProductViewT

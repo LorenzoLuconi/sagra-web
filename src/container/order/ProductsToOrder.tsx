@@ -21,7 +21,7 @@ import {useQuery} from "@tanstack/react-query";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 import {useLocalStorage} from "../../utils";
-import {defaultUserPreferences} from "../../userPreferences.ts";
+import {defaultUserPreferences, ProductViewT} from "../../userPreferences.ts";
 
 const ProductLayoutMapping: Record<ProductViewT, number> = {
   'grid': 0,
@@ -90,7 +90,7 @@ const ProductsToOrder = () => {
     }
 
     const handlePreferences = (
-        event: React.MouseEvent<HTMLElement>,
+        _event: React.MouseEvent<HTMLElement>,
         newPreference: string | null,
     ) => {
       setUserPreferences({productView: newPreference});
@@ -103,7 +103,7 @@ const ProductsToOrder = () => {
           <CoursesSelector handleClick={handleSelectCourse} />
         </Paper>
         <Paper variant="outlined"
-               sx={{ display: "flex", justifyContent: "flex-end", mt: 1, backgroundColor: theme.sagra.panelBackground }}
+               sx={{ display: "flex", justifyContent: "flex-end", mt: 1, p: 1, backgroundColor: theme.sagra.panelBackground }}
                className="paper-top">
 
           <ToggleButtonGroup
@@ -111,7 +111,7 @@ const ProductsToOrder = () => {
               value={userPreferences.productView}
               exclusive
               onChange={handlePreferences}
-              aria-label="text alignment"
+
           >
             <ToggleButton value="grid" aria-label="grid">
               <AppsOutlined/>
@@ -120,6 +120,7 @@ const ProductsToOrder = () => {
               <FormatListNumberedOutlined />
             </ToggleButton>
           </ToggleButtonGroup>
+          <Divider sx={{ml: 1, mr: 1}} orientation="vertical" flexItem />
           <IconButton>
             <CachedOutlined onClick={() => handlRefreshProducts()} />
           </IconButton>
