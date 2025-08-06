@@ -56,8 +56,13 @@ const ProductSearchForm : React.FC<ProductSearchFormProps> = (props: ProductSear
     }
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if( event.key == 'Enter' ) {
+        if ( event.key == 'Enter' ) {
             setSearchParam(createSearchParam(name, courseSelected))
+        }
+
+        if ( event.key == 'Escape' ) {
+            setName('')
+            setSearchParam(createSearchParam('', courseSelected))
         }
     };
 

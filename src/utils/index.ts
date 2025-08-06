@@ -150,7 +150,7 @@ export const testOrderProductAvailability = (product: Product, quantity: number,
 
 export const manageError = (error: ErrorWrapper<unknown>) => {
     const {status, payload} = error.stack
-    console.log('Status: ', status, payload)
+    console.log('Utils ManageError: ', status, payload)
     toast.error(`${payload.message}`)
 }
 
