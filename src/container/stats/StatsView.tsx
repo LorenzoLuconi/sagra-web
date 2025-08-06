@@ -6,7 +6,7 @@ import {
     Button,
     Card,
     CardContent,
-    CircularProgress,
+    CircularProgress, LinearProgress,
     Paper,
     Tab,
     Table,
@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import {Product, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
-import {currency} from "../../utils";
+import {currency, percent, percentLabel} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
 import {get, orderBy } from "lodash";
@@ -202,6 +202,7 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
     const [prodOrderBy, setProdOrderBy] = useState<ProductsOrderBy>(ProductsOrderBy.totalAmount)
     const [orderDirection, setOrderDirection] = useState<OrderDirection>(OrderDirection.desc)
 
+    const totalAmount = Object.values(productsInOrder).reduce((a, c) => a + c.totalAmount, 0);
 
     const productsIds = () => {
         const values = Object.values(productsInOrder);
@@ -252,6 +253,7 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                     Importo
                                     </TableSortLabel>
                             </TableCell>
+                            <TableCell>Percentuale Importo</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -265,6 +267,12 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                 </TableCell>
                                 <TableCell align="center">{productsInOrder[+productId].totalQuantity}</TableCell>
                                 <TableCell align="right">{currency(productsInOrder[+productId].totalAmount)}</TableCell>
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <LinearProgress sx={{height: 10, borderRadius: 5, width: '140px'}} variant="determinate" value={productsInOrder[+productId].totalAmount*100/totalAmount}/>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9em' }}>{Math.round(productsInOrder[+productId].totalAmount*100/totalAmount)}%</Typography>
+                                    </Box>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -433,7 +441,7 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                     </Tabs>
 
                     <TabPanel value={value} index={0}>
-                        <StatsBarChart productsStats={summary.productsTable} field={'totalAmount'}/>
+                        <StatsPieChart productsStats={summary.productsTable} field={'totalAmount'}/>
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <StatsBarChart productsStats={summary.productsTable} field={'totalQuantity'}/>
