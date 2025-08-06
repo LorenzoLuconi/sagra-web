@@ -9,9 +9,8 @@ import {
   ToggleButtonGroup,
   useTheme
 } from "@mui/material";
-import {Course, Product} from "../../api/sagra/sagraSchemas.ts";
+import { Product} from "../../api/sagra/sagraSchemas.ts";
 import {useState} from "react";
-import CoursesSelector from "../course/CoursesSelector.tsx";
 import {AppsOutlined, CachedOutlined, FormatListNumberedOutlined} from "@mui/icons-material";
 import ProductsOrderCard from "../product/ProductsOrderCard.tsx";
 import {useOrderStore} from "../../context/OrderStore.tsx";
@@ -22,6 +21,7 @@ import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 import {useLocalStorage} from "../../utils";
 import {defaultUserPreferences, ProductViewT} from "../../userPreferences.ts";
+import ProductSearchForm from "../product/ProductSearchForm.tsx";
 
 const ProductLayoutMapping: Record<ProductViewT, number> = {
   'grid': 0,
@@ -31,34 +31,24 @@ const ProductLayoutMapping: Record<ProductViewT, number> = {
 
 const ProductsToOrder = () => {
   const theme = useTheme();
-  const [selectedCourse, setSelectedCourse] = useState<Course | undefined>(undefined);
   const [userPreferences, setUserPreferences] = useLocalStorage('sagraWeb:userPreferences:genericUser', defaultUserPreferences)
 
-  //const [type, setType] = useState(0);
+  const [searchParam, setSearchParam] = useState<ProductsSearchQueryParams>({});
+
+  const handleChangeSearchParam = (searchParam : ProductsSearchQueryParams) => {
+    setSearchParam(searchParam)
+  }
 
   const { addProduct } = useOrderStore();
 
-  const productsSearchParam = () => {
-    const params = {} as ProductsSearchQueryParams;
-    if (selectedCourse) {
-      params.courseId = selectedCourse.id;
-    }
-
-    return params;
-  };
-
   const productsSearchConf = productsSearchQuery({
-    queryParams: productsSearchParam(),
+    queryParams: searchParam,
   });
 
   const productsQuery = useQuery({
     queryKey: productsSearchConf.queryKey,
     queryFn: productsSearchConf.queryFn,
   });
-
-  const handleSelectCourse = (course?: Course) => {
-    setSelectedCourse(course);
-  };
 
 
   const handleAddProduct = (product: Product) => {
@@ -100,7 +90,7 @@ const ProductsToOrder = () => {
     return (
       <Box>
         <Paper variant="outlined" sx={{ p: 2, backgroundColor: theme.sagra.panelBackground }}>
-          <CoursesSelector select={handleSelectCourse} selected={selectedCourse}/>
+          <ProductSearchForm setSearchParam={handleChangeSearchParam} />
         </Paper>
         <Paper variant="outlined"
                sx={{ display: "flex", justifyContent: "flex-end", mt: 1, p: 1, backgroundColor: theme.sagra.panelBackground }}
