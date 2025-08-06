@@ -70,7 +70,7 @@ const OrderEditForm: React.FC = () => {
         });
     },
     onError: (error: Error) => {
-        manageError(error as ErrorWrapper<unknown>)
+        manageError(error)
     },
   });
 
@@ -92,47 +92,44 @@ const OrderEditForm: React.FC = () => {
     const productsSearchConf = productsSearchQuery({});
 
 
-    const manageError = (error: ErrorWrapper<unknown>) => {
-      // @ts-ignore
-    const {status, payload} = error.stack
+    const manageError = (error: Error) => {
+        console.log('Gestione errore ordini: ', error)
+        const errorWrapper = error as ErrorWrapper<unknown>;
+        // @ts-ignore
+        const {status, payload} = errorWrapper.stack
+        console.log(`Error: status=${status}, payload=`, payload);
 
-      console.log('Status: ', status, payload)
+        switch (status) {
+            case 450: {
+                const {invalidProducts} = payload as ErrorResourceNotEnoughQuantity
+                invalidProducts.map((invalidProduct) => {
+                    console.log('Errore 450 per prodotto non valido: ', invalidProduct)
+                    setFieldError(`product.${invalidProduct.productId}`, `${invalidProduct.message}`)
+                    toast.error(`Ordine non registrato per quantità prodotto non sufficiente per '${productsTable[invalidProduct.productId].name}'`)
+                })
 
+                queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
+                    //toast.success("Quantità dei prodotti aggiornata")
+                }).catch((e: Error) => {
+                    console.log('Errore: ', e)
+                })
 
-      switch (status) {
-          case 450: {
-              const {invalidProducts} = payload as ErrorResourceNotEnoughQuantity
-              invalidProducts.map((invalidProduct) => {
-                  console.log('Errore 450 per prodotto non valid: ', invalidProduct)
-                  setFieldError(`product.${invalidProduct.productId}`, `${invalidProduct.message}`)
-                  toast.error(`Ordine non registrato per quantità prodotto non sufficiente per '${productsTable[invalidProduct.productId].name}'`)
-              })
+                break;
+            }
 
-              queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
-                  //toast.success("Quantità dei prodotti aggiornata")
-              }).catch((e: Error) => {console.log('Errore: ', e)})
-
-              break;
-          }
-
-          default: {
-            toast.error(`${payload.message}`)
-          }
-      }
-  }
+            default: {
+                toast.error(`${payload.message}`)
+            }
+        }
+    }
 
 
     const updateOrder = useMutation({
       mutationFn: (data: OrderRequest) => {
           return fetchOrderUpdate({body: data, pathParams: {orderId: originalOrder?.id??0}})
       },
-      onError: (error: OrderRequest) => {
-          console.log('error: ', error as ErrorWrapper<unknown>)
-
-          const netError = error as ErrorWrapper<unknown>
-
-          manageError(netError)
-
+      onError: (error: Error) => {
+          manageError(error)
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
@@ -155,11 +152,9 @@ const OrderEditForm: React.FC = () => {
               return fetchOrderCreate({body: data})
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      onError: (error: OrderRequest) => {
-          console.log('error: ', error, error as ErrorWrapper<unknown>)
-          //const errors: ErrorResource = error as ErrorResource
-
-          manageError(errors as ErrorWrapper<unknown>)
+      onError: (error: Error) => {
+          //console.log('Order Create error: ', error, error as ErrorWrapper<unknown>)
+          manageError(error)
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
