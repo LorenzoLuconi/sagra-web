@@ -257,13 +257,6 @@ const OrderEditForm: React.FC = () => {
                    onChange={handleChangeCustomer}
                    helperText={errors['customer'] !== undefined ? errors['customer'] : ''}
         />
-      <Box
-        component="form"
-        sx={{ '& > :not(style)': { m: 1 } }}
-        noValidate
-        autoComplete="off"
-      >
-      </Box>
         <Box sx={{ display: "flex", marginTop: 2 }}>
           <TextField size='small'
                      value={coperti !== undefined ? coperti : ''}
