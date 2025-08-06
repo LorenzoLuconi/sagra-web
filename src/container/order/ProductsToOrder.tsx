@@ -100,7 +100,7 @@ const ProductsToOrder = () => {
     return (
       <Box>
         <Paper variant="outlined" sx={{ p: 2, backgroundColor: theme.sagra.panelBackground }}>
-          <CoursesSelector handleClick={handleSelectCourse} />
+          <CoursesSelector select={handleSelectCourse} selected={selectedCourse}/>
         </Paper>
         <Paper variant="outlined"
                sx={{ display: "flex", justifyContent: "flex-end", mt: 1, p: 1, backgroundColor: theme.sagra.panelBackground }}

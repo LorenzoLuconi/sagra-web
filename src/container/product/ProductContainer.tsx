@@ -2,23 +2,25 @@ import {Box, Paper, Typography, useTheme} from "@mui/material";
 import {RestaurantOutlined} from "@mui/icons-material";
 import {useState} from "react";
 import ProductEdit from "./ProductEdit.tsx";
-import {Course, Product} from "../../api/sagra/sagraSchemas.ts";
+import { Product} from "../../api/sagra/sagraSchemas.ts";
 import ProductsList from "./ProductsList.tsx";
-import CoursesSelector from "../course/CoursesSelector.tsx";
+import * as React from "react";
+import ProductSearchForm from "./ProductSearchForm.tsx";
+import {ProductsSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
 
-const ProductContainer = () => {
+const ProductContainer: React.FC = () => {
     const theme = useTheme();
 
     const [selected, setSelected] = useState<Product | undefined>(undefined);
-    const [course, setCourse] = useState<Course | undefined>(undefined);
+    const [searchParam, setSearchParam] = useState<ProductsSearchQueryParams>({});
 
     const selectProduct = (product: Product | undefined) => {
         setSelected(product);
     };
 
-    const handleSelectCourse = (course?: Course) => {
-        setCourse(course);
-    };
+    const handleChangeSearchParam = (searchParam : ProductsSearchQueryParams) => {
+        setSearchParam(searchParam)
+    }
 
     return (
         <>
@@ -37,9 +39,10 @@ const ProductContainer = () => {
                     setSelected={selectProduct}
                 />
             </Paper>
+
             <Paper variant="outlined" sx={{padding: 2, backgroundColor: theme.sagra.panelBackground}}
                    className="paper-top">
-                <CoursesSelector handleClick={handleSelectCourse}/>
+                <ProductSearchForm setSearchParam={handleChangeSearchParam}></ProductSearchForm>
             </Paper>
 
             <Paper variant="outlined" sx={{padding: 2, backgroundColor: theme.sagra.panelBackground}}
@@ -47,7 +50,7 @@ const ProductContainer = () => {
                 <ProductsList
                     selected={selected}
                     setSelected={selectProduct}
-                    courseId={course?.id}
+                    searchParam={searchParam}
                 />
             </Paper>
         </>
