@@ -27,23 +27,14 @@ import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 interface IProductList {
   selected: Product | undefined
   setSelected(product: Product | undefined) : void
-  courseId?: number
+  searchParam : ProductsSearchQueryParams
 }
 
 
 const ProductsList = (props : IProductList) => {
 
-  const searchParam = () => {
-    const params = {} as ProductsSearchQueryParams;
-    if (props.courseId !== undefined) {
-      params.courseId = props.courseId;
-    }
-
-    return params;
-  }
-
   const productsSearchConf = productsSearchQuery({
-    queryParams: searchParam()
+    queryParams: props.searchParam
   });
 
   const productsQuery = useQuery({
@@ -104,7 +95,6 @@ const ProductsList = (props : IProductList) => {
     }
 
     return (
-      <form>
         <Table>
           <TableHead sx={{ backgroundColor: 'background.default' }}>
             <TableRow>
@@ -148,7 +138,6 @@ const ProductsList = (props : IProductList) => {
             })}
           </TableBody>
         </Table>
-      </form>
     );
   }
 }

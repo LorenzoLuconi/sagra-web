@@ -1,11 +1,9 @@
-// import React from 'react'
-
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
 } from "@mui/material";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
 import { currency } from "../../utils";
@@ -14,10 +12,10 @@ import { IProductsOrder } from "./IProductsOrder.tsx";
 import {productBackgroundColor, productAvailable} from "./produtils.ts";
 
 const ProductsOrderList = (props: IProductsOrder) => {
-  const {products, addToOrder} = props;
+    const {products, addToOrder} = props;
 
-  return (
-        <Table>
+    return (
+        <Table size={'small'}>
           <TableHead>
             <TableRow>
               <TableCell>Nome Prodotto</TableCell>

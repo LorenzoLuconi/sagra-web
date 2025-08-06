@@ -43,7 +43,6 @@ export const DepartmentEdit = () => {
   });
 
   return (
-    <form>
       <Box sx={{ display: "flex", alignItems: "center", gap: "20px" }}>
         <TextField
           size="small"
@@ -58,6 +57,5 @@ export const DepartmentEdit = () => {
           departmentCreate.mutate({ name: name } as DepartmentRequest);
         }}>Crea Reparto</Button>
       </Box>
-    </form>
   );
 };

@@ -26,7 +26,7 @@ const lightTheme: Theme = createTheme({
         productAlmostSoldOut: 'hsla(48, 100%, 88%, 0.5)',
         productSoldOut: 'hsla(17, 100%, 88%, 0.5)',
         productCard: '#fff',
-        panelBackground: '#f8f8f8'
+        panelBackground: '#f5f5f5'
     },
     palette: {
         mode: 'light',

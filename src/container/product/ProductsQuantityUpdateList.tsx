@@ -23,12 +23,13 @@ import ProductQuantityUpdateDialog from "./ProductQuantityUpdateDialog.tsx";
 import {productBackgroundColor} from "./produtils.ts";
 
 interface IProductsQuantityUpdateListProps {
-    courseId?: number;
+    searchParam: ProductsSearchQueryParams
 }
 
 
 const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => {
 
+    const {searchParam} = props
     const [selectedProduct, setSelectedProduct] = useState({} as Product);
 
 
@@ -44,19 +45,8 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
         resetState()
     }
 
-    const searchParam = () => {
-        const params = {} as ProductsSearchQueryParams;
-        if (props.courseId !== undefined) {
-            params.courseId = props.courseId;
-        }
-
-        params.excludeLinked = true
-
-        return params;
-    };
-
     const productsSearchConf = productsSearchQuery({
-        queryParams: searchParam(),
+        queryParams: searchParam
     });
 
     const productsQuery = useQuery({

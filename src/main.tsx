@@ -25,7 +25,8 @@ export const queryClient = new QueryClient({
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-
+    <ApplicationStore initValues={{}}>
         <MainComponent/>
+    </ApplicationStore>
   </React.StrictMode>,
 );

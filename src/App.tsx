@@ -27,16 +27,20 @@ import MonitorView from "./container/monitor/MonitorView.tsx";
 import AuthProvider, {ProtectedComponent} from "./context/AuthProvider.tsx";
 import Login from './container/login/Login.tsx'
 import Logout from './container/login/Logout.tsx'
+import {useLocalStorage} from "./utils";
+
 
 const useRouter = () => {
-    const [currentTheme, setCurrentTheme] = React.useState('light')
+    // Da spostare dove si può prendere valori derivanti dall'autenticazione
+    const [theme, setTheme] = useLocalStorage(`sagraWeb:theme:genericUser`, 'light')
+
 
     return (
         createBrowserRouter([
 
             {
                 path: '/monitors/:monitorId/view',
-                element:  <ThemeProvider theme={sagraTheme[currentTheme]}><MonitorView/></ThemeProvider>
+                element:  <ThemeProvider theme={sagraTheme[theme]}><MonitorView/></ThemeProvider>
             },
             {
               path: '/login',
@@ -50,10 +54,10 @@ const useRouter = () => {
                 path: "/",
                 element: (
                     <MainLayout
-                        theme={sagraTheme[currentTheme]}
+                        theme={sagraTheme[theme]}
                         header={
                             <Header changeTheme={(theme: string) => {
-                                setCurrentTheme(theme)
+                                setTheme(theme)
                                 }}
                             />
                         }
