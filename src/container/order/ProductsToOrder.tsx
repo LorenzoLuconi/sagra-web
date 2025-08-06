@@ -1,7 +1,5 @@
 import {
-  Alert,
   Box,
-  CircularProgress,
   Divider,
   IconButton,
   Paper,
@@ -16,7 +14,6 @@ import ProductsOrderCard from "../product/ProductsOrderCard.tsx";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import ProductsOrderList from "../product/ProductsOrderList.tsx";
 import {productsSearchQuery, ProductsSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
-import {useQuery} from "@tanstack/react-query";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 import {useLocalStorage} from "../../utils";
@@ -41,51 +38,24 @@ const ProductsToOrder = () => {
 
   const { addProduct } = useOrderStore();
 
-  const productsSearchConf = productsSearchQuery({
-    queryParams: searchParam,
-  });
-
-  const productsQuery = useQuery({
-    queryKey: productsSearchConf.queryKey,
-    queryFn: productsSearchConf.queryFn,
-  });
-
 
   const handleAddProduct = (product: Product) => {
     addProduct(product, 1);
   };
 
-  const handlRefreshProducts = () => {
+  const productsSearchConf = productsSearchQuery({});
+  const handleRefreshProducts = () => {
     queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
       toast.success("Elenco prodotti aggiornato", {duration: 2000})
     }).catch((e: Error) => {console.log('Errore: ', e)})
   }
 
-  if (productsQuery.isLoading) {
-    return ( <Box sx={{ display: "flex" }}>
-        <CircularProgress />
-      </Box>
-    )
-  }
-
-  if (productsQuery.isError) {
-    return <Alert severity="error">Si è verificato un errore prelevando la lista dei prodotti: {productsQuery.error.message}</Alert>
-  }
-
-  if ( productsQuery.data ) {
-    const products = productsQuery.data;
-
-    if (products.length < 1) {
-      return <Alert severity="warning">Nessuno prodotto presente</Alert>
-    }
-
-    const handlePreferences = (
-        _event: React.MouseEvent<HTMLElement>,
-        newPreference: string | null,
-    ) => {
-      setUserPreferences({productView: newPreference});
-    };
-
+  const handlePreferences = (
+      _event: React.MouseEvent<HTMLElement>,
+      newPreference: string | null,
+  ) => {
+    setUserPreferences({productView: newPreference});
+  };
 
     return (
       <Box>
@@ -112,7 +82,7 @@ const ProductsToOrder = () => {
           </ToggleButtonGroup>
           <Divider sx={{ml: 1, mr: 1}} orientation="vertical" flexItem />
           <IconButton>
-            <CachedOutlined onClick={() => handlRefreshProducts()} />
+            <CachedOutlined onClick={() => handleRefreshProducts()} />
           </IconButton>
         </Paper>
         <Paper variant="outlined" className="paper-bottom"
@@ -121,19 +91,18 @@ const ProductsToOrder = () => {
           {ProductLayoutMapping[userPreferences.productView] === 0 ? (
             <ProductsOrderCard
               addToOrder={handleAddProduct}
-              products={products}
+              searchParam={searchParam}
             />
           ) : (
             <ProductsOrderList
               addToOrder={handleAddProduct}
-              products={products}
+              searchParam={searchParam}
             />
           )}
           </>
         </Paper>
       </Box>
     );
-  }
 };
 
 export default ProductsToOrder;

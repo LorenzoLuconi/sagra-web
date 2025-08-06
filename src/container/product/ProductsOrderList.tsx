@@ -1,20 +1,51 @@
 // import React from 'react'
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
+    Alert,
+    Box, CircularProgress,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
 } from "@mui/material";
 import { Product } from "../../api/sagra/sagraSchemas.ts";
 import { currency } from "../../utils";
 import ProductQuantity from "./ProductQuantity.tsx";
 import { IProductsOrder } from "./IProductsOrder.tsx";
 import {productBackgroundColor, productAvailable} from "./produtils.ts";
+import {productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
+import {useQuery} from "@tanstack/react-query";
 
 const ProductsOrderList = (props: IProductsOrder) => {
-  const {products, addToOrder} = props;
+    const {searchParam, addToOrder} = props;
+
+    const productsSearchConf = productsSearchQuery({
+        queryParams: searchParam,
+    });
+
+    const productsQuery = useQuery({
+        queryKey: productsSearchConf.queryKey,
+        queryFn: productsSearchConf.queryFn,
+    });
+
+    if (productsQuery.isLoading) {
+        return ( <Box sx={{ display: "flex" }}>
+                <CircularProgress />
+            </Box>
+        )
+    }
+
+    if (productsQuery.isError) {
+        return <Alert severity="error">Si è verificato un errore prelevando la lista dei prodotti: {productsQuery.error.message}</Alert>
+    }
+
+
+    if (! productsQuery.data || productsQuery.data.length < 1 ) {
+        return <Alert severity="warning">Nessuno prodotto presente</Alert>
+    }
+
+    const products = productsQuery.data;
 
   return (
         <Table size={'small'}>
