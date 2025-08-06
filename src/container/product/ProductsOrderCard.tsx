@@ -2,13 +2,11 @@
 // import React from 'react'
 
 import {
-    Alert,
     Box,
     Card,
     CardActionArea,
     CardContent,
     CardMedia,
-    CircularProgress,
     SxProps,
     Typography,
     useTheme,
@@ -19,40 +17,11 @@ import {IProductsOrder} from "./IProductsOrder.tsx";
 import ProductQuantity from "./ProductQuantity.tsx";
 import {AppConf} from "../../AppConf.ts";
 import {productBackgroundColor, productAvailable} from "./produtils.ts";
-import {productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
-import {useQuery} from "@tanstack/react-query";
 
 const ProductsOrderCard = (props : IProductsOrder) => {
 
     const theme = useTheme();
-    const {searchParam, addToOrder} = props;
-
-    const productsSearchConf = productsSearchQuery({
-        queryParams: searchParam,
-    });
-
-    const productsQuery = useQuery({
-        queryKey: productsSearchConf.queryKey,
-        queryFn: productsSearchConf.queryFn,
-    });
-
-    if (productsQuery.isLoading) {
-        return ( <Box sx={{ display: "flex" }}>
-                <CircularProgress />
-            </Box>
-        )
-    }
-
-    if (productsQuery.isError) {
-        return <Alert severity="error">Si è verificato un errore prelevando la lista dei prodotti: {productsQuery.error.message}</Alert>
-    }
-
-
-    if (! productsQuery.data || productsQuery.data.length < 1 ) {
-        return <Alert severity="warning">Nessuno prodotto presente</Alert>
-    }
-
-    const products = productsQuery.data;
+    const {products, addToOrder} = props;
 
     return (
           <Box sx={{display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >

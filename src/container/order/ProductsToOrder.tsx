@@ -10,15 +10,14 @@ import {
 import { Product} from "../../api/sagra/sagraSchemas.ts";
 import {useState} from "react";
 import {AppsOutlined, CachedOutlined, FormatListNumberedOutlined} from "@mui/icons-material";
-import ProductsOrderCard from "../product/ProductsOrderCard.tsx";
 import {useOrderStore} from "../../context/OrderStore.tsx";
-import ProductsOrderList from "../product/ProductsOrderList.tsx";
 import {productsSearchQuery, ProductsSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 import {useLocalStorage} from "../../utils";
 import {defaultUserPreferences, ProductViewT} from "../../userPreferences.ts";
 import ProductSearchForm from "../product/ProductSearchForm.tsx";
+import ProductsOrder from "../product/ProductsOrder.tsx";
 
 const ProductLayoutMapping: Record<ProductViewT, number> = {
   'grid': 0,
@@ -89,12 +88,14 @@ const ProductsToOrder = () => {
                sx={{ p: 1, pb: 2, backgroundColor: theme.sagra.panelBackground}}>
           <>
           {ProductLayoutMapping[userPreferences.productView] === 0 ? (
-            <ProductsOrderCard
+            <ProductsOrder
+                type="card"
               addToOrder={handleAddProduct}
               searchParam={searchParam}
             />
           ) : (
-            <ProductsOrderList
+            <ProductsOrder
+                type="list"
               addToOrder={handleAddProduct}
               searchParam={searchParam}
             />

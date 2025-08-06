@@ -1,7 +1,6 @@
 import { Product } from "../../api/sagra/sagraSchemas.ts";
-import {ProductsSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
 
 export interface IProductsOrder {
-  searchParam: ProductsSearchQueryParams
+  products: Product[]
   addToOrder(product: Product): void;
 }
