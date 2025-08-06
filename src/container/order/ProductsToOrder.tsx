@@ -1,4 +1,14 @@
-import {Alert, Box, CircularProgress, Divider, IconButton, Paper, useTheme} from "@mui/material";
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Paper,
+  ToggleButton,
+  ToggleButtonGroup,
+  useTheme
+} from "@mui/material";
 import {Course, Product} from "../../api/sagra/sagraSchemas.ts";
 import {useState} from "react";
 import CoursesSelector from "../course/CoursesSelector.tsx";
@@ -10,11 +20,21 @@ import {productsSearchQuery, ProductsSearchQueryParams} from "../../api/sagra/sa
 import {useQuery} from "@tanstack/react-query";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
+import {useLocalStorage} from "../../utils";
+import {defaultUserPreferences} from "../../userPreferences.ts";
+
+const ProductLayoutMapping: Record<ProductViewT, number> = {
+  'grid': 0,
+  'list': 1
+}
+
 
 const ProductsToOrder = () => {
   const theme = useTheme();
   const [selectedCourse, setSelectedCourse] = useState<Course | undefined>(undefined);
-  const [type, setType] = useState(0);
+  const [userPreferences, setUserPreferences] = useLocalStorage('sagraWeb:userPreferences:genericUser', defaultUserPreferences)
+
+  //const [type, setType] = useState(0);
 
   const { addProduct } = useOrderStore();
 
@@ -69,6 +89,14 @@ const ProductsToOrder = () => {
       return <Alert severity="warning">Nessuno prodotto presente</Alert>
     }
 
+    const handlePreferences = (
+        event: React.MouseEvent<HTMLElement>,
+        newPreference: string | null,
+    ) => {
+      setUserPreferences({productView: newPreference});
+    };
+
+
     return (
       <Box>
         <Paper variant="outlined" sx={{ p: 2, backgroundColor: theme.sagra.panelBackground }}>
@@ -78,13 +106,20 @@ const ProductsToOrder = () => {
                sx={{ display: "flex", justifyContent: "flex-end", mt: 1, backgroundColor: theme.sagra.panelBackground }}
                className="paper-top">
 
-          <IconButton>
-            <AppsOutlined onClick={() => setType(0)} />
-          </IconButton>
-          <IconButton>
-            <FormatListNumberedOutlined onClick={() => setType(1)} />
-          </IconButton>
-          <Divider orientation="vertical" flexItem />
+          <ToggleButtonGroup
+              size={"small"}
+              value={userPreferences.productView}
+              exclusive
+              onChange={handlePreferences}
+              aria-label="text alignment"
+          >
+            <ToggleButton value="grid" aria-label="grid">
+              <AppsOutlined/>
+            </ToggleButton>
+            <ToggleButton value="list" aria-label="list">
+              <FormatListNumberedOutlined />
+            </ToggleButton>
+          </ToggleButtonGroup>
           <IconButton>
             <CachedOutlined onClick={() => handlRefreshProducts()} />
           </IconButton>
@@ -92,7 +127,7 @@ const ProductsToOrder = () => {
         <Paper variant="outlined" className="paper-bottom"
                sx={{ p: 1, pb: 2, backgroundColor: theme.sagra.panelBackground}}>
           <>
-          {type == 0 ? (
+          {ProductLayoutMapping[userPreferences.productView] === 0 ? (
             <ProductsOrderCard
               addToOrder={handleAddProduct}
               products={products}

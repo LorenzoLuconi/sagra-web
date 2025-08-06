@@ -24,23 +24,26 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import 'dayjs/locale/it';
 import OrderListContainer from "./container/order/OrderListContainer.tsx";
 import MonitorView from "./container/monitor/MonitorView.tsx";
+import {useLocalStorage} from "./utils";
 
 
 const useRouter = () => {
-    const [currentTheme, setCurrentTheme] = React.useState('light')
+    // Da spostare dove si può prendere valori derivanti dall'autenticazione
+    const [theme, setTheme] = useLocalStorage(`sagraWeb:theme:genericUser`, 'light')
+
 
     return (
         createBrowserRouter([
 
             {
                 path: '/monitors/:monitorId/view',
-                element:  <ThemeProvider theme={sagraTheme[currentTheme]}><MonitorView/></ThemeProvider>
+                element:  <ThemeProvider theme={sagraTheme[theme]}><MonitorView/></ThemeProvider>
             },
             {
                 path: "/",
                 element: (
-                    <MainLayout theme={sagraTheme[currentTheme]} header={<Header changeTheme={(theme: string) => {
-                        setCurrentTheme(theme)
+                    <MainLayout theme={sagraTheme[theme]} header={<Header changeTheme={(theme: string) => {
+                        setTheme(theme)
                     }}/>} body={<Outlet/>} footer={<div>footer</div>}/>
                 ),
                 errorElement: <span>Error</span>,
