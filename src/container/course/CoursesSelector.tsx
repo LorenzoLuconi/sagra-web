@@ -2,15 +2,15 @@ import { coursesSearchQuery } from "../../api/sagra/sagraComponents.ts";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Box, Button, CircularProgress } from "@mui/material";
 import { Course } from "../../api/sagra/sagraSchemas.ts";
-import { useState } from "react";
 
 interface ICourseSelector {
-  handleClick: (course?: Course) => void;
+  select: (course?: Course) => void;
+  selected?: Course;
 }
 
 const CoursesSelector = (props : ICourseSelector) => {
 
-  const [selected, setSelected] = useState<Course | undefined>(undefined);
+  const {selected} = props
 
   const coursesSearchConf = coursesSearchQuery({});
   const coursesQuery = useQuery({
@@ -36,8 +36,8 @@ const CoursesSelector = (props : ICourseSelector) => {
     >
       <Button key={-1} color={!selected ? 'secondary' : 'primary'}
               onClick={() => {
-                setSelected(undefined);
-                props.handleClick(undefined);
+                // setSelected(undefined);
+                props.select(undefined);
               }}
               variant="contained" disableElevation >
         Tutte le portate
@@ -47,8 +47,8 @@ const CoursesSelector = (props : ICourseSelector) => {
           return (
             <Button key={course.id}
                     onClick={() => {
-                      setSelected(course);
-                      props.handleClick(course)
+                      //setSelected(course);
+                      props.select(course)
                     }}
                     color={selected?.id === course.id ? 'secondary' : 'primary'}
                     variant="contained" disableElevation >

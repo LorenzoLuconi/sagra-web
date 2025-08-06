@@ -132,7 +132,6 @@ export const DiscountEdit = (props: IDiscountEdit) => {
 
   return (
     <Box
-      component="form"
       sx={{ "& .MuiTextField-root": { mb: 2, display: "block" } }}
     >
       <TextField

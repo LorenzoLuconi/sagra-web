@@ -46,7 +46,6 @@ export const CourseEdit = () => {
   });
 
   return (
-    <form>
       <Box sx={{ display: "flex", alignItems: "center", gap: "20px" }}>
         <TextField
           size="small"
@@ -61,6 +60,5 @@ export const CourseEdit = () => {
           courseCreate.mutate({ name: name } as CourseRequest);
         }}>Crea Portata</Button>
       </Box>
-    </form>
   );
 };

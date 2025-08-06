@@ -89,7 +89,6 @@ const DiscountsList = (props: IDiscountsList) => {
     }
 
     return (
-        <form>
             <Table sx={{ backgroundColor: 'background.default' }}>
                 <TableHead>
                     <TableRow>
@@ -126,7 +125,6 @@ const DiscountsList = (props: IDiscountsList) => {
                     </>
                 </TableBody>
             </Table>
-        </form>
     );
 };
 

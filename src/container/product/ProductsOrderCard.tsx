@@ -1,7 +1,16 @@
 
 // import React from 'react'
 
-import {Box, Card, CardActionArea, CardContent, CardMedia, SxProps, Typography, useTheme,} from "@mui/material";
+import {
+    Box,
+    Card,
+    CardActionArea,
+    CardContent,
+    CardMedia,
+    SxProps,
+    Typography,
+    useTheme,
+} from "@mui/material";
 import {Product} from "../../api/sagra/sagraSchemas.ts";
 import {currency} from "../../utils";
 import {IProductsOrder} from "./IProductsOrder.tsx";
@@ -13,7 +22,6 @@ const ProductsOrderCard = (props : IProductsOrder) => {
 
     const theme = useTheme();
     const {products, addToOrder} = props;
-
 
     return (
           <Box sx={{display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >
