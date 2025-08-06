@@ -9,6 +9,7 @@ import OrderEditTotal from "./OrderEditTotal.tsx";
 import OrderEditProducts from "./OrderEditProducts.tsx";
 import OrderEditForm from "./OrderEditForm.tsx";
 import { Order } from "../../api/sagra/sagraSchemas.ts";
+import {convertDate, TIME_CONF} from "../../utils";
 
 interface OrderEditContainerProps {
   order: Order;
@@ -55,7 +56,7 @@ interface OrderEditContainerProps {
               <Paper variant="outlined"
                      sx={{ p: 0.5, textAlign: 'center', backgroundColor: theme.sagra.panelBackground, filter: 'brightness(85%)' }}
                      className="paper-top">
-                <Typography sx={{fontWeight: 500, fontSize: '1.1em'}}>Ordine n. {order.id}</Typography>
+                <Typography sx={{fontWeight: 500, fontSize: '1.1em'}}>Ordine n. {order.id} del {convertDate('it', new Date(order.created))} ore {convertDate('it', new Date(order.created), TIME_CONF)}</Typography>
               </Paper>
             }
 
