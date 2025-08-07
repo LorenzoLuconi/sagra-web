@@ -58,7 +58,8 @@ const ProductsToOrder = () => {
 
     return (
       <Box>
-        <Paper variant="outlined" sx={{ p: 2, backgroundColor: theme.sagra.panelBackground }}>
+        <Paper variant="outlined" sx={{ p: 2, backgroundColor: theme.sagra.panelBackground }}
+            className="paper-round">
           <ProductSearchForm setSearchParam={handleChangeSearchParam} />
         </Paper>
         <Paper variant="outlined"
