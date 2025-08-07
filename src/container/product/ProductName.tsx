@@ -13,8 +13,7 @@ export const ProductName: React.FC<ProductNameI> = (props) => {
 
   const productData = useQuery({
     queryKey: productConf.queryKey,
-    queryFn: productConf.queryFn,
-    staleTime: 1000 * 60 * 10
+    queryFn: productConf.queryFn
   });
 
   if (productData.isFetched) {

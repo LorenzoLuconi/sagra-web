@@ -9,16 +9,27 @@ import "./index.css";
 import {QueryClient} from '@tanstack/react-query'
 import MainComponent from "./MainComponent.tsx";
 import ApplicationStore from "./context/ApplicationStore.tsx";
+import {
+    coursesSearchQuery,
+    departmentsSearchQuery,
+    discountsSearchQuery
+} from "./api/sagra/sagraComponents.ts";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: false,
-      //staleTime: 1000 * 60 * 3,
+      staleTime: 1000 * 60 * 2,
     },
   },
 })
+
+const defaultLongStale = 1000 * 60 * 60 * 4
+
+queryClient.setQueryDefaults( departmentsSearchQuery({}).queryKey, { staleTime: defaultLongStale })
+queryClient.setQueryDefaults( coursesSearchQuery({}).queryKey, { staleTime: defaultLongStale })
+queryClient.setQueryDefaults( discountsSearchQuery({}).queryKey, { staleTime: defaultLongStale })
 
 
 createRoot(document.getElementById("root")!).render(

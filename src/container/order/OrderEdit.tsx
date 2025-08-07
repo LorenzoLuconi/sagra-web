@@ -16,7 +16,6 @@ const OrderEdit = () => {
   const orderData = useQuery({
     queryKey: orderConf.queryKey,
     queryFn: orderConf.queryFn,
-    staleTime: 1000 * 60,
     enabled: orderId > 0,
   });
 
