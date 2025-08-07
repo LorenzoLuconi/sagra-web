@@ -156,8 +156,10 @@ interface OrderListProps {
 }
 const OrderList = (props: OrderListProps): React.ReactElement => {
   console.log("Richiesta ricerca ordini, parametri: ", props.searchQueryParam)
+  const [searchQuery, setSearchQuery] = useState(props.searchQueryParam)
+  console.log("Parametri di ricerca: ", searchQuery);
 
-  const searchQuery = props.searchQueryParam
+  // const searchQuery = props.searchQueryParam
 
   const rowsPerPageOptions = [25, 50, 100]
   const [page, setPage] = useState(0)
