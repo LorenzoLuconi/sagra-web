@@ -236,10 +236,8 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
     <>
       <Paper variant='outlined' sx={{p: 1, mb: 2, display: "flex", justifyContent: "space-between", gap: 2 }}>
         <Typography component="div" sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini ${searchQueryParamsString()}`}</Typography>
-        <IconButton>
-          <IconButton sx={{ width: '40px'}} onClick={handleRefresh}>
-            <CachedOutlined  />
-          </IconButton>
+        <IconButton sx={{ width: '40px'}} onClick={handleRefresh}>
+          <CachedOutlined  />
         </IconButton>
       </Paper>
     <TableContainer>
