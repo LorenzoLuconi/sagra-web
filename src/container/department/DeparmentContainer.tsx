@@ -1,28 +1,47 @@
-import { Box, Paper, Typography, useTheme } from "@mui/material";
-import { DepartmentEdit } from "./DepartmentEdit";
+import {IconButton, Paper, useTheme} from "@mui/material";
+import {DepartmentEdit} from "./DepartmentEdit";
 import DepartmentsList from "./DepartmentsList.tsx";
-import { WorkspacesOutlined } from "@mui/icons-material";
+import {CachedOutlined, WorkspacesOutlined} from "@mui/icons-material";
+import PageTitle from "../../view/PageTitle.tsx";
+import {departmentsSearchQuery} from "../../api/sagra/sagraComponents.ts";
+import {queryClient} from "../../main.tsx";
+import toast from "react-hot-toast";
 
 const DepartmentContainer = () => {
-    const theme =  useTheme();
-  return (
-    <Box sx={{mt :1}}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1, alignItems: 'center'}}>
-        <WorkspacesOutlined />
-        <Typography sx={{fontWeight: 700, fontSize: '1.5em'}}>Reparti</Typography>
-      </Box>
+    const theme = useTheme();
 
-      <Paper variant="outlined" sx={{padding: 2, backgroundColor: theme.sagra.panelBackground }}
-             className="paper-top">
-        <DepartmentEdit />
-      </Paper>
+    const searchConf = departmentsSearchQuery({});
+    const handleRefresh = () => {
+        queryClient.invalidateQueries({queryKey: searchConf.queryKey}).then(() => {
+            toast.success("Elenco reparti aggiornato", {duration: 2000})
+        }).catch((e: Error) => {console.log('Errore: ', e)})
+    }
 
-      <Paper variant="outlined" sx={{mt: 1, p: 2, backgroundColor: theme.sagra.panelBackground}}
-        className="paper-bottom">
-        <DepartmentsList />
-      </Paper>
-    </Box>
-  );
+    return (
+        <>
+            <PageTitle title="Reparti" icon={<WorkspacesOutlined/>}/>
+
+            <Paper variant="outlined"
+                   sx={{
+                       display: "flex",
+                       justifyContent: "space-between",
+                       padding: 2,
+                       flexWrap: "wrap",
+                       gap: 1,
+                       backgroundColor: theme.sagra.panelBackground}}
+                   className="paper-top">
+                <DepartmentEdit/>
+                <IconButton sx={{ width: '40px'}}>
+                    <CachedOutlined onClick={handleRefresh} />
+                </IconButton>
+            </Paper>
+
+            <Paper variant="outlined" sx={{mt: 1, p: 2, backgroundColor: theme.sagra.panelBackground}}
+                   className="paper-bottom">
+                <DepartmentsList/>
+            </Paper>
+        </>
+    );
 };
 
 export default DepartmentContainer

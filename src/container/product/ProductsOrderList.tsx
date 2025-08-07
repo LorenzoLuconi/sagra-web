@@ -15,7 +15,7 @@ const ProductsOrderList = (props: IProductsOrder) => {
     const {products, addToOrder} = props;
 
     return (
-        <Table size={'small'}>
+        <Table size={'medium'}>
           <TableHead>
             <TableRow>
               <TableCell>Nome Prodotto</TableCell>

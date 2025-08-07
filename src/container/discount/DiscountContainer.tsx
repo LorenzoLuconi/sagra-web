@@ -1,9 +1,13 @@
-import {Box, Paper, Typography, useTheme} from "@mui/material";
-import {CalculateOutlined} from "@mui/icons-material";
+import {Box, IconButton, Paper, useTheme} from "@mui/material";
+import {CachedOutlined, CalculateOutlined} from "@mui/icons-material";
 import {DiscountEdit} from "./DiscountEdit.tsx";
 import DiscountsList from "./DiscountsList.tsx";
 import {useState} from "react";
 import {Discount} from "../../api/sagra/sagraSchemas.ts";
+import PageTitle from "../../view/PageTitle.tsx";
+import {discountsSearchQuery} from "../../api/sagra/sagraComponents.ts";
+import {queryClient} from "../../main.tsx";
+import toast from "react-hot-toast";
 
 const DiscountContainer = () => {
 
@@ -14,20 +18,36 @@ const DiscountContainer = () => {
         setSelected(discount)
     }
 
+    const searchConf = discountsSearchQuery({});
+    const handleRefresh = () => {
+        queryClient.invalidateQueries({queryKey: searchConf.queryKey}).then(() => {
+            toast.success("Elenco sconti aggiornato", {duration: 2000})
+        }).catch((e: Error) => {console.log('Errore: ', e)})
+    }
+
     return (
         <>
-            <Box sx={{display: 'flex', justifyContent: 'flex-start', mb: 1, alignItems: 'center'}}>
-                <CalculateOutlined/>
-                <Typography sx={{fontWeight: 700, fontSize: '1.5em'}}>Sconti</Typography>
-            </Box>
+            <PageTitle title="Sconti" icon={<CalculateOutlined/>}/>
 
-            <Paper variant="outlined" sx={{mt: 1, p: 2, backgroundColor: theme.sagra.panelBackground}}
-                className="paper-top">
+            <Paper variant="outlined"
+                   sx={{
+                       display: "flex",
+                       justifyContent: "space-between",
+                       padding: 2,
+                       flexWrap: "wrap",
+                       gap: 1,
+                       backgroundColor: theme.sagra.panelBackground}}
+                   className="paper-top">
                 <DiscountEdit key={selected?.id} selected={selected} setSelected={selectDiscount}/>
+                <Box>
+                    <IconButton sx={{ width: '40px'}}>
+                        <CachedOutlined onClick={handleRefresh} />
+                    </IconButton>
+                </Box>
             </Paper>
 
             <Paper variant="outlined" sx={{mt: 1, p: 2, backgroundColor: theme.sagra.panelBackground}}
-                className="paper-bottom">
+                   className="paper-bottom">
                 <DiscountsList selected={selected} setSelected={selectDiscount}/>
             </Paper>
         </>

@@ -13,8 +13,7 @@ export const CourseName: React.FC<ICourseName> = (props) => {
 
   const courseData = useQuery({
     queryKey: courseQuery.queryKey,
-    queryFn: courseQuery.queryFn,
-    staleTime: 1000 * 60 * 10,
+    queryFn: courseQuery.queryFn
   });
 
   if (courseData.isFetched) {

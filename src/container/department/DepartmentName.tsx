@@ -13,8 +13,7 @@ export const DepartmentName: React.FC<IDepartmentName> = (props) => {
 
   const departmentData = useQuery({
     queryKey: departmentQuery.queryKey,
-    queryFn: departmentQuery.queryFn,
-    staleTime: 1000 * 60 * 10,
+    queryFn: departmentQuery.queryFn
   });
 
   if (departmentData.isFetched) {
