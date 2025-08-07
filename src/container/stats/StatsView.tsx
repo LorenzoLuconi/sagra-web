@@ -6,7 +6,8 @@ import {
     Button,
     Card,
     CardContent,
-    CircularProgress, LinearProgress,
+    CircularProgress,
+    LinearProgress,
     Paper,
     Tab,
     Table,
@@ -22,18 +23,19 @@ import {
 } from "@mui/material";
 import {Product, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
-import {currency, percent, percentLabel} from "../../utils";
+import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
-import {get, orderBy } from "lodash";
+import {get, orderBy} from "lodash";
 import {DatePicker, DatePickerSlotProps} from "@mui/x-date-pickers";
-import dayjs, {Dayjs} from 'dayjs'
+import dayjs, {Dayjs, ManipulateType} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
-import {BarChart, BarLabel} from '@mui/x-charts';
+import {BarChart, BarLabel, SparkLineChart} from '@mui/x-charts';
 import './Stats.css'
-import {calculateSummary, SummaryI} from "./Summary.ts";
+import {calculateSummary, DailyProductStatI, SummaryI} from "./Summary.ts";
 import DepartmentStats from "./DepartmentStats.tsx";
+import {AppConf} from "../../AppConf.ts";
 
 interface GraphStatsField {
     labels: string[],
@@ -150,6 +152,42 @@ const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
  )
 }
 
+const buildChartFromDays = (days: string[], daysInfo: DailyProductStatI[]) => {
+    const xData = []
+    const yData = []
+    for (let i=0; i<days.length; i++) {
+        xData.push(days[i])
+        const idx = daysInfo.findIndex((element) => element.day === days[i])
+        if (idx === -1) {
+            yData.push(0)
+        } else {
+            yData.push(daysInfo[idx].dailyAmount)
+        }
+
+    }
+    console.log('BuildChartFromDays: ', xData, yData)
+
+    return (
+        <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
+            <SparkLineChart
+                data={yData}
+                width={100}
+                height={32}
+                plotType="bar"
+                showHighlight
+                showTooltip
+                color="hsl(210, 98%, 42%)"
+                xAxis={{
+                    scaleType: 'band',
+                    data: xData
+                }}
+            />
+        </div>
+    )
+
+
+}
+
 const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
 
     const {productsStats, field} = props
@@ -162,7 +200,7 @@ const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
         .forEach( (s) => {
             values.push(get( productsStats[s.productId], field))
             labels.push(products[s.productId].name)
-    });
+        });
 
     return (
         <BarChart
@@ -188,6 +226,24 @@ enum OrderDirection {
     desc = "desc"
 }
 
+export function dayjsRange(start: Dayjs, end: Dayjs, unit: ManipulateType, format?: string) {
+    const ff = format ?? 'YYYY-MM-DD'
+    const range = [];
+    let current = start;
+    while (!current.isAfter(end)) {
+        range.push(current.format(ff));
+        current = current.add(1, unit);
+    }
+    return range;
+}
+
+const buildSagraDaysRange = (): string[] => {
+    const startDay = AppConf.getSagraStartDay()
+    const endDay = AppConf.getSagraEndDay()
+    return dayjsRange(new dayjs(startDay), new dayjs(endDay), 'day')
+}
+
+
 const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedProducts>, summary: SummaryI}> = (props) => {
     const {productsInOrder, summary} = props
     const theme = useTheme()
@@ -196,6 +252,11 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
         totalQuantity = "totalQuantity",
         totalAmount = "totalAmount",
     }
+
+
+
+
+    const sagraDays: string[] = buildSagraDaysRange()
 
 
     const {products} = useProducts()
@@ -254,6 +315,9 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                     </TableSortLabel>
                             </TableCell>
                             <TableCell>Percentuale Importo</TableCell>
+                            <TableCell>
+                                Importi Giornalieri
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -273,6 +337,8 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                         <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9em' }}>{Math.round(productsInOrder[+productId].totalAmount*100/totalAmount)}%</Typography>
                                     </Box>
                                 </TableCell>
+                                <TableCell align={'center'}>
+                                    {buildChartFromDays(sagraDays, productsInOrder[+productId].days)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -322,6 +388,8 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
     const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+
+
 
     const summary = calculateSummary(stats)
 
