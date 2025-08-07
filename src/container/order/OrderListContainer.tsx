@@ -38,6 +38,10 @@ const createSearchParam = (searchByCreated?: string, searchByCustomer?: string) 
   return params;
 }
 
+const initialStateDate = () => {
+  return dayjs().format('YYYY-MM-DD');
+}
+
 interface OrderListSearchI {
   handleUpdate: (searchParams: SearchParamsI) => void
 }
@@ -57,7 +61,7 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
     if (searchObj.created) {
       return dayjs(searchObj.created).format('YYYY-MM-DD');
     }
-    return dayjs().format('YYYY-MM-DD');
+    return initialStateDate()
   });
 
   const handleClickSearch = () => {
@@ -126,7 +130,7 @@ const OrderListContainer = () => {
 
   const theme = useTheme();
 
-  const [searchParam, setSearchParam] = useState<OrdersSearchQueryParams>( () => createSearchParam() )
+  const [searchParam, setSearchParam] = useState<OrdersSearchQueryParams>( () => createSearchParam(initialStateDate()) )
 
   return (
       <>
