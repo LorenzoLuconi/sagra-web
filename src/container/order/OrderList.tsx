@@ -1,5 +1,4 @@
-import * as React from "react";
-import {ordersSearchQuery, OrdersSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
+import {ordersCountQuery, ordersSearchQuery, OrdersSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
 import { convertDate, currency, TIME_CONF } from "../../utils";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -11,8 +10,8 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
+  TableContainer, TableFooter,
+  TableHead, TablePagination,
   TableRow,
   Typography
 } from "@mui/material";
@@ -28,6 +27,7 @@ import TakeAwayIcon from "../../icons/TakeAwayIcon.tsx";
 import { ProductName } from "../product/ProductName.tsx";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
+import { useState } from "react";
 
 
 
@@ -37,7 +37,7 @@ interface OrderRowI {
 
 const OrderRow: React.FC<OrderRowI> = (props) => {
   const { order } = props;
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const createdDate = order.created ? new Date(order.created) : new Date();
   const navigate = useNavigate();
   return (
@@ -155,23 +155,49 @@ interface OrderListProps {
   searchQueryParam: OrdersSearchQueryParams
 }
 const OrderList = (props: OrderListProps): React.ReactElement => {
-  console.log("Ricerca ordini, parametri: ", props.searchQueryParam)
-  const ordersConf = ordersSearchQuery({ queryParams: props.searchQueryParam });
+  console.log("Richiesta ricerca ordini, parametri: ", props.searchQueryParam)
 
+  const searchQuery = props.searchQueryParam
+
+  const rowsPerPageOptions = [25, 50, 100]
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0])
+
+  const handleChangePage = (
+      _event: React.MouseEvent<HTMLButtonElement> | null,
+      newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+
+  const ordersConf = ordersSearchQuery({ queryParams: searchQuery});
   const ordersData = useQuery({
     queryKey: ordersConf.queryKey,
     queryFn: ordersConf.queryFn,
   });
 
+  const ordersCountConf = ordersCountQuery({ queryParams: searchQuery });
+  const ordersCountData = useQuery({
+    queryKey: ordersCountConf.queryKey,
+    queryFn: ordersCountConf.queryFn,
+  });
+
   const searchQueryParamsString = () => {
-    if ( props.searchQueryParam.created || props.searchQueryParam.customer ) {
+    if ( searchQuery.created || searchQuery.customer ) {
       let result = " con parametri di ricerca: "
 
-      if ( props.searchQueryParam.created )
-        result = result  + `data creazione = '${props.searchQueryParam.created}'`;
+      if ( searchQuery.created )
+        result = result  + `data creazione = '${searchQuery.created}'`;
 
-      if ( props.searchQueryParam.customer)
-        result = result  + `${props.searchQueryParam.created?',' : ''} nome cliente = '${props.searchQueryParam.customer}'`;
+      if ( searchQuery)
+        result = result  + `${searchQuery.created?',' : ''} nome cliente = '${searchQuery.customer}'`;
 
       return result;
     }
@@ -179,7 +205,7 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
     return '';
   }
 
-  if ( ordersData.isPending)
+  if ( ordersData.isPending || ordersCountData.isPending )
     return (
       <Box sx={{ display: "flex" }}>
         <CircularProgress />
@@ -187,10 +213,11 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
     );
 
 
-  if ( ordersData.isError )
-    return <Alert severity="error">Si è verificato un errore prelevando la lista degli ordini: {ordersData.error.message}</Alert>
+  if ( ordersData.isError || ordersCountData.isError )
+    return <Alert severity="error">Si è verificato un errore prelevando la lista degli ordini</Alert>
 
   const orders = ordersData.data;
+  const countOrders = ordersCountData.data;
 
   if ( ! orders || orders.length == 0) {
     return (
@@ -240,6 +267,20 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
 
           {orders === undefined && <span>Empty</span>}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+                rowsPerPageOptions={rowsPerPageOptions}
+                colSpan={9}
+                count={countOrders.count}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                labelRowsPerPage={<Typography component="span" sx={{ mr: 1, fontSize: '1em' }} >Ordini per pagina</Typography>}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </TableRow>
+        </TableFooter>
       </Table>
     </TableContainer>
     </>
