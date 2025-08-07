@@ -1,9 +1,10 @@
-import {Box, Paper, Typography, useTheme} from "@mui/material";
+import {Paper, useTheme} from "@mui/material";
 import {CalculateOutlined} from "@mui/icons-material";
 import {DiscountEdit} from "./DiscountEdit.tsx";
 import DiscountsList from "./DiscountsList.tsx";
 import {useState} from "react";
 import {Discount} from "../../api/sagra/sagraSchemas.ts";
+import PageTitle from "../../view/PageTitle.tsx";
 
 const DiscountContainer = () => {
 
@@ -16,18 +17,15 @@ const DiscountContainer = () => {
 
     return (
         <>
-            <Box sx={{display: 'flex', justifyContent: 'flex-start', mb: 1, alignItems: 'center'}}>
-                <CalculateOutlined/>
-                <Typography sx={{fontWeight: 700, fontSize: '1.5em'}}>Sconti</Typography>
-            </Box>
+            <PageTitle title="Sconti" icon={<CalculateOutlined/>}/>
 
-            <Paper variant="outlined" sx={{mt: 1, p: 2, backgroundColor: theme.sagra.panelBackground}}
-                className="paper-top">
+            <Paper variant="outlined" sx={{ p: 2, backgroundColor: theme.sagra.panelBackground}}
+                   className="paper-top">
                 <DiscountEdit key={selected?.id} selected={selected} setSelected={selectDiscount}/>
             </Paper>
 
             <Paper variant="outlined" sx={{mt: 1, p: 2, backgroundColor: theme.sagra.panelBackground}}
-                className="paper-bottom">
+                   className="paper-bottom">
                 <DiscountsList selected={selected} setSelected={selectDiscount}/>
             </Paper>
         </>

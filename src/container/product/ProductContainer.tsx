@@ -1,12 +1,13 @@
-import {Box, Paper, Typography, useTheme} from "@mui/material";
+import {Paper, useTheme} from "@mui/material";
 import {RestaurantOutlined} from "@mui/icons-material";
 import {useState} from "react";
 import ProductEdit from "./ProductEdit.tsx";
-import { Product} from "../../api/sagra/sagraSchemas.ts";
+import {Product} from "../../api/sagra/sagraSchemas.ts";
 import ProductsList from "./ProductsList.tsx";
 import * as React from "react";
 import ProductSearchForm from "./ProductSearchForm.tsx";
 import {ProductsSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
+import PageTitle from "../../view/PageTitle.tsx";
 
 const ProductContainer: React.FC = () => {
     const theme = useTheme();
@@ -18,21 +19,16 @@ const ProductContainer: React.FC = () => {
         setSelected(product);
     };
 
-    const handleChangeSearchParam = (searchParam : ProductsSearchQueryParams) => {
+    const handleChangeSearchParam = (searchParam: ProductsSearchQueryParams) => {
         setSearchParam(searchParam)
     }
 
     return (
         <>
-            <Box sx={{display: 'flex', justifyContent: 'flex-start', mb: 1, alignItems: "center"}}>
-                <RestaurantOutlined/>
-                <Typography sx={{fontWeight: 700, fontSize: "1.5em"}}>
-                    Prodotti
-                </Typography>
-            </Box>
+            <PageTitle title="Prodotti" icon={<RestaurantOutlined/>}/>
 
             <Paper variant="outlined" sx={{padding: 2, mb: 1, backgroundColor: theme.sagra.panelBackground}}
-                className="paper-round">
+                   className="paper-round">
                 <ProductEdit
                     key={selected?.id}
                     selected={selected}

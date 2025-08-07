@@ -1,12 +1,11 @@
 import {  Close, LibraryBooksOutlined } from "@mui/icons-material";
 import {
-  Box,
   Divider, FormControlLabel,
   IconButton,
   InputBase,
   Paper,
   Switch,
-  Typography, useTheme
+  useTheme
 } from "@mui/material";
 import OrderList from "./OrderList.tsx";
 import SearchIcon from '@mui/icons-material/Search';
@@ -18,11 +17,11 @@ import { OrdersSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {cloneDeep, set} from "lodash";
+import PageTitle from "../../view/PageTitle.tsx";
 
 interface SearchParamsI {
   created?: string
   customer?: string
-  created: string
   page: number
   size: number
 }
@@ -120,11 +119,7 @@ const OrderListContainer = () => {
 
   return (
       <>
-        <Box sx={{display: 'flex', flexDirection: 'row', mt: 2, mb: 1, gap: 2, alignItems: 'center'}}>
-          <LibraryBooksOutlined />
-          <Typography sx={{fontWeight: 700, fontSize: '1.5em'}}>Elenco degli Ordini</Typography>
-        </Box>
-
+        <PageTitle title="Elenco degli Ordini" icon={ <LibraryBooksOutlined />} />
 
         <Paper id="order-search-bar" variant="outlined"
                sx={{p: 2, display: 'flex', justifyContent: 'center', backgroundColor: theme.sagra.panelBackground }}
