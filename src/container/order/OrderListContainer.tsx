@@ -75,6 +75,16 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
           }, [setSearchByCustomer]
       );
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if ( event.key == 'Enter' ) {
+      handleClickSearch()
+    }
+
+    if ( event.key == 'Escape' ) {
+      setSearchByCustomer('')
+    }
+  };
+
   return (
       <Paper
           sx={{  p: '2px 4px', display: 'flex', alignItems: 'center', width: '70%', minWidth: '600px' }}
@@ -82,9 +92,10 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
 
         <InputBase
             sx={{ ml: 1, flex: 1 }}
-            placeholder="Nome cliente"
+            placeholder="Nome cliente da ricercare"
             value={searchByCustomer}
             onChange={handleChangeCustomer}
+            onKeyUp={handleKeyPress}
             inputProps={{ 'aria-label': 'search by customer' }}
 
         />
