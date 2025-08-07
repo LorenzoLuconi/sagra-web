@@ -9,6 +9,7 @@ const StatsContainer = (): React.ReactElement => {
   const statsData = useQuery({
     queryKey: statsConf.queryKey,
     queryFn: statsConf.queryFn,
+    refetchInterval: 1000*60
   });
 
   if (statsData.isError) {

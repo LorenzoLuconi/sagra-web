@@ -65,18 +65,18 @@ const StatsField: React.FC<StatsFieldI> = (props) => {
    const value = props.isAmount ? currency(props.value): props.value
 
     return (
-        <Card sx={{ ...cardStyle }}>
+        <Card sx={{ ...cardStyle, position: 'relative' }}>
             <CardContent>
                 <Typography component="div" sx={{ ...cardTitle }}>{props.field}</Typography>
                 <Typography component="div" sx={{ ...cardValue }}>{`${value}`}</Typography>
                 { props.description && <Typography component="div" sx={{ mt: 1, fontSize: '0.9em', fontWeight: 300 }}>{`${props.description}`}</Typography> }
             </CardContent>
             { props.graphData &&
-                <Box sx={{ height: 100, mt: 1}}>
+                <Box sx={{ height: 120, position: 'absolute', bottom: 0,  }}>
                     <BarChart
                         series={[{ data: props.graphData.values, type: 'bar',
                             valueFormatter: (v) => v && props.isAmount ? currency(v) : `${v}` }]}
-                        xAxis={[{ data: props.graphData.labels, position: 'none' }]}
+                        xAxis={[{ data: props.graphData.labels, position: 'none'  }]}
                         yAxis={[{position: 'none'}]}
                         barLabel="value"
                         slots={{ barLabel: BarLabel  }}
