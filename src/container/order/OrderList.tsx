@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ordersSearchQuery, OrdersSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
+import {ordersSearchQuery, OrdersSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
 import { convertDate, currency, TIME_CONF } from "../../utils";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -20,11 +20,14 @@ import { Order, OrderedProduct } from "../../api/sagra/sagraSchemas.ts";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
+  CachedOutlined,
   EditOutlined,
   SettingsOutlined,
 } from "@mui/icons-material";
 import TakeAwayIcon from "../../icons/TakeAwayIcon.tsx";
 import { ProductName } from "../product/ProductName.tsx";
+import {queryClient} from "../../main.tsx";
+import toast from "react-hot-toast";
 
 
 
@@ -196,11 +199,21 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
         </Paper>
     )
   }
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({queryKey: ordersSearchQuery({}).queryKey}).then(() => {
+      toast.success("Elenco ordini aggiornato", {duration: 2000})
+    }).catch((e: Error) => {console.log('Errore: ', e)})
+  }
 
   return (
     <>
-      <Paper variant='outlined' sx={{p: 1, mb: 2}}>
-        <Typography sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini ${searchQueryParamsString()}`}</Typography>
+      <Paper variant='outlined' sx={{p: 1, mb: 2, display: "flex", justifyContent: "space-between", gap: 2 }}>
+        <Typography component="div" sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini ${searchQueryParamsString()}`}</Typography>
+        <IconButton>
+          <IconButton sx={{ width: '40px'}} onClick={handleRefresh}>
+            <CachedOutlined  />
+          </IconButton>
+        </IconButton>
       </Paper>
     <TableContainer>
       <Table stickyHeader aria-label="collapsible table">
