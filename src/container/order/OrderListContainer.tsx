@@ -19,7 +19,7 @@ import dayjs from "dayjs";
 import {cloneDeep, set} from "lodash";
 import PageTitle from "../../view/PageTitle.tsx";
 
-interface SearchParamsI {
+export interface SearchParamsI {
   created?: string
   customer?: string
   page: number
@@ -136,11 +136,13 @@ const OrderListContainer = () => {
   const location = useLocation()
   const queryString = new URLSearchParams(location.search)
 
+  //const searchObj = orderQuery(queryString)
+
   const [searchParam, setSearchParam] = useState<OrdersSearchQueryParams>( () => createSearchParam(initialStateDate()) )
 
   const pageSize = queryString.get('size') ?? rowsPerPageOptions[0]
   console.log('PageSize: ', pageSize)
-  const pageNum = queryString.get('page') ?? '0'
+  //const pageNum = queryString.get('page') ?? '0'
   return (
       <>
         <PageTitle title="Elenco degli Ordini" icon={ <LibraryBooksOutlined />} />
@@ -149,15 +151,23 @@ const OrderListContainer = () => {
                sx={{p: 2, display: 'flex', justifyContent: 'center', backgroundColor: theme.sagra.panelBackground }}
                className="paper-top">
           <OrderListSearch handleUpdate={(searchParams: SearchParamsI) => {
-
             setSearchParam(searchParams)
+
+
           }}/>
 
         </Paper>
         <Paper variant="outlined"
                sx={{ p: 3, mb: 2, backgroundColor: theme.sagra.panelBackground }}
                className="paper-bottom">
-          <OrderList searchQueryParam={{...searchParam, ...{page: +pageNum, size: parseInt(pageSize, 10)}}}/>
+          <OrderList searchQueryParam={searchParam} handleUpdate={(searchParams:SearchParamsI) => {
+            setSearchParam((prevState) => {
+              const res = cloneDeep(prevState);
+              res.page = searchParams.page
+              res.size = searchParams.size
+              return res
+            })
+          }}/>
         </Paper>
       </>
   )

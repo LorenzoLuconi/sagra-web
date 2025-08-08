@@ -1,36 +1,35 @@
 import * as React from "react";
+import {useState} from "react";
 import {ordersCountQuery, ordersSearchQuery, OrdersSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
-import { convertDate, currency, TIME_CONF } from "../../utils";
-import {useLocation, useNavigate} from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import {convertDate, currency, TIME_CONF} from "../../utils";
+import {useNavigate} from "react-router";
+import {useQuery} from "@tanstack/react-query";
 import {
   Alert,
-  Box, CircularProgress,
+  Box,
+  CircularProgress,
   Collapse,
-  IconButton, Paper,
+  IconButton,
+  Paper,
   Table,
   TableBody,
   TableCell,
-  TableContainer, TableFooter,
-  TableHead, TablePagination,
+  TableContainer,
+  TableFooter,
+  TableHead,
+  TablePagination,
   TableRow,
   Typography
 } from "@mui/material";
-import { Order, OrderedProduct } from "../../api/sagra/sagraSchemas.ts";
+import {Order, OrderedProduct} from "../../api/sagra/sagraSchemas.ts";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import {
-  CachedOutlined,
-  EditOutlined,
-  SettingsOutlined,
-} from "@mui/icons-material";
+import {CachedOutlined, EditOutlined, SettingsOutlined,} from "@mui/icons-material";
 import TakeAwayIcon from "../../icons/TakeAwayIcon.tsx";
-import { ProductName } from "../product/ProductName.tsx";
+import {ProductName} from "../product/ProductName.tsx";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
-import { useState } from "react";
-import {rowsPerPageOptions} from "./OrderListContainer.tsx";
-
+import {rowsPerPageOptions, SearchParamsI} from "./OrderListContainer.tsx";
 
 
 interface OrderRowI {
@@ -155,15 +154,10 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
 
 interface OrderListProps {
   searchQueryParam: OrdersSearchQueryParams
+  handleUpdate: (searchParams: SearchParamsI) => void
 }
 const OrderList = (props: OrderListProps): React.ReactElement => {
   const {searchQueryParam: searchQuery} = props
-  const navigate = useNavigate()
-  const location = useLocation()
-  const queryString = new URLSearchParams(location.search)
-
-
-
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0])
 
@@ -171,9 +165,7 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
       _event: React.MouseEvent<HTMLButtonElement> | null,
       newPage: number) => {
     setPage(newPage);
-    queryString.set('page', `${newPage}`)
-    const url = '/orders?'+queryString.toString()
-    navigate(url)
+    props.handleUpdate({page: newPage, size: searchQuery.size??rowsPerPageOptions[0]})
   };
 
   const handleChangeRowsPerPage = (
@@ -181,11 +173,7 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    const sizeS = `${parseInt(event.target.value, 10)}`
-    queryString.set('size', sizeS)
-    queryString.delete('page')
-    const url = '/orders?'+queryString.toString()
-    navigate(url)
+    props.handleUpdate({page: searchQuery.page ?? 0, size: parseInt(event.target.value, 10)})
   };
 
   console.log('SearchQuery: ', searchQuery)
