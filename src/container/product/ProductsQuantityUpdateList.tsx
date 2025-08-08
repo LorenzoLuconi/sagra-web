@@ -51,8 +51,7 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
 
     const productsQuery = useQuery({
         queryKey: productsSearchConf.queryKey,
-        queryFn: productsSearchConf.queryFn,
-        staleTime: 1000 * 10,
+        queryFn: productsSearchConf.queryFn
     });
 
     if (productsQuery.isLoading) {

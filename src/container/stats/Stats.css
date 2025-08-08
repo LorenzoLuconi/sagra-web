@@ -1,0 +1,7 @@
+.MuiBarLabel-root {
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    fill: white!important;
+    font-size: 0.8rem!important;
+    font-weight: 700!important;
+}

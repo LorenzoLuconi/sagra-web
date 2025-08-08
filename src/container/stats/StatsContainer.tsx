@@ -1,7 +1,7 @@
 import * as React from "react";
 import { orderStatsQuery } from "../../api/sagra/sagraComponents.ts";
 import { useQuery } from "@tanstack/react-query";
-import { CircularProgress } from "@mui/material";
+import {Alert, CircularProgress} from "@mui/material";
 import StatsView from "./StatsView.tsx";
 
 const StatsContainer = (): React.ReactElement => {
@@ -9,6 +9,7 @@ const StatsContainer = (): React.ReactElement => {
   const statsData = useQuery({
     queryKey: statsConf.queryKey,
     queryFn: statsConf.queryFn,
+    refetchInterval: 1000*60*5
   });
 
   if (statsData.isError) {
@@ -20,7 +21,7 @@ const StatsContainer = (): React.ReactElement => {
     if (statsData.data !== undefined) {
       return <StatsView stats={statsData.data}/>;
     }
-    return <span>No data</span>
+    return (<Alert severity="warning">Nessun dato statistico al momento disponibile</Alert>)
   }
 
   return <CircularProgress title={"Caricamento Statistiche"} />;

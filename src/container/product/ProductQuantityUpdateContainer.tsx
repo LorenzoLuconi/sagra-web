@@ -1,11 +1,15 @@
-import {Box, Paper, Typography, useTheme} from "@mui/material";
-import {WarehouseOutlined} from "@mui/icons-material";
+import * as React from 'react'
+import {Box, IconButton, Paper, useTheme} from "@mui/material";
+import {CachedOutlined, WarehouseOutlined} from "@mui/icons-material";
 import {useState} from "react";
 import ProductsQuantityUpdateList from "./ProductsQuantityUpdateList.tsx";
 import ProductSearchForm from "./ProductSearchForm.tsx";
-import {ProductsSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
+import {productsSearchQuery, ProductsSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
+import {queryClient} from "../../main.tsx";
+import toast from "react-hot-toast";
+import PageTitle from "../../view/PageTitle.tsx";
 
-const ProductQuantityUpdateContainer = () => {
+const ProductQuantityUpdateContainer = (): React.ReactElement => {
     const theme = useTheme();
 
     const [searchParam, setSearchParam] = useState<ProductsSearchQueryParams>({});
@@ -14,19 +18,30 @@ const ProductQuantityUpdateContainer = () => {
         setSearchParam(searchParam)
     }
 
+    const productsSearchConf = productsSearchQuery({});
+    const handleRefreshProducts = () => {
+        queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
+            toast.success("Elenco prodotti aggiornato", {duration: 2000})
+        }).catch((e: Error) => {console.log('Errore: ', e)})
+    }
+
     return (
         <>
-            <Box sx={{display: 'flex', justifyContent: 'flex-start', mb: 1, alignItems: "center"}}>
-                <WarehouseOutlined/>
-                <Typography sx={{fontWeight: 700, fontSize: "1.5em"}}>
-                    Giacenze Magazzino
-                </Typography>
-            </Box>
+
+            <PageTitle title="Giacenze Magazzino" icon={<WarehouseOutlined/>}/>
 
             <Paper variant="outlined"
-                   sx={{p: 2, mt: 1, mb: 1, backgroundColor: theme.sagra.panelBackground}}
+                   sx={{p: 2, mt: 1, mb: 1, backgroundColor: theme.sagra.panelBackground,
+                        display: 'flex', justifyContent: 'space-between'}}
                    className="paper-top">
-                <ProductSearchForm setSearchParam={handleChangeSearchParam} />
+                <Box sx={{ width: '100%'}}>
+                    <ProductSearchForm setSearchParam={handleChangeSearchParam} />
+                </Box>
+                <Box>
+                    <IconButton sx={{ width: '40px'}}>
+                        <CachedOutlined onClick={handleRefreshProducts} />
+                    </IconButton>
+                </Box>
             </Paper>
 
             <Paper variant="outlined"

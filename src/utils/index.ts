@@ -40,7 +40,8 @@ export const convertDate = (locale: string, date: Date, dataConversion?: Intl.Da
     return new Intl.DateTimeFormat(locale, o).format(date);
 }
 
-export const currencyEuro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" });
+// NOTA BENE: de-DE è voluto perché it-IT il separatore migliaia lo metto solo se >= 10.000. Boh!
+export const currencyEuro = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
 
 export const currency = (value : number) : string => {
   return currencyEuro.format(value)
@@ -52,18 +53,18 @@ export const checkOrderErrors = (order: Order, productsTable: Record<number, Pro
     const res = {} as OrderErrorT
 
     if (order.customer.length===0) {
-        res['customer'] = 'Bisogna specificare il nome del cliente'
+        res['customer'] = 'Deve essere inserito il nome del cliente'
     }
 
     if ( (order.serviceNumber === undefined || order.serviceNumber < 0) && !order.takeAway) {
-        res['serviceNumber'] = 'Inserire il numero di coperti'
+        res['serviceNumber'] = 'Inserire il numero di coperti o selezionare asporto'
     }
 
     // Check products quantity
     const {products} = order
 
     if (products.length === 0) {
-        res['products'] = 'Bisogna specificare almeno una portata'
+        res['products'] = "Deve essere presente almeno un prodotto nell'ordine"
     }
 
 /*
