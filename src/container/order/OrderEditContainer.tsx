@@ -101,7 +101,7 @@ const OrderEditInnerContainer: React.FC = () => {
                     <Paper
                         variant="outlined"
                         sx={{padding: 2, backgroundColor: theme.sagra.panelBackground}}
-                        className={ isNewOrder() || isOrderChanged ? 'paper-bottom' : 'paper-middle'}
+                        className={ showCalc() ? 'paper-middle' : 'paper-bottom'}
                     >
                         <OrderEditForm/>
                     </Paper>
