@@ -1,7 +1,8 @@
-import { EmptyOrder, useOrderStore } from "../../context/OrderStore.tsx";
+import * as React from 'react'
+import {EmptyOrder} from "../../context/OrderStore.tsx";
 import OrderEditContainer from "./OrderEditContainer.tsx";
 
-const OrderNew = () => {
+const OrderNew = (): React.ReactElement => {
   // TODO commentato, perché non sono sicuro che alla fine serva davvero. Apparentemente funziona
   //const { updateOrder } = useOrderStore();
 

@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {IconButton, Paper, useTheme} from "@mui/material";
 import {DepartmentEdit} from "./DepartmentEdit";
 import DepartmentsList from "./DepartmentsList.tsx";
@@ -7,7 +8,7 @@ import {departmentsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 
-const DepartmentContainer = () => {
+const DepartmentContainer = (): React.ReactElement => {
     const theme = useTheme();
 
     const searchConf = departmentsSearchQuery({});

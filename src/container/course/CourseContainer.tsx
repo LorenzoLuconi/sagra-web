@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {Box, IconButton, Paper, useTheme} from "@mui/material";
 import {CachedOutlined, FormatListNumberedOutlined} from "@mui/icons-material";
 import {CourseEdit} from "./CourseEdit.tsx";
@@ -7,7 +8,7 @@ import { coursesSearchQuery } from "../../api/sagra/sagraComponents.ts";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 
-const CourseContainer = () => {
+const CourseContainer = (): React.ReactElement => {
     const theme = useTheme();
 
     const searchConf = coursesSearchQuery({});
