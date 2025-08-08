@@ -25,11 +25,11 @@ interface SearchParamsI {
   page: number
   size: number
 }
-
+export const rowsPerPageOptions = [10, 20, 50]
 const createSearchParam = (searchByCreated?: string, searchByCustomer?: string) => {
 
   const params = {
-    size: 2000 // TODO per il momento niente paginazione
+    size: rowsPerPageOptions[0] // TODO per il momento niente paginazione
   } as OrdersSearchQueryParams;
 
   Object.assign(params, searchByCustomer ? { customer: searchByCustomer } : null)
@@ -45,16 +45,20 @@ const initialStateDate = () => {
 interface OrderListSearchI {
   handleUpdate: (searchParams: SearchParamsI) => void
 }
+
+export const orderQuery = (search: URLSearchParams) =>  getQueryObj(search, {
+  customer: "string",
+  username: "string",
+  created: "string",
+  page: "number",
+  size: "number"
+});
+
 const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
   const location = useLocation();
   const search = new URLSearchParams(location.search);
-  const searchObj = getQueryObj(search, {
-    customer: "string",
-    username: "string",
-    created: "string",
-    page: "number",
-    size: "number"
-  });
+
+  const searchObj = orderQuery(search)
 
   const [searchByCustomer, setSearchByCustomer] = useState<string>(searchObj?.customer??'');
   const [searchByCreated, setSearchByCreated] = useState<string>(() => {
@@ -129,9 +133,14 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
 const OrderListContainer = () => {
 
   const theme = useTheme();
+  const location = useLocation()
+  const queryString = new URLSearchParams(location.search)
 
   const [searchParam, setSearchParam] = useState<OrdersSearchQueryParams>( () => createSearchParam(initialStateDate()) )
 
+  const pageSize = queryString.get('size') ?? rowsPerPageOptions[0]
+  console.log('PageSize: ', pageSize)
+  const pageNum = queryString.get('page') ?? '0'
   return (
       <>
         <PageTitle title="Elenco degli Ordini" icon={ <LibraryBooksOutlined />} />
@@ -141,14 +150,14 @@ const OrderListContainer = () => {
                className="paper-top">
           <OrderListSearch handleUpdate={(searchParams: SearchParamsI) => {
 
-            setSearchParam({customer: searchParams.customer, created: searchParams.created})
+            setSearchParam(searchParams)
           }}/>
 
         </Paper>
         <Paper variant="outlined"
                sx={{ p: 3, mb: 2, backgroundColor: theme.sagra.panelBackground }}
                className="paper-bottom">
-          <OrderList searchQueryParam={searchParam}/>
+          <OrderList searchQueryParam={{...searchParam, ...{page: +pageNum, size: parseInt(pageSize, 10)}}}/>
         </Paper>
       </>
   )

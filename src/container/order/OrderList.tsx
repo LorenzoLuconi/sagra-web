@@ -1,6 +1,7 @@
+import * as React from "react";
 import {ordersCountQuery, ordersSearchQuery, OrdersSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
 import { convertDate, currency, TIME_CONF } from "../../utils";
-import { useNavigate } from "react-router";
+import {useLocation, useNavigate} from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Alert,
@@ -28,6 +29,7 @@ import { ProductName } from "../product/ProductName.tsx";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import {rowsPerPageOptions} from "./OrderListContainer.tsx";
 
 
 
@@ -155,13 +157,13 @@ interface OrderListProps {
   searchQueryParam: OrdersSearchQueryParams
 }
 const OrderList = (props: OrderListProps): React.ReactElement => {
-  console.log("Richiesta ricerca ordini, parametri: ", props.searchQueryParam)
-  const [searchQuery, setSearchQuery] = useState(props.searchQueryParam)
-  console.log("Parametri di ricerca: ", searchQuery);
+  const {searchQueryParam: searchQuery} = props
+  const navigate = useNavigate()
+  const location = useLocation()
+  const queryString = new URLSearchParams(location.search)
 
-  // const searchQuery = props.searchQueryParam
 
-  const rowsPerPageOptions = [25, 50, 100]
+
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0])
 
@@ -169,6 +171,9 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
       _event: React.MouseEvent<HTMLButtonElement> | null,
       newPage: number) => {
     setPage(newPage);
+    queryString.set('page', `${newPage}`)
+    const url = '/orders?'+queryString.toString()
+    navigate(url)
   };
 
   const handleChangeRowsPerPage = (
@@ -176,8 +181,14 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+    const sizeS = `${parseInt(event.target.value, 10)}`
+    queryString.set('size', sizeS)
+    queryString.delete('page')
+    const url = '/orders?'+queryString.toString()
+    navigate(url)
   };
 
+  console.log('SearchQuery: ', searchQuery)
 
   const ordersConf = ordersSearchQuery({ queryParams: searchQuery});
   const ordersData = useQuery({
