@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {Box, IconButton, Paper, useTheme} from "@mui/material";
 import {CachedOutlined, WarehouseOutlined} from "@mui/icons-material";
 import {useState} from "react";
@@ -8,7 +9,7 @@ import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 import PageTitle from "../../view/PageTitle.tsx";
 
-const ProductQuantityUpdateContainer = () => {
+const ProductQuantityUpdateContainer = (): React.ReactElement => {
     const theme = useTheme();
 
     const [searchParam, setSearchParam] = useState<ProductsSearchQueryParams>({});

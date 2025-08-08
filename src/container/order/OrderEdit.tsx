@@ -1,3 +1,4 @@
+import * as React from "react";
 import { orderByIdQuery } from "../../api/sagra/sagraComponents.ts";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
@@ -5,7 +6,7 @@ import { Alert, CircularProgress } from "@mui/material";
 import OrderEditContainer from "./OrderEditContainer.tsx";
 import { ErrorWrapper } from "../../api/sagra/sagraFetcher.ts";
 
-const OrderEdit = () => {
+const OrderEdit = (): React.ReactElement => {
   const params = useParams();
   const orderId: number = params.orderId ? +params.orderId : 0;
 
