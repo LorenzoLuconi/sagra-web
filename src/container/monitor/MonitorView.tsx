@@ -1,6 +1,18 @@
 import * as React from "react"
 import {MonitorProductView} from "../../api/sagra/sagraSchemas.ts";
-import {Alert, Box, CircularProgress, Paper, Typography, useTheme} from "@mui/material";
+import {
+    Alert,
+    Box,
+    CircularProgress,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Typography,
+    useTheme
+} from "@mui/material";
 import {convertDate, TIME_CONF} from "../../utils";
 import {useParams} from "react-router";
 import {monitorViewQuery} from "../../api/sagra/sagraComponents.ts";
@@ -54,26 +66,85 @@ const MonitorView: React.FC = () => {
                     <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '5ch'}}>{monitor.name}</Typography>
                     <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '5ch'}}>{convertDate('it', new Date(monitor.lastUpdate), TIME_CONF)}</Typography>
                 </Box>
-                <Box sx={{display: 'flex', width: '100%', flexDirection: 'column', gap: '5px'}}>
-                    <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '10px'}}>
-                        <Typography sx={{fontWeight: 400, textTransform: 'uppercase', fontSize: '3ch'}}>
-                            Prodotto
-                        </Typography>
-                        <Typography sx={{fontWeight: 400, textTransform: 'uppercase', fontSize: '3ch'}}>
-                            Quantità D/I
-                        </Typography>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="left" style={{fontWeight: 400, textTransform: 'uppercase', fontSize: '2ch'}}>Prodotto</TableCell>
+                            <TableCell align="center" style={{ width: "10vw", fontWeight: 400, textTransform: 'uppercase', fontSize: '2ch'}}>Iniziale</TableCell>
+                            <TableCell align="center" style={{ width: "10vw", fontWeight: 400, textTransform: 'uppercase', fontSize: '2ch' }}>Venduto</TableCell>
+                            <TableCell align="center" style={{ width: "10vw", fontWeight: 400, textTransform: 'uppercase', fontSize: '2ch' }}>Vendibile</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+
+                        {products.map((product: MonitorProductView, idx: number) => {
+                            return (
+                                <TableRow key={idx} sx={{ backgroundColor: productBackGroundColor(product.availableQuantity, idx) }}>
+                                    <TableCell style={{ fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch' }}>
+                                        {product.name}
+                                    </TableCell>
+                                    <TableCell style={{ fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch' }} align="center">
+                                        {product.initialQuantity}
+                                    </TableCell>
+                                    <TableCell style={{ fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch' }} align="center">
+                                        {product.initialQuantity-product.availableQuantity}
+                                    </TableCell>
+                                    <TableCell style={{ fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch' }} align="center">
+                                        {product.availableQuantity}
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                </Table>
+                <Box sx={{display: 'none', width: '100%', flexDirection: 'column', gap: '5px'}}>
+                    <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 2, padding: '10px'}}>
+                        <Box sx={{ width: '100%' }}>
+                            <Typography sx={{fontWeight: 400, textTransform: 'uppercase', fontSize: '3ch'}}>
+                                Prodotto
+                            </Typography>
+                        </Box>
+                        <Box sx={{ width: '100px', alignItems: 'center' }}>
+                            <Typography sx={{fontWeight: 400, textTransform: 'uppercase', fontSize: '2ch'}}>
+                                Iniziale
+                            </Typography>
+                        </Box>
+                        <Box sx={{ width: '100px', alignItems: 'center' }}>
+                            <Typography component="div" sx={{fontWeight: 400, textTransform: 'uppercase', fontSize: '2ch', width: '24ch'}}>
+                                Venduto
+                            </Typography>
+                        </Box>
+                        <Box sx={{ width: '100px', alignItems: 'center' }}>
+                            <Typography component="div" sx={{fontWeight: 400, textTransform: 'uppercase', fontSize: '2ch', width: '24ch'}}>
+                                Da Vendere
+                            </Typography>
+                        </Box>
                     </Box>
 
                 {products.map((product: MonitorProductView, idx: number) => {
                     return (
-                        <Box key={idx} sx={{display: 'flex', justifyContent: 'space-between', padding: '10px',
+                        <Box key={idx} sx={{display: 'flex', padding: '10px', gap: 2,
                             backgroundColor: productBackGroundColor(product.availableQuantity, idx)}}>
-                            <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch'}}>
-                                {product.name}
-                            </Typography>
-                            <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch'}}>
-                                {`${product.availableQuantity}/${product.initialQuantity}`}
-                            </Typography>
+                            <Box sx={{ width: '100%', alignItems: 'center' }}>
+                                <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch', width: '80%'}}>
+                                    {product.name}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ width: '100px', alignItems: 'center' }}>
+                                <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch'}}>
+                                    {product.initialQuantity}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ width: '100px', alignItems: 'center' }}>
+                                <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch'}}>
+                                    {product.initialQuantity-product.availableQuantity}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ width: '100px', alignItems: 'center' }}>
+                                <Typography sx={{fontWeight: 700, textTransform: 'uppercase', fontSize: '3ch'}}>
+                                    {product.availableQuantity}
+                                </Typography>
+                            </Box>
                         </Box>
                     )
                 })}
