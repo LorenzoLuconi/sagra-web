@@ -1,7 +1,8 @@
 import { SagraContext } from "./sagraContext";
 import {manageErrorResponse} from "../../utils";
+import {AppConf} from "../../AppConf.ts";
 
-const baseUrl = "http://localhost:8080";
+const baseUrl = AppConf.getApiUrl();
 
 export type ErrorWrapper<TError> =
   | TError
