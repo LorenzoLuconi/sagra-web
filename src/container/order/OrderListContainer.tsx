@@ -1,20 +1,13 @@
-import {  Close, LibraryBooksOutlined } from "@mui/icons-material";
-import {
-  Divider, FormControlLabel,
-  IconButton,
-  InputBase,
-  Paper,
-  Switch,
-  useTheme
-} from "@mui/material";
+import {Close, LibraryBooksOutlined} from "@mui/icons-material";
+import {Divider, FormControlLabel, IconButton, InputBase, Paper, Switch, useTheme} from "@mui/material";
 import OrderList from "./OrderList.tsx";
 import SearchIcon from '@mui/icons-material/Search';
 import * as React from "react";
-import { useLocation } from "react-router";
-import { getQueryObj } from "../../utils";
-import { useState } from "react";
-import { OrdersSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
-import { DatePicker } from "@mui/x-date-pickers";
+import {useState} from "react";
+import {useLocation, useNavigate} from "react-router";
+import {getQueryObj} from "../../utils";
+import {OrdersSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
+import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {cloneDeep, set} from "lodash";
 import PageTitle from "../../view/PageTitle.tsx";
@@ -55,26 +48,38 @@ export const orderQuery = (search: URLSearchParams) =>  getQueryObj(search, {
 });
 
 const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
+
   const location = useLocation();
   const search = new URLSearchParams(location.search);
 
   const searchObj = orderQuery(search)
 
-  const [searchByCustomer, setSearchByCustomer] = useState<string>(searchObj?.customer??'');
-  const [searchByCreated, setSearchByCreated] = useState<string>(() => {
-    if (searchObj.created) {
-      return dayjs(searchObj.created).format('YYYY-MM-DD');
-    }
-    return initialStateDate()
-  });
+  const customer = search.get('customer') ?? ''
+  const created = search.get('created') ?? initialStateDate()
+
+
+  const [searchByCustomer, setSearchByCustomer] = useState<string>(customer);
+  const [searchByCreated, setSearchByCreated] = useState<string>(created);
+
+  React.useEffect(() => {
+    setSearchByCustomer(customer)
+  }, [customer])
+
+  React.useEffect(() => {
+    setSearchByCreated(created)
+  }, [created])
+
+
 
   const handleClickSearch = () => {
+
 
     const res: SearchParamsI = cloneDeep(searchObj)
     set(res, 'created', searchByCreated)
     set(res, 'customer', searchByCustomer)
 
     props.handleUpdate(res);
+
   }
 
   const handleChangeCustomer =
@@ -133,12 +138,32 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
 const OrderListContainer = () => {
 
   const theme = useTheme();
+  const navigate = useNavigate()
   const location = useLocation()
   const queryString = new URLSearchParams(location.search)
 
-  //const searchObj = orderQuery(queryString)
+  const searchObj = orderQuery(queryString)
 
-  const [searchParam, setSearchParam] = useState<OrdersSearchQueryParams>( () => createSearchParam(initialStateDate()) )
+  React.useEffect(() => {
+    // devo settare la prima
+    const searchQuery = new URLSearchParams()
+    const {created, page, customer, size} = searchObj
+    if (created === null || created === undefined) {
+      searchQuery.set('created', initialStateDate())
+    }
+    if (page!==undefined) {
+      searchQuery.set('page', page)
+    }
+    if (customer !== undefined) {
+      searchQuery.set('customer', customer)
+    }
+    if (size !== undefined) {
+      searchQuery.set('size', size)
+    }
+      navigate(`/orders?${searchQuery.toString()}`)
+
+  }, [])
+
 
   const pageSize = queryString.get('size') ?? rowsPerPageOptions[0]
   console.log('PageSize: ', pageSize)
@@ -150,8 +175,28 @@ const OrderListContainer = () => {
         <Paper id="order-search-bar" variant="outlined"
                sx={{p: 2, display: 'flex', justifyContent: 'center', backgroundColor: theme.sagra.panelBackground }}
                className="paper-top">
+
           <OrderListSearch handleUpdate={(searchParams: SearchParamsI) => {
-            setSearchParam(searchParams)
+
+            const {created, customer} = searchParams
+
+            console.log('SEARCH: ', searchParams)
+
+            const searchQuery = new URLSearchParams()
+
+
+
+            if (created !== undefined && created.length > 0 ){
+              searchQuery.set('created', created)
+            }
+            if (customer !== undefined && customer.length > 0) {
+              searchQuery.set('customer', customer)
+            }
+            searchQuery.set('page', '0')
+            searchQuery.set('size', searchObj['size'] ?? rowsPerPageOptions[0])
+
+            navigate(`/orders?${searchQuery.toString()}`)
+
 
 
           }}/>
@@ -160,14 +205,16 @@ const OrderListContainer = () => {
         <Paper variant="outlined"
                sx={{ p: 3, mb: 2, backgroundColor: theme.sagra.panelBackground }}
                className="paper-bottom">
-          <OrderList searchQueryParam={searchParam} handleUpdate={(searchParams:SearchParamsI) => {
-            setSearchParam((prevState) => {
-              const res = cloneDeep(prevState);
-              res.page = searchParams.page
-              res.size = searchParams.size
-              return res
-            })
-          }}/>
+          <OrderList
+              handleUpdate={(searchParams:SearchParamsI) => {
+                const {page, size} = searchParams
+                const searchQuery = new URLSearchParams(queryString)
+                searchQuery.set('page', `${page}`)
+                searchQuery.set('size', `${size}`)
+
+                navigate(`/orders?${searchQuery.toString()}`)
+            }}
+          />
         </Paper>
       </>
   )

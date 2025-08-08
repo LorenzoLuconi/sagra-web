@@ -1,8 +1,8 @@
 import * as React from "react";
 import {useState} from "react";
-import {ordersCountQuery, ordersSearchQuery, OrdersSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
+import {ordersCountQuery, ordersSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {convertDate, currency, TIME_CONF} from "../../utils";
-import {useNavigate} from "react-router";
+import {useLocation, useNavigate} from "react-router";
 import {useQuery} from "@tanstack/react-query";
 import {
   Alert,
@@ -29,7 +29,7 @@ import TakeAwayIcon from "../../icons/TakeAwayIcon.tsx";
 import {ProductName} from "../product/ProductName.tsx";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
-import {rowsPerPageOptions, SearchParamsI} from "./OrderListContainer.tsx";
+import {orderQuery, rowsPerPageOptions, SearchParamsI} from "./OrderListContainer.tsx";
 
 
 interface OrderRowI {
@@ -153,11 +153,15 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
 };
 
 interface OrderListProps {
-  searchQueryParam: OrdersSearchQueryParams
   handleUpdate: (searchParams: SearchParamsI) => void
 }
 const OrderList = (props: OrderListProps): React.ReactElement => {
-  const {searchQueryParam: searchQuery} = props
+  const location = useLocation();
+  const search = new URLSearchParams(location.search);
+
+  const searchQuery = orderQuery(search)
+
+
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0])
 
