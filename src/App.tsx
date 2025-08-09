@@ -22,13 +22,9 @@ import {sagraTheme} from "./SagraTheme.ts";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import 'dayjs/locale/it';
-import OrderListContainer from "./container/order/OrderListContainer.tsx";
-import MonitorView from "./container/monitor/MonitorView.tsx";
 import AuthProvider, {ProtectedComponent} from "./context/AuthProvider.tsx";
 import Login from './container/login/Login.tsx'
 import Logout from './container/login/Logout.tsx'
-//import OrderListContainer from "./container/order/OrderListContainer.tsx";
-//import MonitorView from "./container/monitor/MonitorView.tsx";
 import {useLocalStorage} from "./utils";
 
 const UnmanagedPathView = React.lazy(() => import("./view/UnmanagedPathView.tsx"))
@@ -37,7 +33,7 @@ const OrderEdit = React.lazy(() => import('./container/order/OrderEdit.tsx'))
 const DepartmentContainer = React.lazy(() => import("./container/department/DeparmentContainer.tsx"))
 const ProductContainer = React.lazy(() => import('./container/product/ProductContainer.tsx'))
 const DiscountContainer = React.lazy(()=> import('./container/department/DeparmentContainer.tsx'))
-const  CourseContainer = React.lazy(() => import("./container/course/CourseContainer.tsx"))
+const CourseContainer = React.lazy(() => import("./container/course/CourseContainer.tsx"))
 const OrderNew = React.lazy(() => import("./container/order/OrderNew.tsx"))
 const ProductQuantityUpdateContainer = React.lazy(() => import("./container/product/ProductQuantityUpdateContainer.tsx"))
 const StatsContainer = React.lazy(() => import("./container/stats/StatsContainer.tsx"))
