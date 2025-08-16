@@ -15,6 +15,7 @@ import { convertDate, currency, FULL_DATE_CONF } from "../../utils";
 import "./OrderPrint.css"
 import {DepartmentName} from "../department/DepartmentName.tsx";
 import * as React from "react";
+import {AppConf} from "../../AppConf.ts";
 
 interface OrderPrintProps {
   order: Order
@@ -222,7 +223,7 @@ const OrderPrintLogo = () => {
   return (
     <Box sx={{display: 'flex', columnGap: 5, justifyContent: 'flex-start', width: '100%'}}>
       <Logo sx={{fontSize: '6vh', color: 'text.primary', verticalAlign: 'middle'}} />
-      <Typography sx={{fontSize: '1.8em', color: 'text.primary', pt: 3}}>Sagra San Pio X</Typography>
+      <Typography sx={{fontSize: '1.8em', color: 'text.primary', pt: 3}}>{AppConf.getTitle()}</Typography>
     </Box>
   )
 }

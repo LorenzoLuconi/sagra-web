@@ -3,6 +3,7 @@ interface SagraWebConfI {
     sagraEndDay: string
     apiUrl: string
     showProductImages: boolean
+    title: string
 }
 
 export class AppConf {
@@ -10,6 +11,7 @@ export class AppConf {
     private apiUrl: string
     private sagraStartDay: string
     private sagraEndDay: string
+    private title: string
     private showProductImages: boolean
     private constructor()  {
         const {sagraWeb} = window as SagraWebConfI
@@ -17,6 +19,7 @@ export class AppConf {
         this.sagraStartDay = sagraWeb.sagraStartDay
         this.sagraEndDay = sagraWeb.sagraEndDay
         this.showProductImages = sagraWeb.showProductImages
+        this.title = sagraWeb.title
     }
 
     public static getInstance() {
@@ -40,6 +43,10 @@ export class AppConf {
 
     public static showProductImages() {
         return AppConf.getInstance().showProductImages
+    }
+
+    public static getTitle() {
+        return AppConf.getInstance().title
     }
 
 }
