@@ -32,6 +32,7 @@ import {
     WorkspacesOutlined
 } from "@mui/icons-material";
 import MaterialUISwitch from "../view/MaterialUISwitch.tsx";
+import {AppConf} from "../AppConf.ts";
 
 const RedButton = styled(Button)<ButtonProps>(({ theme }) => ({
     color: theme.palette.getContrastText(red[700]),
@@ -177,7 +178,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                     <IconButton disabled>
                         <AccountCircleOutlined />
                     </IconButton>
-                    <MaterialUISwitch onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+                    <MaterialUISwitch sx={{ display: AppConf.showThemeSwitcher() ? 'flex' : 'none'}}onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
                         console.log('event: ', event)
                         console.log('checked: ', checked)
                         props.changeTheme(checked?'dark': 'light')
