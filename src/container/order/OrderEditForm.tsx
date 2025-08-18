@@ -158,8 +158,14 @@ const OrderEditForm: React.FC = () => {
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
-          toast.success(`Ordine per cliente '${order.customer}' creato con n. ${order.id}`)
-          navigate(`/orders/${order.id}`)
+
+          queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
+
+                  toast.success(`Ordine per cliente '${order.customer}' creato con n. ${order.id}`)
+              navigate(`/orders/${order.id}`)
+          }).catch((e: Error)=> {
+              manageError(e)
+          })
       }
   })
 
