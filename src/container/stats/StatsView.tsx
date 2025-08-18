@@ -80,7 +80,6 @@ const StatsField: React.FC<StatsFieldI> = (props) => {
                             valueFormatter: (v) => v && props.isAmount ? currency(v) : `${v}` }]}
                         xAxis={[{ data: props.graphData.labels, position: 'none'  }]}
                         yAxis={[{position: 'none'}]}
-                        barLabel="value"
                         slots={{ barLabel: BarLabel  }}
                     >
                     </BarChart>
@@ -456,10 +455,6 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
             </Box>
 
             <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                gap: '30px',
                 width: '100%'
             }}>
                 <Paper  sx={{
