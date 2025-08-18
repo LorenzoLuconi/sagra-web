@@ -7,7 +7,7 @@ import {
     Card,
     CardContent,
     CircularProgress,
-    LinearProgress,
+    LinearProgress, Menu, MenuItem,
     Paper,
     Tab,
     Table,
@@ -27,15 +27,17 @@ import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
 import {get, orderBy} from "lodash";
-import {DatePicker, DatePickerSlotProps} from "@mui/x-date-pickers";
 import dayjs, {Dayjs, ManipulateType} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
 import {BarChart, BarLabel, SparkLineChart} from '@mui/x-charts';
 import './Stats.css'
-import {calculateSummary, DailyProductStatI, SummaryI} from "./Summary.ts";
+import {calculateSummary, DailyProductStatI} from "./Summary.ts";
 import DepartmentStats from "./DepartmentStats.tsx";
 import {AppConf} from "../../AppConf.ts";
+import {KeyboardArrowDown} from "@mui/icons-material";
+import 'dayjs/locale/it';
+
 
 interface GraphStatsField {
     labels: string[],
@@ -406,7 +408,7 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
     const totalAmountGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalAmount), labels: dayKeys} : undefined;
     const serviceGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalServiceNumber), labels: dayKeys} : undefined;
 
-    console.log("Total Stats: ", isTotal);
+    console.log("Day Key: ", dayKeys);
 
     return (
         <Paper variant="outlined" sx={{
@@ -542,28 +544,63 @@ const DayInfoStats: React.FC<{day: Dayjs, stats: OrderStatsResponse}> = (props) 
         return <Typography>No data</Typography>
     }
 }
-const AllDaysStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
+const DailyStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
     const {stats} = props
-    const [selectedDay, setSelectedDay] = React.useState(dayjs().format('YYYY-MM-DD'))
 
-    const subStats: OrderStatsResponse = {}
-    subStats[selectedDay] = stats[selectedDay]
+    const theme = useTheme()
 
-    let component = <Typography>No Data</Typography>
+    const days = Object.keys(stats).map(d => dayjs(d)).sort((a, b) => b.diff(a, "day"))
 
-    if (subStats[selectedDay] !== undefined && subStats[selectedDay].products.length > 0) {
-        component = <TotalInfo stats={subStats}/>
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
 
+    const handleSelectDay = (day: Dayjs) => {
+        setSelectedDay(day)
+        setAnchorEl(null)
     }
 
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const [selectedDay, setSelectedDay] = React.useState(() => days[0])
+    //
+    const subStats: OrderStatsResponse = {}
+    const selectedDayString = selectedDay.format("YYYY-MM-DD");
+    subStats[selectedDayString] = stats[selectedDayString]
+    //
+    // let component = <Typography>No Data</Typography>
+    //
+    // if (subStats[selectedDay] !== undefined && subStats[selectedDay].products.length > 0) {
+    //     component = <TotalInfo stats={subStats}/>
+    // }
+
+
+
     return (
-        <Box   id={'order-search-bar'}>
-            <DatePicker
-                value={dayjs(selectedDay)}
-                onChange={ (v) => setSelectedDay(v ? v.format( 'YYYY-MM-DD') : '')}
-                slotProps={{field: { clearable: true }} as DatePickerSlotProps<true>}
-            />
-            {component}
+        <Box id={'stats-day-select'}>
+            <Paper variant="outlined" sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                p: 1,
+                mb: 1,
+                backgroundColor: theme.sagra.panelBackground,
+                borderRadius: '10px',
+            }}>
+                <Button variant="contained" endIcon={<KeyboardArrowDown />} onClick={handleClick}>
+                    { selectedDay.locale('it').format("DD MMMM")}
+                </Button>
+            </Paper>
+            <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
+                { days.map((d, idx) =>
+                    <MenuItem key={idx} onClick={() => handleSelectDay(d)}>{d.locale('it').format("DD MMMM")}</MenuItem>
+                )}
+            </Menu>
+
+            <TotalInfo stats={subStats} />
         </Box>
     )
 }
@@ -598,18 +635,14 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
                                 value={value}
                                 onChange={handleChange}
                             >
-                                <Tab label={'Totale'}></Tab>
-                                <Tab label={'Oggi'}/>
-                                <Tab label={'Giorni Precedenti'}/>
+                                <Tab label={'Totali'}></Tab>
+                                <Tab label={'Giornaliere'}/>
                             </Tabs>
                             <TabPanel value={value} index={0}>
                                 <TotalInfo stats={stats} isTotal />
                             </TabPanel>
                             <TabPanel value={value} index={1}>
-                                <DayInfoStats day={dayjs()} stats={stats} />
-                            </TabPanel>
-                            <TabPanel value={value} index={2}>
-                                <AllDaysStats stats={stats}/>
+                                <DailyStats stats={stats}/>
                             </TabPanel>
 
                         </Box>
