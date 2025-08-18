@@ -42,7 +42,7 @@ const TotalTableCompare: React.FC<{stats: OrderStatsResponse, summary: SummaryI}
                         const percent = statsOrder.totalAmount*100/summary.totalAmount;
                         return (
                                 <TableRow key={idx}  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell sx={{ textWrap: 'nowrap'}}>{day.format("DD MMMM")}</TableCell>
+                                    <TableCell sx={{ textWrap: 'nowrap'}}>{day.locale('it').format("DD MMMM")}</TableCell>
                                     <TableCell align="center">{statsOrder.totalServiceNumber}</TableCell>
                                     <TableCell align="center">{statsOrder.count}</TableCell>
                                     <TableCell align="center">{statsOrder.takeAway?.count??0}</TableCell>

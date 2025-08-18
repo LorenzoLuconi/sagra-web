@@ -567,7 +567,7 @@ const DailyStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
             </Paper>
             <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
                 { days.map((d, idx) =>
-                    <MenuItem key={idx} onClick={() => handleSelectDay(d)}>{d.locale('it').format("DD MMMM")}</MenuItem>
+                    <MenuItem key={idx} onClick={() => handleSelectDay(d)} sx={{ textTransform: 'uppercase'}}>{d.locale('it').format("DD MMMM")}</MenuItem>
                 )}
             </Menu>
 
