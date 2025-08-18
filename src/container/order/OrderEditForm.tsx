@@ -21,7 +21,7 @@ import {useMutation} from "@tanstack/react-query";
 import {
   fetchOrderCreate, fetchOrderDelete,
   fetchOrderUpdate,
-  orderByIdQuery, ordersSearchQuery,
+  ordersSearchQuery,
   productsSearchQuery
 } from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
@@ -63,11 +63,11 @@ const OrderEditForm: React.FC = () => {
       });
     },
     onSuccess: () => {
-      queryClient
-        .invalidateQueries({ queryKey: ordersSearchConf.queryKey })
-        .then(() => {
-          toast.success(`L'ordine n. ${order.id} è stato rimosso`);
-        });
+        queryClient.invalidateQueries({queryKey: ordersSearchConf.queryKey}).then(() => {
+            queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
+                toast.success(`L'ordine n. ${order.id} è stato rimosso`);
+            })
+        })
     },
     onError: (error: Error) => {
         manageError(error)
@@ -134,9 +134,7 @@ const OrderEditForm: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
 
-          const fetchOrderConf = orderByIdQuery({pathParams: {orderId: order.id}})
-
-          queryClient.invalidateQueries({queryKey: fetchOrderConf.queryKey}).then(() => {
+          queryClient.invalidateQueries({queryKey: ordersSearchConf.queryKey}).then(() => {
             queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
               toast.success(`L'ordine n. ${order.id} è stato aggiornato`)
               navigate(`/orders/${order.id}`)
@@ -158,8 +156,15 @@ const OrderEditForm: React.FC = () => {
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
-          toast.success(`Ordine per cliente '${order.customer}' creato con n. ${order.id}`)
-          navigate(`/orders/${order.id}`)
+
+          queryClient.invalidateQueries({queryKey: ordersSearchConf.queryKey}).then(() => {
+              queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
+                  toast.success(`Ordine per cliente '${order.customer}' creato con n. ${order.id}`)
+                  navigate(`/orders/${order.id}`)
+              })
+          }).catch((e: Error)=> {
+              manageError(e)
+          })
       }
   })
 
