@@ -165,7 +165,7 @@ const buildChartFromDays = (days: string[], daysInfo: DailyProductStatI[]) => {
         }
 
     }
-    console.log('BuildChartFromDays: ', xData, yData)
+    // console.log('BuildChartFromDays: ', xData, yData)
 
     return (
         <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
@@ -243,18 +243,20 @@ const buildSagraDaysRange = (): string[] => {
     return dayjsRange(new dayjs(startDay), new dayjs(endDay), 'day')
 }
 
+interface TotalTabularInfoProps {
+    productsInOrder: Record<number, StatsOrderedProducts>,
+    isTotal?: boolean
+}
 
-const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedProducts>, summary: SummaryI}> = (props) => {
-    const {productsInOrder, summary} = props
+
+const TotalTabularInfo: React.FC<TotalTabularInfoProps> = (props) => {
+    const {productsInOrder, isTotal} = props
     const theme = useTheme()
     enum ProductsOrderBy {
         name = "name",
         totalQuantity = "totalQuantity",
         totalAmount = "totalAmount",
     }
-
-
-
 
     const sagraDays: string[] = buildSagraDaysRange()
 
@@ -315,9 +317,11 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                     </TableSortLabel>
                             </TableCell>
                             <TableCell>Percentuale Importo</TableCell>
-                            <TableCell>
-                                Importi Giornalieri
-                            </TableCell>
+                            { isTotal &&
+                                <TableCell>
+                                    Importi Giornalieri
+                                </TableCell>
+                            }
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -337,8 +341,10 @@ const TotalTabularInfo: React.FC<{productsInOrder: Record<number, StatsOrderedPr
                                         <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9em' }}>{Math.round(productsInOrder[+productId].totalAmount*100/totalAmount)}%</Typography>
                                     </Box>
                                 </TableCell>
-                                <TableCell align={'center'}>
-                                    {buildChartFromDays(sagraDays, productsInOrder[+productId].days)}</TableCell>
+                                { isTotal &&
+                                    <TableCell align={'center'}>
+                                        {buildChartFromDays(sagraDays, productsInOrder[+productId].days)}</TableCell>
+                                }
                             </TableRow>
                         ))}
                     </TableBody>
@@ -377,10 +383,13 @@ const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, prod
 }
 
 
+interface TotalInfoProps {
+    stats: OrderStatsResponse
+    isTotal?: boolean
+}
 
-
-const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
-    const {stats} = props
+const TotalInfo: React.FC<TotalInfoProps> = (props) => {
+    const {stats, isTotal} = props
     const theme = useTheme();
     const [value, setValue] = React.useState(0)
     const {products} = useProducts()
@@ -394,9 +403,11 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
     const summary = calculateSummary(stats)
 
     const dayKeys = orderBy(Object.keys(stats));
-    const countGraph = { values: dayKeys.map(day => stats[day].count), labels: dayKeys};
-    const serviceGraph = { values: dayKeys.map(day => stats[day].totalServiceNumber), labels: dayKeys};
-    const totalAmountGraph = { values: dayKeys.map(day => stats[day].totalAmount), labels: dayKeys};
+    const countGraph = isTotal ? { values: dayKeys.map(day => stats[day].count), labels: dayKeys} : undefined
+    const totalAmountGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalAmount), labels: dayKeys} : undefined;
+    const serviceGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalServiceNumber), labels: dayKeys} : undefined;
+
+    console.log("Total Stats: ", isTotal);
 
     return (
         <Paper variant="outlined" sx={{
@@ -434,7 +445,7 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                     field={'Totale Incasso'}
                     value={summary.totalAmount}
                     description={summary.totalTakeAwayAmount ? `Di cui ${currency(summary.totalTakeAwayAmount) } da asporto` : ''}
-                    graphData={totalAmountGraph}
+                    graphData={ totalAmountGraph }
                     isAmount />
                 <Card sx={{ ...cardStyle}} >
                     <CardContent>
@@ -459,7 +470,7 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                     <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella prodotti venduti</Typography>
                     <TotalTabularInfo
                         productsInOrder={summary.productsTable}
-                        summary={summary}
+                        isTotal={isTotal}
                     />
                     <Button
                         onClick={() => {
@@ -496,7 +507,7 @@ const TotalInfo: React.FC<{ stats: OrderStatsResponse }> = (props) => {
                         Esporta XLS
                     </Button>
                 </Paper>
-                <Paper  sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', gap: 1, p: 2 }}>
+                <Paper  sx={{display: 'none', flexDirection: 'column', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', gap: 1, p: 2 }}>
 
                     <Tabs
                         value={value}
@@ -529,7 +540,7 @@ const DayInfoStats: React.FC<{day: Dayjs, stats: OrderStatsResponse}> = (props) 
     subStats[date] = stats[date]
 
         return (
-            <TotalInfo stats={subStats}/>
+            <TotalInfo stats={subStats} />
 
         )
     } else {
@@ -597,7 +608,7 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
                                 <Tab label={'Giorni Precedenti'}/>
                             </Tabs>
                             <TabPanel value={value} index={0}>
-                                <TotalInfo stats={stats}/>
+                                <TotalInfo stats={stats} isTotal />
                             </TabPanel>
                             <TabPanel value={value} index={1}>
                                 <DayInfoStats day={dayjs()} stats={stats} />
