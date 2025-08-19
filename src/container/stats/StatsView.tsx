@@ -17,13 +17,11 @@ import {
     useTheme
 } from "@mui/material";
 import {Product, StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
-import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
-import {get} from "lodash";
-import dayjs, {Dayjs, ManipulateType} from 'dayjs'
-import writeXlsxFile, {SheetData} from "write-excel-file";
+import dayjs, {Dayjs} from 'dayjs'
+import writeXlsxFile  from "write-excel-file";
 import toast from "react-hot-toast";
 import {BarChart, BarLabel} from '@mui/x-charts';
 import './Stats.css'
@@ -89,10 +87,10 @@ const StatsField: React.FC<StatsFieldI> = (props) => {
     )
 }
 
-interface PiePair {
-    label: string
-    value: number
-}
+// interface PiePair {
+//     label: string
+//     value: number
+// }
 
 interface TabPanelI extends React.PropsWithChildren {
     value: number
@@ -117,105 +115,103 @@ interface ResponseStatsViewI {
     stats: OrderStatsResponse
 }
 
-const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
-
-    const {productsStats, field} = props
-    const {products} = useProducts()
-    const productsK = Object.keys(productsStats)
-    const data: PiePair[] = []
-
-    for (let i = 0; i<productsK.length; i++) {
-        const {productId} = productsStats[+productsK[i]]
-        data.push({
-            label: `${products[productId].name}`,
-            value: get( productsStats[+productsK[i]], field)
-        })
-    }
-    return (
-     <PieChart
-         width={500}
-         height={400}
-         hideLegend={false}
-         sx={{fontFamily: 'Roboto'}}
-         series={[{ innerRadius: 100, outerRadius: 200, data, arcLabel: 'value' } as PieSeries]}
-     />
- )
-}
-
-
-
-const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
-
-    const {productsStats, field} = props
-    const {products} = useProducts()
-
-    const values: number[] = []
-    const labels: string[] = []
-
-    Object.values(productsStats).sort((a, b) => (get(a, field) < get(b, field) ? 1 : get(a, field) < get(b, field) ? -1 : 0))
-        .forEach( (s) => {
-            values.push(get( productsStats[s.productId], field))
-            labels.push(products[s.productId].name)
-        });
-
-    return (
-        <BarChart
-            width={500}
-            height={31*values.length}
-            layout="horizontal"
-            hideLegend
-            sx={{fontFamily: 'Roboto'}}
-
-            series={[
-                {
-                    data: values,
-                    label: 'Importo',
-                },
-            ]}
-            yAxis={[{ data: labels ,  position: 'none'}]}
-        />
-    )
-}
+// const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
+//
+//     const {productsStats, field} = props
+//     const {products} = useProducts()
+//     const productsK = Object.keys(productsStats)
+//     const data: PiePair[] = []
+//
+//     for (let i = 0; i<productsK.length; i++) {
+//         const {productId} = productsStats[+productsK[i]]
+//         data.push({
+//             label: `${products[productId].name}`,
+//             value: get( productsStats[+productsK[i]], field)
+//         })
+//     }
+//     return (
+//      <PieChart
+//          width={500}
+//          height={400}
+//          hideLegend={false}
+//          sx={{fontFamily: 'Roboto'}}
+//          series={[{ innerRadius: 100, outerRadius: 200, data, arcLabel: 'value' } as PieSeries]}
+//      />
+//  )
+// }
 
 
 
-export function dayjsRange(start: Dayjs, end: Dayjs, unit: ManipulateType, format?: string) {
-    const ff = format ?? 'YYYY-MM-DD'
-    const range = [];
-    let current = start;
-    while (!current.isAfter(end)) {
-        range.push(current.format(ff));
-        current = current.add(1, unit);
-    }
-    return range;
-}
+// const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
+//
+//     const {productsStats, field} = props
+//     const {products} = useProducts()
+//
+//     const values: number[] = []
+//     const labels: string[] = []
+//
+//     Object.values(productsStats).sort((a, b) => (get(a, field) < get(b, field) ? 1 : get(a, field) < get(b, field) ? -1 : 0))
+//         .forEach( (s) => {
+//             values.push(get( productsStats[s.productId], field))
+//             labels.push(products[s.productId].name)
+//         });
+//
+//     return (
+//         <BarChart
+//             width={500}
+//             height={31*values.length}
+//             layout="horizontal"
+//             hideLegend
+//             sx={{fontFamily: 'Roboto'}}
+//
+//             series={[
+//                 {
+//                     data: values,
+//                     label: 'Importo',
+//                 },
+//             ]}
+//             yAxis={[{ data: labels ,  position: 'none'}]}
+//         />
+//     )
+// }
+
+
+
+// export function dayjsRange(start: Dayjs, end: Dayjs, unit: ManipulateType, format?: string) {
+//     const ff = format ?? 'YYYY-MM-DD'
+//     const range = [];
+//     let current = start;
+//     while (!current.isAfter(end)) {
+//         range.push(current.format(ff));
+//         current = current.add(1, unit);
+//     }
+//     return range;
+// }
 
 
 
 const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, productsTable: Record<number, Product>) => {
     const productKeys = Object.keys(fullOrder)
-    const rows = productKeys.map((productId: number) => {
+    return productKeys.map((productId) => {
+        const id = +productId
         return (
             [
                 {
                     type: String,
-                    value: productsTable[productId].name,
-
+                    value: productsTable[id].name,
                 },
                 {
                     type: Number,
-                    value: fullOrder[productId].totalQuantity
+                    value: fullOrder[id].totalQuantity
                 },
                 {
                     type: Number,
-                    value: fullOrder[productId].totalAmount,
-                    format: '#,## €'
+                    value: fullOrder[id].totalAmount,
+                    format: '#,##0.00 €',
                 }
             ]
         )
     })
-
-    return rows
 }
 
 
