@@ -30,7 +30,6 @@ export interface SummaryI {
 }
 
 const updateProductsTable = (day: string, dayStats: StatsOrder, productsTable: Record<number, StatsOrderedProducts & DailyProductStatsI>) => {
-    console.log('updateProductsTable: ', productsTable)
     Object.values(dayStats.products).forEach(p => {
         const productInTable = productsTable[p.productId]
         if (productInTable === undefined) {

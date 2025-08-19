@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {useState} from 'react'
-import {orderStatsQuery, OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
+import {OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {
     Box,
     Button,
     Card,
     CardContent,
-    CircularProgress, Divider, IconButton,
+    CircularProgress, Divider,
     LinearProgress, Menu, MenuItem,
     Paper,
     Tab,
@@ -34,11 +34,9 @@ import {BarChart, BarLabel, SparkLineChart} from '@mui/x-charts';
 import './Stats.css'
 import {calculateSummary, DailyProductStatI} from "./Summary.ts";
 import DepartmentStats from "./DepartmentStats.tsx";
-import {AppConf} from "../../AppConf.ts";
-import {CachedOutlined, KeyboardArrowDown, PrintOutlined} from "@mui/icons-material";
+import { KeyboardArrowDown } from "@mui/icons-material";
 import 'dayjs/locale/it';
 import TotalTableCompare from "./TotalTableCompare.tsx";
-import {queryClient} from "../../main.tsx";
 import StatsToolbar from "./StatsToolbar.tsx";
 
 
@@ -398,8 +396,6 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
     const countGraph = isTotal ? { values: dayKeys.map(day => stats[day].count), labels: dayKeys} : undefined
     const totalAmountGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalAmount), labels: dayKeys} : undefined;
     const serviceGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalServiceNumber), labels: dayKeys} : undefined;
-
-    console.log("Day Key: ", dayKeys);
 
     return (
         <Paper variant="outlined" sx={{
