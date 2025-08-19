@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {useState} from 'react'
-import {OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
+import {orderStatsQuery, OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {
     Box,
     Button,
     Card,
     CardContent,
-    CircularProgress,
+    CircularProgress, Divider, IconButton,
     LinearProgress, Menu, MenuItem,
     Paper,
     Tab,
@@ -35,9 +35,11 @@ import './Stats.css'
 import {calculateSummary, DailyProductStatI} from "./Summary.ts";
 import DepartmentStats from "./DepartmentStats.tsx";
 import {AppConf} from "../../AppConf.ts";
-import {KeyboardArrowDown} from "@mui/icons-material";
+import {CachedOutlined, KeyboardArrowDown, PrintOutlined} from "@mui/icons-material";
 import 'dayjs/locale/it';
 import TotalTableCompare from "./TotalTableCompare.tsx";
+import {queryClient} from "../../main.tsx";
+import StatsToolbar from "./StatsToolbar.tsx";
 
 
 interface GraphStatsField {
@@ -81,7 +83,7 @@ const StatsField: React.FC<StatsFieldI> = (props) => {
                     <BarChart
                         series={[{ data: props.graphData.values, type: 'bar',
                             valueFormatter: (v) => v && props.isAmount ? currency(v) : `${v}` }]}
-                        xAxis={[{ data: props.graphData.labels, position: 'none'  }]}
+                        xAxis={[{ data: props.graphData.labels, position: 'none' }]}
                         yAxis={[{position: 'none'}]}
                         slots={{ barLabel: BarLabel  }}
                     >
@@ -242,7 +244,7 @@ export function dayjsRange(start: Dayjs, end: Dayjs, unit: ManipulateType, forma
 const buildSagraDaysRange = (): string[] => {
     const startDay = AppConf.getSagraStartDay()
     const endDay = AppConf.getSagraEndDay()
-    return dayjsRange(new dayjs(startDay), new dayjs(endDay), 'day')
+    return dayjsRange(dayjs(startDay),dayjs(endDay), 'day')
 }
 
 interface ProductsTableStatsProps {
@@ -261,7 +263,6 @@ const ProductsTableStats: React.FC<ProductsTableStatsProps> = (props) => {
     }
 
     const sagraDays: string[] = buildSagraDaysRange()
-
 
     const {products} = useProducts()
     const [prodOrderBy, setProdOrderBy] = useState<ProductsOrderBy>(ProductsOrderBy.totalAmount)
@@ -518,12 +519,11 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
 const DailyStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
     const {stats} = props
 
-    const theme = useTheme()
-
     const days = Object.keys(stats).map(d => dayjs(d)).sort((a, b) => b.diff(a, "day"))
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -550,31 +550,57 @@ const DailyStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
     // }
 
 
-
     return (
-        <Box id={'stats-day-select'}>
-            <Paper variant="outlined" sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                p: 1,
-                mb: 1,
-                backgroundColor: theme.sagra.panelBackground,
-                borderRadius: '10px',
-            }}>
-                <Button variant="contained" endIcon={<KeyboardArrowDown />} onClick={handleClick}>
-                    { selectedDay.locale('it').format("DD MMMM")}
-                </Button>
-            </Paper>
+        <Box >
+            <StatsToolbar
+                title={`Statistiche giornaliere del ${selectedDay.locale('it').format('DD MMMM, YYYY')}`}
+                toolbarBefore={<DayMenuButton selectedDay={selectedDay} handleClick={handleClick} />}
+            />
             <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
                 { days.map((d, idx) =>
                     <MenuItem key={idx} onClick={() => handleSelectDay(d)} sx={{ textTransform: 'uppercase'}}>{d.locale('it').format("DD MMMM")}</MenuItem>
                 )}
             </Menu>
+            <Divider sx={{ml: 1, mr: 1}} orientation="vertical" flexItem />
 
             <TotalInfo stats={subStats} />
         </Box>
     )
 }
+
+interface DayMenuButtonProps {
+    selectedDay: Dayjs
+    handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void
+}
+
+const DayMenuButton : React.FC<DayMenuButtonProps> = (props) => {
+    const {selectedDay, handleClick} = props
+
+    return (
+        <>
+            <Button variant="contained" endIcon={<KeyboardArrowDown />} sx={{ textWrap: 'nowrap'}} onClick={handleClick}>
+                { selectedDay.locale('it').format("DD MMMM")}
+            </Button>
+            <Divider sx={{ml: 1, mr: 1}} orientation="vertical" flexItem />
+        </>
+    )
+}
+
+// const DayMenu : React.FC = () => {
+//     return (
+//         <>
+//             <Button variant="contained" endIcon={<KeyboardArrowDown />} sx={{ textWrap: 'nowrap'}} onClick={handleClick}>
+//                 { selectedDay.locale('it').format("DD MMMM")}
+//             </Button>
+//             <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
+//                 { days.map((d, idx) =>
+//                     <MenuItem key={idx} onClick={() => handleSelectDay(d)} sx={{ textTransform: 'uppercase'}}>{d.locale('it').format("DD MMMM")}</MenuItem>
+//                 )}
+//             </Menu>
+//             <Divider sx={{ml: 1, mr: 1}} orientation="vertical" flexItem />
+//         </>
+//     )
+// }
 
 
 const StatsView: React.FC<ResponseStatsViewI> = (props) => {
@@ -610,6 +636,7 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
                                 <Tab label={'Giornaliere'}/>
                             </Tabs>
                             <TabPanel value={value} index={0}>
+                                <StatsToolbar title="Statistiche Totali" />
                                 <TotalInfo stats={stats} isTotal />
                             </TabPanel>
                             <TabPanel value={value} index={1}>
