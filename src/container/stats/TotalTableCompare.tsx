@@ -2,7 +2,7 @@ import {OrderStatsResponse} from "../../api/sagra/sagraComponents.ts";
 import dayjs from "dayjs";
 import {
     Box,
-    LinearProgress,
+    LinearProgress, SxProps,
     Table,
     TableBody,
     TableCell,
@@ -15,16 +15,16 @@ import {currency} from "../../utils";
 import * as React from "react";
 import {SummaryI} from "./Summary.ts";
 
-const TotalTableCompare: React.FC<{stats: OrderStatsResponse, summary: SummaryI}> = (props) => {
-    const {stats, summary} = props
+const TotalTableCompare: React.FC<{stats: OrderStatsResponse, summary: SummaryI, sx?: SxProps, isPrint?: boolean}> = (props) => {
+    const {stats, summary, sx, isPrint} = props
     const theme = useTheme();
 
     const days = Object.keys(stats).map(d => dayjs(d)).sort((a, b) => b.diff(a, "day"))
 
 
     return (
-        <TableContainer component={Box}>
-            <Table sx={{ minWidth: 500 ,backgroundColor: theme.palette.background.default }} size={'small'}>
+        <TableContainer component={Box} sx={{ ...sx}}>
+            <Table sx={{ minWidth: 500, backgroundColor: theme.palette.background.default }} size={'small'}>
                 <TableHead>
                     <TableRow>
                         <TableCell>Giorno</TableCell>
@@ -49,10 +49,14 @@ const TotalTableCompare: React.FC<{stats: OrderStatsResponse, summary: SummaryI}
                                     <TableCell align="right">{statsOrder.takeAway?.totalAmount ? currency(statsOrder.takeAway.totalAmount) : currency(0)}</TableCell>
                                     <TableCell align="right">{currency(statsOrder.totalAmount)}</TableCell>
                                     <TableCell >
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '10px' }}>
-                                            <LinearProgress sx={{height: 10, borderRadius: 5, width: '140px'}} variant="determinate" value={percent}/>
+                                        { isPrint ?
                                             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9em' }}>{Math.round(percent)}%</Typography>
-                                        </Box>
+                                            :
+                                            <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '10px' }}>
+                                                <LinearProgress sx={{height: 10, borderRadius: 5, width: '140px'}} variant="determinate" value={percent}/>
+                                                <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9em' }}>{Math.round(percent)}%</Typography>
+                                            </Box>
+                                        }
                                     </TableCell>
                                 </TableRow>
                             )

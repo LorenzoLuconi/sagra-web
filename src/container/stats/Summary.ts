@@ -27,6 +27,7 @@ export interface SummaryI {
     totalTakeAwayCount: number
     productsTable: Record<number, StatsOrderedProducts  & DailyProductStatsI>
     departments: Record<number, number>
+    totalDepartments: number
 }
 
 const updateProductsTable = (day: string, dayStats: StatsOrder, productsTable: Record<number, StatsOrderedProducts & DailyProductStatsI>) => {
@@ -60,7 +61,8 @@ export const calculateSummary = ( stats: OrderStatsResponse ) => {
         totalTakeAwayAmount: 0,
         totalTakeAwayCount: 0,
         productsTable: {},
-        departments: {}
+        departments: {},
+        totalDepartments: 0 // differisce dal totalAmount perché non ha i coperti
     }
 
     Object.keys(stats).forEach((day) => {
@@ -77,6 +79,7 @@ export const calculateSummary = ( stats: OrderStatsResponse ) => {
             } else {
                 result.departments[depStat.id] = depStat.totalAmount
             }
+            result.totalDepartments += depStat.totalAmount
         })
 
         updateProductsTable(day, dayStats, result.productsTable)

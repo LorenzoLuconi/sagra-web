@@ -1,11 +1,37 @@
 import {SummaryI} from "./Summary.ts";
 import dayjs, {Dayjs} from "dayjs";
 import {OrderStatsResponse} from "../../api/sagra/sagraComponents.ts";
-import {Box, Grid, SxProps, Typography} from "@mui/material";
+import {Box, Grid, Paper, SxProps, Typography} from "@mui/material";
 import {Logo} from "../../layout/Logo.tsx";
 import {AppConf} from "../../AppConf.ts";
 import * as React from "react";
 import {convertDate, currency, FULL_DATE_CONF} from "../../utils";
+import TotalTableCompare from "./TotalTableCompare.tsx";
+import DepartmentsTable from "./DepartmentsTable.tsx";
+import "../order/OrderPrint.css";
+
+
+const ValueStyle : SxProps = {
+    fontSize: '1.2rem',
+    fontWeight: 700,
+    ml: '5px'
+}
+
+const FieldStyle : SxProps = {
+    fontSize: '0.9rem',
+    fontWeight: 400,
+    textTransform: 'uppercase',
+    mt: 2
+}
+
+
+const TitleTableStyle : SxProps = {
+    fontSize: '1rem',
+    fontWeight: 500,
+    textTransform: 'uppercase',
+    p: 2
+}
+
 
 interface StatsPrintProps {
     stats: OrderStatsResponse
@@ -29,6 +55,16 @@ const StatsPrint : React.FC<StatsPrintProps> = (props) => {
                 <Typography sx={{ mt: 1}}>{convertDate('it', new Date(), FULL_DATE_CONF)}</Typography>
             </Box>
             <StatsPrintSummary summary={summary} days={days}/>
+            { ! day && days.length > 1 &&
+                <Paper variant="outlined" sx={{ mt: 4 }}>
+                    <Typography sx={{ ...TitleTableStyle}}>Comparazione Statistiche Giornaliere</Typography>
+                    <TotalTableCompare stats={stats} summary={summary} isPrint />
+                </Paper>
+            }
+            <Paper variant="outlined" sx={{ mt: 2 }}>
+                <Typography sx={{ ...TitleTableStyle}}>Statistiche Reparti</Typography>
+                <DepartmentsTable summary={summary} />
+            </Paper>
         </StatsPrintContainer>
     )
 }
@@ -41,18 +77,6 @@ const StatsPrintContainer = ( props: React.PropsWithChildren ) => {
     )
 }
 
-const ValueStyle : SxProps = {
-    fontSize: '1.2rem',
-    fontWeight: 700,
-    ml: '5px'
-}
-
-const FieldStyle : SxProps = {
-    fontSize: '0.9rem',
-    fontWeight: 400,
-    textTransform: 'uppercase',
-    mt: 2
-}
 
 const StatsPrintSummary : React.FC<{summary: SummaryI, days: Dayjs[]}> = (props) => {
     const {summary, days} = props
