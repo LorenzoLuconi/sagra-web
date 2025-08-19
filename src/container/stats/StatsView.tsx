@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {useState} from 'react'
+import {useRef, useState} from 'react'
 import {OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {
     Box,
@@ -38,6 +38,7 @@ import { KeyboardArrowDown } from "@mui/icons-material";
 import 'dayjs/locale/it';
 import TotalTableCompare from "./TotalTableCompare.tsx";
 import StatsToolbar from "./StatsToolbar.tsx";
+import StatsPrint from "./StatsPrint.tsx";
 
 
 interface GraphStatsField {
@@ -375,11 +376,12 @@ const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, prod
 
 interface TotalInfoProps {
     stats: OrderStatsResponse
+    printContentRef: React.RefObject<HTMLDivElement|null>
     isTotal?: boolean
 }
 
 const TotalInfo: React.FC<TotalInfoProps> = (props) => {
-    const {stats, isTotal} = props
+    const {stats, isTotal, printContentRef} = props
     const theme = useTheme();
    // const [value, setValue] = React.useState(0)
     const {products} = useProducts()
@@ -398,116 +400,125 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
     const serviceGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalServiceNumber), labels: dayKeys} : undefined;
 
     return (
-        <Paper variant="outlined" sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            p: 2,
-            backgroundColor: theme.sagra.panelBackground,
-            borderRadius: '10px',
-        }}>
-            <Box
-                sx={() => (
-                    {
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        flexWrap: 'wrap',
-                        gap: 2,
-                        width: '100%'
-                    }
-                )}>
-                <Box>
+        <>
+            <Paper variant="outlined" sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                p: 2,
+                backgroundColor: theme.sagra.panelBackground,
+                borderRadius: '10px',
+            }}>
+                <Box
+                    sx={() => (
+                        {
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: 2,
+                            width: '100%'
+                        }
+                    )}>
+                    <Box>
+                        <StatsField
+                            field={'Numero Ordini'}
+                            value={summary.count}
+                            description={summary.totalTakeAwayCount ? `Di cui ${summary.totalTakeAwayCount } da asporto` : ''}
+                            graphData={countGraph}
+                        />
+                    </Box>
                     <StatsField
-                        field={'Numero Ordini'}
-                        value={summary.count}
-                        description={summary.totalTakeAwayCount ? `Di cui ${summary.totalTakeAwayCount } da asporto` : ''}
-                        graphData={countGraph}
-                    />
+                        field={'Totale Coperti'}
+                        value={summary.totalServiceNumber}
+                        graphData={serviceGraph}/>
+                    <StatsField
+                        field={'Totale Incasso'}
+                        value={summary.totalAmount}
+                        description={summary.totalTakeAwayAmount ? `Di cui ${currency(summary.totalTakeAwayAmount) } da asporto` : ''}
+                        graphData={ totalAmountGraph }
+                        isAmount />
+                    <Card sx={{ ...cardStyle}} >
+                        <CardContent>
+                            <Typography sx={{ ...cardTitle, mb: 2}} >Statistiche Reparti</Typography>
+                            <DepartmentStats summary={summary} width={170} height={170} />
+                        </CardContent>
+                    </Card>
                 </Box>
-                <StatsField
-                    field={'Totale Coperti'}
-                    value={summary.totalServiceNumber}
-                    graphData={serviceGraph}/>
-                <StatsField
-                    field={'Totale Incasso'}
-                    value={summary.totalAmount}
-                    description={summary.totalTakeAwayAmount ? `Di cui ${currency(summary.totalTakeAwayAmount) } da asporto` : ''}
-                    graphData={ totalAmountGraph }
-                    isAmount />
-                <Card sx={{ ...cardStyle}} >
-                    <CardContent>
-                        <Typography sx={{ ...cardTitle, mb: 2}} >Statistiche Reparti</Typography>
-                        <DepartmentStats summary={summary} width={170} height={170} />
-                    </CardContent>
-                </Card>
-            </Box>
-            { isTotal &&
-                <Paper  sx={{
-                    ml: '16px',
-                    mr: '16px',
-                    p: 2,
-                    width: 'calc(100% - 32px)' }}>
-                        <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella comparazione statistiche per giorno</Typography>
-                        <TotalTableCompare stats={stats} summary={summary} />
-                </Paper>
+                { isTotal &&
+                    <Paper  sx={{
+                        ml: '16px',
+                        mr: '16px',
+                        p: 2,
+                        width: 'calc(100% - 32px)' }}>
+                            <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella comparazione statistiche per giorno</Typography>
+                            <TotalTableCompare stats={stats} summary={summary} />
+                    </Paper>
+                }
+                    <Paper  sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        width: 'calc(100% - 32px)',
+                        ml: '16px',
+                        mr: '16px',
+                        p: 2,
+                    }}>
+                        <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella prodotti venduti</Typography>
+                        <ProductsTableStats
+                            productsInOrder={summary.productsTable}
+                            days={Object.keys(stats)}
+                            isTotal={isTotal}
+                        />
+                        <Button
+                            onClick={() => {
+                                const _data = buildProductsData(summary.productsTable, products)
+
+                                const HEADER = [
+                                    {
+                                        value: 'Nome Prodotto',
+                                        fontWeight: 'bold'
+                                    },
+                                    {
+                                        value: 'Quantità',
+                                        fontWeight: 'bold'
+                                    },
+                                    {
+                                        value: 'Totale',
+                                        fontWeight: 'bold'
+                                    }
+                                ]
+
+                                const data = [HEADER, ..._data];
+
+                                writeXlsxFile(data, {
+                                    fileName: "file.xlsx",
+                                }).then(() => {
+                                    toast.success('File excel generato con successo')
+                                }).catch(() => {
+                                    toast.error('Si è verificato un errore nella generazione del file excel')
+                                })
+
+
+                            }}
+                        >
+                            Esporta XLS
+                        </Button>
+                    </Paper>
+            </Paper>
+            {
+                printContentRef &&
+                    <div ref={printContentRef} className="printContent print-container">
+                        <StatsPrint stats={stats} summary={summary} />
+                    </div>
             }
-                <Paper  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: 'calc(100% - 32px)',
-                    ml: '16px',
-                    mr: '16px',
-                    p: 2,
-                }}>
-                    <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella prodotti venduti</Typography>
-                    <ProductsTableStats
-                        productsInOrder={summary.productsTable}
-                        days={Object.keys(stats)}
-                        isTotal={isTotal}
-                    />
-                    <Button
-                        onClick={() => {
-                            const _data = buildProductsData(summary.productsTable, products)
 
-                            const HEADER = [
-                                {
-                                    value: 'Nome Prodotto',
-                                    fontWeight: 'bold'
-                                },
-                                {
-                                    value: 'Quantità',
-                                    fontWeight: 'bold'
-                                },
-                                {
-                                    value: 'Totale',
-                                    fontWeight: 'bold'
-                                }
-                            ]
-
-                            const data = [HEADER, ..._data];
-
-                            writeXlsxFile(data, {
-                                fileName: "file.xlsx",
-                            }).then(() => {
-                                toast.success('File excel generato con successo')
-                            }).catch(() => {
-                                toast.error('Si è verificato un errore nella generazione del file excel')
-                            })
-
-
-                        }}
-                    >
-                        Esporta XLS
-                    </Button>
-                </Paper>
-        </Paper>
+        </>
     )
 }
 
-const DailyStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
-    const {stats} = props
+const DailyStats: React.FC<{stats: OrderStatsResponse, printContentRef: React.RefObject<HTMLDivElement|null>}> = (props) => {
+    const {stats, printContentRef} = props
 
     const days = Object.keys(stats).map(d => dayjs(d)).sort((a, b) => b.diff(a, "day"))
 
@@ -544,6 +555,7 @@ const DailyStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
         <Box >
             <StatsToolbar
                 title={`Statistiche giornaliere del ${selectedDay.locale('it').format('DD MMMM, YYYY')}`}
+                printContentRef={printContentRef}
                 toolbarBefore={<DayMenuButton selectedDay={selectedDay} handleClick={handleClick} />}
             />
             <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
@@ -553,7 +565,7 @@ const DailyStats: React.FC<{stats: OrderStatsResponse}> = (props) => {
             </Menu>
             <Divider sx={{ml: 1, mr: 1}} orientation="vertical" flexItem />
 
-            <TotalInfo stats={subStats} />
+            <TotalInfo stats={subStats} printContentRef={printContentRef}/>
         </Box>
     )
 }
@@ -597,6 +609,8 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
     const {stats} = props
     const [value, setValue] = React.useState(0)
 
+    const printContentRef = useRef<HTMLDivElement>(null);
+
     const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
@@ -626,11 +640,12 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
                                 <Tab label={'Giornaliere'}/>
                             </Tabs>
                             <TabPanel value={value} index={0}>
-                                <StatsToolbar title="Statistiche Totali" />
-                                <TotalInfo stats={stats} isTotal />
+                                <StatsToolbar title="Statistiche Totali" printContentRef={printContentRef??undefined} />
+                                <TotalInfo stats={stats} printContentRef={printContentRef} isTotal />
                             </TabPanel>
                             <TabPanel value={value} index={1}>
-                                <DailyStats stats={stats}/>
+                                <DailyStats stats={stats} printContentRef={printContentRef} />
+
                             </TabPanel>
 
                         </Box>

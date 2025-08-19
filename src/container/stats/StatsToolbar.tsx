@@ -3,15 +3,20 @@ import {Box, Divider, IconButton, Paper, Typography, useTheme} from "@mui/materi
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
 import {orderStatsQuery} from "../../api/sagra/sagraComponents.ts";
+import {useReactToPrint} from "react-to-print";
 
 interface StatsToolbarProps {
     title?: string
     toolbarBefore?: React.ReactElement
+    printContentRef: React.RefObject<HTMLDivElement|null>
 }
 
 const StatsToolbar: React.FC<StatsToolbarProps> = (props) => {
-    const {title,toolbarBefore} = props
-    const theme = useTheme()
+    const {title,toolbarBefore, printContentRef} = props
+    const theme = useTheme();
+
+    const reactToPrintFn = useReactToPrint({ contentRef: printContentRef });
+
 
     const handleRefreshStats = () => {
         queryClient.invalidateQueries({queryKey: orderStatsQuery({}).queryKey}).then(() => {
@@ -38,8 +43,8 @@ const StatsToolbar: React.FC<StatsToolbarProps> = (props) => {
                 justifyContent: 'flex-end', }}
             >
                 { toolbarBefore }
-                <IconButton disabled>
-                    <PrintOutlined  />
+                <IconButton >
+                    <PrintOutlined onClick={reactToPrintFn} />
                 </IconButton>
 
                 <Divider sx={{ml: 1, mr: 1}} orientation="vertical" flexItem />
