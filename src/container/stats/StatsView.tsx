@@ -319,19 +319,22 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
                                     },
                                     {
                                         value: 'Quantità',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        align: 'center',
                                     },
                                     {
                                         value: 'Totale',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        align: 'center'
                                     }
                                 ]
 
                                 const data = [HEADER, ..._data];
-                                console.log(data)
 
+                                // @ts-ignore
                                 writeXlsxFile(data, {
-                                    fileName: "file.xlsx",
+                                    columns: [{ width: 50}],
+                                    fileName: "statistiche_sagra.xlsx",
                                 }).then(() => {
                                     toast.success('File excel generato con successo')
                                 }).catch(() => {
