@@ -13,7 +13,7 @@ interface DepartmentStatsProps {
     height?: number
 }
 
-const DepartmentStats : React.FC<DepartmentStatsProps> = (props: DepartmentStatsProps) => {
+const DepartmentsStatsPie : React.FC<DepartmentStatsProps> = (props: DepartmentStatsProps) => {
     const { summary } = props;
 
 
@@ -83,4 +83,4 @@ const DepartmentStats : React.FC<DepartmentStatsProps> = (props: DepartmentStats
 
 }
 
-export default DepartmentStats
+export default DepartmentsStatsPie

@@ -33,7 +33,7 @@ import toast from "react-hot-toast";
 import {BarChart, BarLabel, SparkLineChart} from '@mui/x-charts';
 import './Stats.css'
 import {calculateSummary, DailyProductStatI} from "./Summary.ts";
-import DepartmentStats from "./DepartmentStats.tsx";
+import DepartmentsStatsPie from "./DepartmentsStatsPie.tsx";
 import { KeyboardArrowDown } from "@mui/icons-material";
 import 'dayjs/locale/it';
 import TotalTableCompare from "./TotalTableCompare.tsx";
@@ -442,7 +442,7 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
                     <Card sx={{ ...cardStyle}} >
                         <CardContent>
                             <Typography sx={{ ...cardTitle, mb: 2}} >Statistiche Reparti</Typography>
-                            <DepartmentStats summary={summary} width={170} height={170} />
+                            <DepartmentsStatsPie summary={summary} width={170} height={170} />
                         </CardContent>
                     </Card>
                 </Box>

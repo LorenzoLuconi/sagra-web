@@ -5,7 +5,7 @@ import {departmentsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {useQuery} from "@tanstack/react-query";
 import {currency} from "../../utils";
 
-const DepartmentsTable: React.FC<{ summary: SummaryI, sx?: SxProps }> = (props) => {
+const DepartmentsStatsTable: React.FC<{ summary: SummaryI, sx?: SxProps }> = (props) => {
     const {summary} = props;
 
 
@@ -57,4 +57,4 @@ const DepartmentsTable: React.FC<{ summary: SummaryI, sx?: SxProps }> = (props) 
     )
 }
 
-export default DepartmentsTable;
+export default DepartmentsStatsTable;

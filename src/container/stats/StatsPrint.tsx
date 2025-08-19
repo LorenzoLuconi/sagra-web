@@ -7,7 +7,7 @@ import {AppConf} from "../../AppConf.ts";
 import * as React from "react";
 import {convertDate, currency, FULL_DATE_CONF} from "../../utils";
 import TotalTableCompare from "./TotalTableCompare.tsx";
-import DepartmentsTable from "./DepartmentsTable.tsx";
+import DepartmentsStatsTable from "./DepartmentsStatsTable.tsx";
 import "../order/OrderPrint.css";
 
 
@@ -63,7 +63,7 @@ const StatsPrint : React.FC<StatsPrintProps> = (props) => {
             }
             <Paper variant="outlined" sx={{ mt: 2 }}>
                 <Typography sx={{ ...TitleTableStyle}}>Statistiche Reparti</Typography>
-                <DepartmentsTable summary={summary} />
+                <DepartmentsStatsTable summary={summary} />
             </Paper>
         </StatsPrintContainer>
     )
