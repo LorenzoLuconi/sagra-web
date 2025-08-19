@@ -241,28 +241,21 @@ export function dayjsRange(start: Dayjs, end: Dayjs, unit: ManipulateType, forma
     return range;
 }
 
-const buildSagraDaysRange = (): string[] => {
-    const startDay = AppConf.getSagraStartDay()
-    const endDay = AppConf.getSagraEndDay()
-    return dayjsRange(dayjs(startDay),dayjs(endDay), 'day')
-}
-
 interface ProductsTableStatsProps {
-    productsInOrder: Record<number, StatsOrderedProducts>,
+    productsInOrder: Record<number, StatsOrderedProducts>
+    days: string[]
     isTotal?: boolean
 }
 
 
 const ProductsTableStats: React.FC<ProductsTableStatsProps> = (props) => {
-    const {productsInOrder, isTotal} = props
+    const {productsInOrder, isTotal, days} = props
     const theme = useTheme()
     enum ProductsOrderBy {
         name = "name",
         totalQuantity = "totalQuantity",
         totalAmount = "totalAmount",
     }
-
-    const sagraDays: string[] = buildSagraDaysRange()
 
     const {products} = useProducts()
     const [prodOrderBy, setProdOrderBy] = useState<ProductsOrderBy>(ProductsOrderBy.totalAmount)
@@ -344,7 +337,7 @@ const ProductsTableStats: React.FC<ProductsTableStatsProps> = (props) => {
                                 </TableCell>
                                 { isTotal &&
                                     <TableCell align="center">
-                                        {buildChartFromDays(sagraDays, productsInOrder[+productId].days)}</TableCell>
+                                        {buildChartFromDays(days, productsInOrder[+productId].days)}</TableCell>
                                 }
                             </TableRow>
                         ))}
@@ -390,12 +383,12 @@ interface TotalInfoProps {
 const TotalInfo: React.FC<TotalInfoProps> = (props) => {
     const {stats, isTotal} = props
     const theme = useTheme();
-    const [value, setValue] = React.useState(0)
+   // const [value, setValue] = React.useState(0)
     const {products} = useProducts()
 
-    const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
+    // const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+    //     setValue(newValue);
+    // };
 
 
 
@@ -475,6 +468,7 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
                     <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella prodotti venduti</Typography>
                     <ProductsTableStats
                         productsInOrder={summary.productsTable}
+                        days={Object.keys(stats)}
                         isTotal={isTotal}
                     />
                     <Button
