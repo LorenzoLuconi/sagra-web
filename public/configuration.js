@@ -3,5 +3,6 @@ window['sagraWeb'] = {
     sagraEndDay: '2025-08-10',
     apiUrl: 'http://localhost:8080',
     showProductImages: false,
-    title: 'Sagra'
+    title: 'Sagra',
+    showThemeSwitcher: false
 }
