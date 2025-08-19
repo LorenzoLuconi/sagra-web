@@ -23,7 +23,7 @@ import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
 import {get} from "lodash";
 import dayjs, {Dayjs, ManipulateType} from 'dayjs'
-import writeXlsxFile from "write-excel-file";
+import writeXlsxFile, {SheetData} from "write-excel-file";
 import toast from "react-hot-toast";
 import {BarChart, BarLabel} from '@mui/x-charts';
 import './Stats.css'
@@ -222,11 +222,10 @@ const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, prod
 interface TotalInfoProps {
     stats: OrderStatsResponse
     printContentRef: React.RefObject<HTMLDivElement|null>
-    isTotal?: boolean
 }
 
 const TotalInfo: React.FC<TotalInfoProps> = (props) => {
-    const {stats, isTotal, printContentRef} = props
+    const {stats, printContentRef} = props
     const theme = useTheme();
    // const [value, setValue] = React.useState(0)
     const {products} = useProducts()
@@ -235,11 +234,10 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
     //     setValue(newValue);
     // };
 
-
-
     const summary = calculateSummary(stats)
 
     const dayKeys = Object.keys(stats);
+    const isTotal = dayKeys.length > 1
     const countGraph = isTotal ? { values: dayKeys.map(day => stats[day].count), labels: dayKeys} : undefined
     const totalAmountGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalAmount), labels: dayKeys} : undefined;
     const serviceGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalServiceNumber), labels: dayKeys} : undefined;
@@ -313,7 +311,6 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
                         <ProductsTableStats
                             productsInOrder={summary.productsTable}
                             days={Object.keys(stats)}
-                            isTotal={isTotal}
                         />
                         <Button
                             onClick={() => {
@@ -335,6 +332,7 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
                                 ]
 
                                 const data = [HEADER, ..._data];
+                                console.log(data)
 
                                 writeXlsxFile(data, {
                                     fileName: "file.xlsx",
@@ -463,7 +461,7 @@ const StatsView: React.FC<ResponseStatsViewI> = (props) => {
                             </Tabs>
                             <TabPanel value={value} index={0}>
                                 <StatsToolbar title="Statistiche Totali" printContentRef={printContentRef??undefined} />
-                                <TotalInfo stats={stats} printContentRef={printContentRef} isTotal />
+                                <TotalInfo stats={stats} printContentRef={printContentRef} />
                             </TabPanel>
                             <TabPanel value={value} index={1}>
                                 <DailyStats stats={stats} printContentRef={printContentRef} />

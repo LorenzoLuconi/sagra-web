@@ -19,6 +19,7 @@ import {currency} from "../../utils";
 import {StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {SparkLineChart} from "@mui/x-charts";
 import {DailyProductStatI} from "./Summary.ts";
+import dayjs from "dayjs";
 
 
 enum OrderDirection {
@@ -29,19 +30,21 @@ enum OrderDirection {
 interface ProductsTableStatsProps {
     productsInOrder: Record<number, StatsOrderedProducts>
     days: string[]
-    isTotal?: boolean
     isPrint?: boolean
 }
 
+enum ProductsOrderBy {
+    name = "name",
+    totalQuantity = "totalQuantity",
+    totalAmount = "totalAmount",
+}
+
 export const ProductsStatsTable: React.FC<ProductsTableStatsProps> = (props) => {
-    const {productsInOrder, isTotal, isPrint, days} = props
+    const {productsInOrder, isPrint, days} = props
     const theme = useTheme()
 
-    enum ProductsOrderBy {
-        name = "name",
-        totalQuantity = "totalQuantity",
-        totalAmount = "totalAmount",
-    }
+    const isTotal = days.length > 1
+    const isToday = ! isTotal &&  days[0] === dayjs().format("YYYY-MM-DD")
 
     const {products} = useProducts()
     const [prodOrderBy, setProdOrderBy] = useState<ProductsOrderBy>(ProductsOrderBy.totalAmount)
@@ -92,6 +95,9 @@ export const ProductsStatsTable: React.FC<ProductsTableStatsProps> = (props) => 
                                 Quantità
                             </TableSortLabel>
                         </TableCell>
+                        { isToday &&
+                            <TableCell align="center">Quant. Iniziale</TableCell>
+                        }
                         <TableCell sortDirection={orderDirection} align="right">
                             <TableSortLabel active={prodOrderBy === ProductsOrderBy.totalAmount}
                                             direction={orderDirection}
@@ -118,6 +124,7 @@ export const ProductsStatsTable: React.FC<ProductsTableStatsProps> = (props) => 
                                 {products[+productId].name}
                             </TableCell>
                             <TableCell align="center">{productsInOrder[+productId].totalQuantity}</TableCell>
+                            { isToday && <TableCell align="center">{products[+productId].initialQuantity}</TableCell> }
                             <TableCell align="right">{currency(productsInOrder[+productId].totalAmount)}</TableCell>
                             <TableCell>
                                 { isPrint ?

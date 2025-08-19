@@ -68,7 +68,7 @@ const StatsPrint : React.FC<StatsPrintProps> = (props) => {
             </Paper>
             <Paper className="page-break" variant="outlined">
                 <Typography sx={{ ...TitleTableStyle}}>Statistiche Prodotti Venduti</Typography>
-                <ProductsStatsTable productsInOrder={summary.productsTable} days={daysString} isTotal={ !!day } isPrint />
+                <ProductsStatsTable productsInOrder={summary.productsTable} days={daysString} isPrint />
             </Paper>
         </StatsPrintContainer>
     )
