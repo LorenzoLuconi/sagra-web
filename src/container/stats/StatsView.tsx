@@ -453,7 +453,7 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
                         p: 2,
                         width: 'calc(100% - 32px)' }}>
                             <Typography sx={{ ...cardTitle, marginBottom: 2}}>Tabella comparazione statistiche per giorno</Typography>
-                            <TotalTableCompare stats={stats} summary={summary} />
+                            <TotalTableCompare stats={stats} summary={summary}  sx={{ minWidth: 500, backgroundColor: theme.palette.background.default }}/>
                     </Paper>
                 }
                     <Paper  sx={{
