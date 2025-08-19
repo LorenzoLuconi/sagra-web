@@ -6,10 +6,8 @@ import {
     Table,
     TableBody,
     TableCell,
-    TableContainer,
     TableHead,
     TableRow, Typography,
-    useTheme
 } from "@mui/material";
 import {currency} from "../../utils";
 import * as React from "react";

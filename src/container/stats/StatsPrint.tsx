@@ -9,6 +9,7 @@ import {convertDate, currency, FULL_DATE_CONF} from "../../utils";
 import TotalTableCompare from "./TotalTableCompare.tsx";
 import DepartmentsStatsTable from "./DepartmentsStatsTable.tsx";
 import "../order/OrderPrint.css";
+import ProductsStatsTable from "./ProductsStatsTable.tsx";
 
 
 const ValueStyle : SxProps = {
@@ -36,23 +37,23 @@ const TitleTableStyle : SxProps = {
 interface StatsPrintProps {
     stats: OrderStatsResponse
     summary: SummaryI
-    day?: Dayjs
 }
 
 const StatsPrint : React.FC<StatsPrintProps> = (props) => {
 
-    const {stats, summary, day} = props
+    const {stats, summary} = props
 
     const daysString = Object.keys(stats);
     const days = daysString.map( (d) => dayjs(d))
 
+    const day = days.length === 1 ? days[0] : undefined
 
     return (
         <StatsPrintContainer>
             <StatPrintLogo/>
             <Box sx={{ width: '100%', mt: 4, mb: 1, borderBottom: 1, display: "flex" , justifyContent: "space-between"}}>
-                <Typography sx={{ fontSize: '1.5em', fontWeight: 700}} component="h2" > { day ? `Statistiche Giornaliere del ${day.locale('it').format('DD MMMM, YYYYY')}` : "Statistiche Totali"}</Typography>
-                <Typography sx={{ mt: 1}}>{convertDate('it', new Date(), FULL_DATE_CONF)}</Typography>
+                <Typography sx={{ fontSize: '1.3em', fontWeight: 700}} component="h2" > { day ? `Statistiche del ${day.locale('it').format('DD MMMM, YYYY')}` : "Statistiche Totali"}</Typography>
+                <Typography sx={{ mt: 1, fontSize: '0.8em'}}>({convertDate('it', new Date(), FULL_DATE_CONF)})</Typography>
             </Box>
             <StatsPrintSummary summary={summary} days={days}/>
             { ! day && days.length > 1 &&
@@ -64,6 +65,10 @@ const StatsPrint : React.FC<StatsPrintProps> = (props) => {
             <Paper variant="outlined" sx={{ mt: 2 }}>
                 <Typography sx={{ ...TitleTableStyle}}>Statistiche Reparti</Typography>
                 <DepartmentsStatsTable summary={summary} />
+            </Paper>
+            <Paper className="page-break" variant="outlined">
+                <Typography sx={{ ...TitleTableStyle}}>Statistiche Prodotti Venduti</Typography>
+                <ProductsStatsTable productsInOrder={summary.productsTable} days={daysString} isTotal={ !!day } isPrint />
             </Paper>
         </StatsPrintContainer>
     )

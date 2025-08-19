@@ -1,22 +1,17 @@
 import * as React from 'react'
-import {useRef, useState} from 'react'
+import {useRef} from 'react'
 import {OrderStatsResponse, productsSearchQuery} from "../../api/sagra/sagraComponents.ts";
 import {
     Box,
     Button,
     Card,
     CardContent,
-    CircularProgress, Divider,
-    LinearProgress, Menu, MenuItem,
+    CircularProgress,
+    Divider,
+    Menu,
+    MenuItem,
     Paper,
     Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TableSortLabel,
     Tabs,
     Typography,
     useTheme
@@ -26,19 +21,20 @@ import {PieChart, PieSeries} from '@mui/x-charts/PieChart';
 import {currency} from "../../utils";
 import ProductsStore, {useProducts} from "../../context/ProductsStore.tsx";
 import {useQuery} from "@tanstack/react-query";
-import {get, orderBy} from "lodash";
+import {get} from "lodash";
 import dayjs, {Dayjs, ManipulateType} from 'dayjs'
 import writeXlsxFile from "write-excel-file";
 import toast from "react-hot-toast";
-import {BarChart, BarLabel, SparkLineChart} from '@mui/x-charts';
+import {BarChart, BarLabel} from '@mui/x-charts';
 import './Stats.css'
-import {calculateSummary, DailyProductStatI} from "./Summary.ts";
+import {calculateSummary } from "./Summary.ts";
 import DepartmentsStatsPie from "./DepartmentsStatsPie.tsx";
-import { KeyboardArrowDown } from "@mui/icons-material";
+import {KeyboardArrowDown} from "@mui/icons-material";
 import 'dayjs/locale/it';
 import TotalTableCompare from "./TotalTableCompare.tsx";
 import StatsToolbar from "./StatsToolbar.tsx";
 import StatsPrint from "./StatsPrint.tsx";
+import ProductsTableStats from "./ProductsStatsTable.tsx";
 
 
 interface GraphStatsField {
@@ -121,15 +117,6 @@ interface ResponseStatsViewI {
     stats: OrderStatsResponse
 }
 
-/*
- <DayStats key={day} day={day} stats={stats[day]}/>
- */
-
-
-
-
-
-
 const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
 
     const {productsStats, field} = props
@@ -155,41 +142,7 @@ const StatsPieChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
  )
 }
 
-const buildChartFromDays = (days: string[], daysInfo: DailyProductStatI[]) => {
-    const xData = []
-    const yData = []
-    for (let i=0; i<days.length; i++) {
-        xData.push(days[i])
-        const idx = daysInfo.findIndex((element) => element.day === days[i])
-        if (idx === -1) {
-            yData.push(0)
-        } else {
-            yData.push(daysInfo[idx].dailyAmount)
-        }
 
-    }
-    // console.log('BuildChartFromDays: ', xData, yData)
-
-    return (
-        <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
-            <SparkLineChart
-                data={yData}
-                width={100}
-                height={32}
-                plotType="bar"
-                showHighlight
-                showTooltip
-                color="hsl(210, 98%, 42%)"
-                xAxis={{
-                    scaleType: 'band',
-                    data: xData
-                }}
-            />
-        </div>
-    )
-
-
-}
 
 const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProducts>, field: string}> = (props) => {
 
@@ -224,10 +177,7 @@ const StatsBarChart: React.FC<{productsStats: Record<number, StatsOrderedProduct
     )
 }
 
-enum OrderDirection {
-    asc = "asc",
-    desc = "desc"
-}
+
 
 export function dayjsRange(start: Dayjs, end: Dayjs, unit: ManipulateType, format?: string) {
     const ff = format ?? 'YYYY-MM-DD'
@@ -240,111 +190,6 @@ export function dayjsRange(start: Dayjs, end: Dayjs, unit: ManipulateType, forma
     return range;
 }
 
-interface ProductsTableStatsProps {
-    productsInOrder: Record<number, StatsOrderedProducts>
-    days: string[]
-    isTotal?: boolean
-}
-
-
-const ProductsTableStats: React.FC<ProductsTableStatsProps> = (props) => {
-    const {productsInOrder, isTotal, days} = props
-    const theme = useTheme()
-    enum ProductsOrderBy {
-        name = "name",
-        totalQuantity = "totalQuantity",
-        totalAmount = "totalAmount",
-    }
-
-    const {products} = useProducts()
-    const [prodOrderBy, setProdOrderBy] = useState<ProductsOrderBy>(ProductsOrderBy.totalAmount)
-    const [orderDirection, setOrderDirection] = useState<OrderDirection>(OrderDirection.desc)
-
-    const totalAmount = Object.values(productsInOrder).reduce((a, c) => a + c.totalAmount, 0);
-
-    const productsIds = () => {
-        const values = Object.values(productsInOrder);
-        switch (prodOrderBy) {
-            case ProductsOrderBy.totalQuantity:
-            case ProductsOrderBy.totalAmount:
-                return orderBy(values, prodOrderBy, orderDirection).map( v => v.productId);
-            case ProductsOrderBy.name: {
-                const valuesToOrder = values.map(p => {
-                    return {
-                        productId: p.productId,
-                        name: products[p.productId].name,
-                    }
-                });
-
-                return orderBy(valuesToOrder, prodOrderBy, orderDirection).map( v => v.productId);
-            }
-        }
-    }
-
-    const handleChangeOrder = (field: ProductsOrderBy) => {
-        setProdOrderBy(field)
-        setOrderDirection(orderDirection === OrderDirection.desc ? OrderDirection.asc : OrderDirection.desc)
-    }
-
-    return (
-            <TableContainer component={Box}>
-                <Table sx={{ minWidth: 650 ,backgroundColor: theme.palette.background.default }} size={'small'} aria-label="total table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell sortDirection={orderDirection}>
-                                <TableSortLabel active={prodOrderBy === ProductsOrderBy.name} direction={orderDirection}
-                                                onClick={ () => handleChangeOrder(ProductsOrderBy.name) } >
-                                Prodotto
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell sortDirection={orderDirection} align="center">
-                                    <TableSortLabel active={prodOrderBy === ProductsOrderBy.totalQuantity} direction={orderDirection}
-                                                    onClick={ () => handleChangeOrder(ProductsOrderBy.totalQuantity) } >
-                                        Quantità
-                                    </TableSortLabel>
-                                </TableCell>
-                            <TableCell sortDirection={orderDirection} align="right">
-                                    <TableSortLabel active={prodOrderBy === ProductsOrderBy.totalAmount} direction={orderDirection}
-                                                    onClick={ () => handleChangeOrder(ProductsOrderBy.totalAmount) } >
-                                    Importo
-                                    </TableSortLabel>
-                            </TableCell>
-                            <TableCell>Percentuale Importo</TableCell>
-                            { isTotal &&
-                                <TableCell>
-                                    Importi Giornalieri
-                                </TableCell>
-                            }
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {productsIds().map((productId) => (
-                            <TableRow
-                                key={productId}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                                <TableCell component="th" scope="row">
-                                    {products[+productId].name}
-                                </TableCell>
-                                <TableCell align="center">{productsInOrder[+productId].totalQuantity}</TableCell>
-                                <TableCell align="right">{currency(productsInOrder[+productId].totalAmount)}</TableCell>
-                                <TableCell>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <LinearProgress sx={{height: 10, borderRadius: 5, width: '140px'}} variant="determinate" value={productsInOrder[+productId].totalAmount*100/totalAmount}/>
-                                        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9em' }}>{Math.round(productsInOrder[+productId].totalAmount*100/totalAmount)}%</Typography>
-                                    </Box>
-                                </TableCell>
-                                { isTotal &&
-                                    <TableCell align="center">
-                                        {buildChartFromDays(days, productsInOrder[+productId].days)}</TableCell>
-                                }
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-    )
-}
 
 
 const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, productsTable: Record<number, Product>) => {
@@ -543,13 +388,6 @@ const DailyStats: React.FC<{stats: OrderStatsResponse, printContentRef: React.Re
     const subStats: OrderStatsResponse = {}
     const selectedDayString = selectedDay.format("YYYY-MM-DD");
     subStats[selectedDayString] = stats[selectedDayString]
-    //
-    // let component = <Typography>No Data</Typography>
-    //
-    // if (subStats[selectedDay] !== undefined && subStats[selectedDay].products.length > 0) {
-    //     component = <TotalInfo stats={subStats}/>
-    // }
-
 
     return (
         <Box >
@@ -587,22 +425,6 @@ const DayMenuButton : React.FC<DayMenuButtonProps> = (props) => {
         </>
     )
 }
-
-// const DayMenu : React.FC = () => {
-//     return (
-//         <>
-//             <Button variant="contained" endIcon={<KeyboardArrowDown />} sx={{ textWrap: 'nowrap'}} onClick={handleClick}>
-//                 { selectedDay.locale('it').format("DD MMMM")}
-//             </Button>
-//             <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
-//                 { days.map((d, idx) =>
-//                     <MenuItem key={idx} onClick={() => handleSelectDay(d)} sx={{ textTransform: 'uppercase'}}>{d.locale('it').format("DD MMMM")}</MenuItem>
-//                 )}
-//             </Menu>
-//             <Divider sx={{ml: 1, mr: 1}} orientation="vertical" flexItem />
-//         </>
-//     )
-// }
 
 
 const StatsView: React.FC<ResponseStatsViewI> = (props) => {
