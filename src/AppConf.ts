@@ -4,6 +4,7 @@ interface SagraWebConfI {
     apiUrl: string
     showProductImages: boolean
     title: string
+    showThemeSwitcher: boolean
 }
 
 export class AppConf {
@@ -13,6 +14,7 @@ export class AppConf {
     private sagraEndDay: string
     private title: string
     private showProductImages: boolean
+    private showThemeSwitcher: boolean
     private constructor()  {
         const {sagraWeb} = window as SagraWebConfI
         this.apiUrl = sagraWeb.apiUrl
@@ -20,6 +22,7 @@ export class AppConf {
         this.sagraEndDay = sagraWeb.sagraEndDay
         this.showProductImages = sagraWeb.showProductImages
         this.title = sagraWeb.title
+        this.showThemeSwitcher = sagraWeb.showThemeSwitcher
     }
 
     public static getInstance() {
@@ -47,6 +50,10 @@ export class AppConf {
 
     public static getTitle() {
         return AppConf.getInstance().title
+    }
+
+    public static showThemeSwitcher() {
+        return AppConf.getInstance().showThemeSwitcher
     }
 
 }

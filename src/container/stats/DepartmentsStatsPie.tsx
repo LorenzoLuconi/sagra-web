@@ -13,7 +13,7 @@ interface DepartmentStatsProps {
     height?: number
 }
 
-const DepartmentStats : React.FC<DepartmentStatsProps> = (props: DepartmentStatsProps) => {
+const DepartmentsStatsPie : React.FC<DepartmentStatsProps> = (props: DepartmentStatsProps) => {
     const { summary } = props;
 
 
@@ -47,10 +47,8 @@ const DepartmentStats : React.FC<DepartmentStatsProps> = (props: DepartmentStats
         departmentMap[department.id] = department.name;
     })
 
-    const totalDepartments = Object.values(summary.departments).reduce((a, v) => a + v, 0);
-
     const getArcLabel = (params: DefaultizedPieValueType) => {
-        const percent = params.value / totalDepartments;
+        const percent = params.value / summary.totalDepartments;
         return `${(percent * 100).toFixed(0)}%`;
     };
 
@@ -85,4 +83,4 @@ const DepartmentStats : React.FC<DepartmentStatsProps> = (props: DepartmentStats
 
 }
 
-export default DepartmentStats
+export default DepartmentsStatsPie

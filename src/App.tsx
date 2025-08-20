@@ -26,6 +26,7 @@ import AuthProvider, {ProtectedComponent} from "./context/AuthProvider.tsx";
 import Login from './container/login/Login.tsx'
 import Logout from './container/login/Logout.tsx'
 import {useLocalStorage} from "./utils";
+import DiscountContainer from "./container/discount/DiscountContainer.tsx";
 
 const UnmanagedPathView = React.lazy(() => import("./view/UnmanagedPathView.tsx"))
 const MonitorContainer = React.lazy(() => import("./container/monitor/MonitorContainer.tsx"))
@@ -33,6 +34,7 @@ const OrderEdit = React.lazy(() => import('./container/order/OrderEdit.tsx'))
 const DepartmentContainer = React.lazy(() => import("./container/department/DeparmentContainer.tsx"))
 const ProductContainer = React.lazy(() => import('./container/product/ProductContainer.tsx'))
 const DiscountContainer = React.lazy(()=> import('./container/department/DeparmentContainer.tsx'))
+const CourseContainer = React.lazy(() => import("./container/course/CourseContainer.tsx"))
 const CourseContainer = React.lazy(() => import("./container/course/CourseContainer.tsx"))
 const OrderNew = React.lazy(() => import("./container/order/OrderNew.tsx"))
 const ProductQuantityUpdateContainer = React.lazy(() => import("./container/product/ProductQuantityUpdateContainer.tsx"))
