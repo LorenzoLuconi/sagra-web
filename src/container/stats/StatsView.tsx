@@ -190,11 +190,11 @@ interface ResponseStatsViewI {
 
 
 
-const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, productsTable: Record<number, Product>) => {
+const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, productsTable: Record<number, Product>, addInitial: boolean) => {
     const productKeys = Object.keys(fullOrder)
     return productKeys.map((productId) => {
         const id = +productId
-        return (
+        const row =
             [
                 {
                     type: String,
@@ -210,7 +210,12 @@ const buildProductsData = (fullOrder: Record<number, StatsOrderedProducts>, prod
                     format: '#,##0.00 €',
                 }
             ]
-        )
+
+        if ( addInitial ) {
+            row.splice(1, 0, {  type: Number, value: productsTable[id].initialQuantity })
+        }
+
+        return row;
     })
 }
 
@@ -237,6 +242,45 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
     const countGraph = isTotal ? { values: dayKeys.map(day => stats[day].count), labels: dayKeys} : undefined
     const totalAmountGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalAmount), labels: dayKeys} : undefined;
     const serviceGraph = isTotal ? { values: dayKeys.map(day => stats[day].totalServiceNumber), labels: dayKeys} : undefined;
+
+    const excelExport = () => {
+
+        const HEADER = [
+            {
+                value: 'Nome Prodotto',
+                fontWeight: 'bold'
+            },
+            {
+                value: 'Venduti',
+                fontWeight: 'bold',
+                align: 'center',
+            },
+            {
+                value: 'Totale',
+                fontWeight: 'bold',
+                align: 'center'
+            }
+        ]
+
+        const addInitial = dayKeys.length === 1 && dayKeys[0] === dayjs().format("YYYY-MM-DD");
+
+        if ( addInitial ) {
+            HEADER.splice(1, 0, {value: 'Iniziale', fontWeight: 'bold', align: 'center'})
+        }
+
+        const rows = buildProductsData(summary.productsTable, products, addInitial)
+        const data = [HEADER, ...rows];
+
+        // @ts-ignore
+        writeXlsxFile(data, {
+            columns: [{ width: 50}],
+            fileName: "statistiche_sagra.xlsx",
+        }).then(() => {
+            toast.success('File excel generato con successo')
+        }).catch(() => {
+            toast.error('Si è verificato un errore nella generazione del file excel')
+        })
+    }
 
     return (
         <>
@@ -308,44 +352,7 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
                             productsInOrder={summary.productsTable}
                             days={Object.keys(stats)}
                         />
-                        <Button
-                            onClick={() => {
-                                const _data = buildProductsData(summary.productsTable, products)
-
-                                const HEADER = [
-                                    {
-                                        value: 'Nome Prodotto',
-                                        fontWeight: 'bold'
-                                    },
-                                    {
-                                        value: 'Quantità',
-                                        fontWeight: 'bold',
-                                        align: 'center',
-                                    },
-                                    {
-                                        value: 'Totale',
-                                        fontWeight: 'bold',
-                                        align: 'center'
-                                    }
-                                ]
-
-                                const data = [HEADER, ..._data];
-
-                                // @ts-ignore
-                                writeXlsxFile(data, {
-                                    columns: [{ width: 50}],
-                                    fileName: "statistiche_sagra.xlsx",
-                                }).then(() => {
-                                    toast.success('File excel generato con successo')
-                                }).catch(() => {
-                                    toast.error('Si è verificato un errore nella generazione del file excel')
-                                })
-
-
-                            }}
-                        >
-                            Esporta XLS
-                        </Button>
+                        <Button onClick={() => excelExport()}>Esporta XLS</Button>
                     </Paper>
             </Paper>
             {
