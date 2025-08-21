@@ -186,10 +186,11 @@ const OrderEditForm: React.FC = () => {
 
   const handleChangeTakeAway =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-            setTakeAway(event.target.checked);
+        setTakeAway(event.target.checked);
+        setCoperti(undefined)
         updateOrderField('takeAway', event.target.checked)
-          }, [setTakeAway, updateOrderField]
-      );
+        updateOrderField('serviceNumber', undefined)
+  }, [setTakeAway, updateOrderField, setCoperti]);
 
   const handleChangeCoperti =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
