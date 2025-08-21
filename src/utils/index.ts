@@ -141,7 +141,6 @@ export const testOrderProductAvailability = (product: Product, quantity: number,
             _orderProduct.quantity = operator(_orderProduct.quantity, quantity)
         }
 
-        console.log('testOrderProductAvailability: ', product.name, selectedOrderProduct?.quantity, product.availableQuantity, selectedOrderProduct?.quantity > product.availableQuantity)
         const originalQuantity = _originalOrderProduct?.quantity ?? 0
         const orderQuantity = _orderProduct?.quantity ?? 0
 
