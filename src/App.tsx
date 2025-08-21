@@ -45,7 +45,7 @@ const useRouter = () => {
                 element: (
                     <MainLayout theme={sagraTheme[theme]} header={<Header changeTheme={(theme: string) => {
                         setTheme(theme)
-                    }}/>} body={<Outlet/>} footer={<div>footer</div>}/>
+                    }}/>} body={<Outlet />} footer={<div>footer</div>}/>
                 ),
                 errorElement: <span>Error</span>,
                 children: [
