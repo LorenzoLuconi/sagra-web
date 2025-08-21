@@ -68,7 +68,7 @@ const OrderEditInnerContainer: React.FC = () => {
                 <ProductsToOrder/>
             </Grid>
             <Grid size={5} sx={{minWidth: '400px'}}>
-                <Box sx={{display: 'flex', flexDirection: 'column', position: 'sticky', top: '10px'}}>
+                <Box sx={{ position: 'sticky', top: '70px' }}>
                     <ErrorInfo/>
 
                     {
@@ -88,7 +88,7 @@ const OrderEditInnerContainer: React.FC = () => {
 
                     <Paper variant="outlined"
                            sx={{p: 0.5, backgroundColor: theme.sagra.panelBackground}}
-                           className="paper-middle">
+                           className={ isNewOrder() ? "paper-top" : "paper-middle"}>
                         <OrderEditTotal/>
                     </Paper>
 
