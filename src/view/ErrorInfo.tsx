@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {useOrderStore} from "../context/OrderStore.tsx";
-import {Paper, Typography} from "@mui/material";
+import {Alert, Box} from "@mui/material";
 const ErrorInfo = () => {
 
     const {errors} = useOrderStore()
@@ -10,26 +10,14 @@ const ErrorInfo = () => {
     if (hasErrors) {
 
         return (
-
-            <Paper
-                sx={{
-                    p: 1, mt: 1,
-                    display: 'flex',
-                    gap: '10px',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                    backgroundColor: "error.light",
-                    color: 'white'
-                }}
-            >
+            <Box>
                 {errorKeys.map((eK: string, idx: number) => {
                     const eMessage = errors[eK]
                     return (
-                    <Typography key={idx}>{eMessage}</Typography>
+                        <Alert variant="standard" key={idx} severity="error" sx={{margin: '5px'}}>{eMessage}</Alert>
                     )
                 })}
-
-            </Paper>
+            </Box>
 
         )
     }
