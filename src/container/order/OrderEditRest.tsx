@@ -17,13 +17,10 @@ const OrderEditRest: React.FC = () => {
                 const value = Number.parseFloat(event.target.value)
                 if (!isNaN(value)) {
                     setCash(value);
-
-                    if (value && value > totalAmount)
-                        setRest(value - totalAmount);
-                    else
-                        setRest(undefined);
+                    setRest(value - totalAmount);   // sempre, anche se negativo
                 } else {
                     setCash(undefined);
+                    setRest(undefined);
                 }
             }, [setCash, setRest, totalAmount],
         );
@@ -54,8 +51,8 @@ const OrderEditRest: React.FC = () => {
 
             { rest &&
                 <Box sx={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', minWidth: '150px'}}>
-                    <Typography component="div" sx={{fontSize: '0.9rem', textTransform: 'uppercase' }}>Resto: </Typography>
-                    <Typography component="div" sx={{ml: 1, fontSize: '1.2rem', minWidth: '150px'}}>{currency(rest)}</Typography>
+                    <Typography component="div" sx={{fontSize: '0.9rem', textTransform: 'uppercase' }}>{rest >= 0 ? "Resto:" : "Mancante:"} </Typography>
+                    <Typography component="div" sx={{ml: 1, fontSize: '1.2rem', minWidth: '150px'}}>{rest > 0 ? currency(rest) : currency(-rest)}</Typography>
                 </Box>
             }
         </Box>
