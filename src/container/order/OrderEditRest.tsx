@@ -1,6 +1,6 @@
 import * as React from "react";
 import {currency} from "../../utils";
-import {Box, TextField, Typography} from "@mui/material";
+import {Box, TextField, Typography, useTheme} from "@mui/material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
 import { CalculateOutlined } from "@mui/icons-material";
 
@@ -8,9 +8,12 @@ import { CalculateOutlined } from "@mui/icons-material";
 const OrderEditRest: React.FC = () => {
     const {order} = useOrderStore();
     const {totalAmount} = order
+    const theme = useTheme();
 
     const [cash, setCash] = React.useState<number | undefined>(undefined);
-    const [rest, setRest] = React.useState<number | undefined>(undefined);
+    const [rest, setRest] = React.useState<number>(-totalAmount);
+
+
 
     const handleChangeCash =
         React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
@@ -20,7 +23,7 @@ const OrderEditRest: React.FC = () => {
                     setRest(value - totalAmount);   // sempre, anche se negativo
                 } else {
                     setCash(undefined);
-                    setRest(undefined);
+                    setRest(-totalAmount);
                 }
             }, [setCash, setRest, totalAmount],
         );
@@ -28,7 +31,7 @@ const OrderEditRest: React.FC = () => {
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if ( event.key == 'Escape' ) {
             setCash(undefined)
-            setRest(undefined)
+            setRest(-totalAmount);
         }
     };
 
@@ -49,12 +52,10 @@ const OrderEditRest: React.FC = () => {
                 slotProps={{ htmlInput: { size: 8, min: 1 } }}
             />
 
-            { rest &&
                 <Box sx={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', minWidth: '150px'}}>
                     <Typography component="div" sx={{fontSize: '0.9rem', textTransform: 'uppercase' }}>{rest >= 0 ? "Resto:" : "Mancante:"} </Typography>
-                    <Typography component="div" sx={{ml: 1, fontSize: '1.2rem', minWidth: '150px'}}>{rest > 0 ? currency(rest) : currency(-rest)}</Typography>
+                    <Typography component="div" sx={{ml: 1, fontSize: '1.2rem', minWidth: '150px', color: rest < 0 ? theme.palette.error.main : theme.palette.text.primary}}>{rest >= 0 ? currency(rest) : currency(-rest)}</Typography>
                 </Box>
-            }
         </Box>
     )
 }
