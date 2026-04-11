@@ -13,6 +13,8 @@ import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import 'dayjs/locale/it';
 import {useLocalStorage} from "./utils";
+import {useAuth} from "./context/AuthStore.tsx";
+import LoginView from "./view/LoginView.tsx";
 
 const UnmanagedPathView = React.lazy(() => import("./view/UnmanagedPathView.tsx"))
 const MonitorContainer = React.lazy(() => import("./container/monitor/MonitorContainer.tsx"))
@@ -21,12 +23,22 @@ const DepartmentContainer = React.lazy(() => import("./container/department/Depa
 const DiscountContainer = React.lazy(() => import("./container/discount/DiscountContainer.tsx"))
 const ProductContainer = React.lazy(() => import('./container/product/ProductContainer.tsx'))
 const CourseContainer = React.lazy(() => import("./container/course/CourseContainer.tsx"))
+const UserContainer = React.lazy(() => import("./container/user/UserContainer.tsx"))
 const OrderNew = React.lazy(() => import("./container/order/OrderNew.tsx"))
 const ProductQuantityUpdateContainer = React.lazy(() => import("./container/product/ProductQuantityUpdateContainer.tsx"))
 const StatsContainer = React.lazy(() => import("./container/stats/StatsContainer.tsx"))
 const OrderListContainer = React.lazy(() => import("./container/order/OrderListContainer.tsx"))
 const MonitorView = React.lazy(() => import("./container/monitor/MonitorView.tsx"))
 
+const AdminOnly = ({children}: React.PropsWithChildren): React.ReactElement => {
+    const {user} = useAuth();
+
+    if (user?.role !== "admin") {
+        return <Navigate to="/home" replace />;
+    }
+
+    return <>{children}</>;
+};
 
 const useRouter = () => {
     // Da spostare dove si può prendere valori derivanti dall'autenticazione
@@ -63,11 +75,11 @@ const useRouter = () => {
                     },
                     {
                         path: '/products',
-                        element: <ProductContainer/>
+                        element: <AdminOnly><ProductContainer/></AdminOnly>
                     },
                     {
                         path: '/products/updateQuantity',
-                        element: <ProductQuantityUpdateContainer/>
+                        element: <AdminOnly><ProductQuantityUpdateContainer/></AdminOnly>
                     },
                     {
                         path: '/orders',
@@ -83,24 +95,28 @@ const useRouter = () => {
                     },
 
                     {
+                        path: '/users',
+                        element: <AdminOnly><UserContainer/></AdminOnly>
+                    },
+                    {
                         path: '/departments',
-                        element: <DepartmentContainer/>
+                        element: <AdminOnly><DepartmentContainer/></AdminOnly>
                     },
                     {
                         path: '/courses',
-                        element: <CourseContainer/>
+                        element: <AdminOnly><CourseContainer/></AdminOnly>
                     },
                     {
                         path: '/discounts',
-                        element: <DiscountContainer/>
+                        element: <AdminOnly><DiscountContainer/></AdminOnly>
                     },
                     {
                         path: '/stats',
-                        element: <StatsContainer/>
+                        element: <AdminOnly><StatsContainer/></AdminOnly>
                     },
                     {
                         path: '/monitors',
-                        element: <MonitorContainer/>
+                        element: <AdminOnly><MonitorContainer/></AdminOnly>
                     },
                     {
                         path: '*',
@@ -118,6 +134,7 @@ const useRouter = () => {
 export default function App() {
 
     const router = useRouter()
+    const {status} = useAuth()
 
     return (
         <React.Suspense fallback={<CircularProgress/>}>
@@ -156,7 +173,7 @@ export default function App() {
                 }}
             />
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'it'}>
-                <RouterProvider router={router}/>
+                {status === "authenticated" ? <RouterProvider router={router}/> : <LoginView/>}
             </LocalizationProvider>
         </React.Suspense>
     )

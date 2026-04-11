@@ -3,6 +3,50 @@
  *
  * @version v0
  */
+/**
+ * Dati per la modifica di un utente
+ */
+export type UserUpdateRequest = {
+  /**
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Ruolo assegnato all'utente
+   */
+  role: "admin" | "cashier";
+  /**
+   * Nuova password dell'utente. Se omessa la password corrente non viene modificata
+   */
+  password?: string;
+};
+
+export type ErrorResource = {
+  message: string;
+  /**
+   * @uniqueItems true
+   */
+  invalidValues?: InvalidValue[];
+};
+
+export type InvalidValue = {
+  field: string;
+  value?: void;
+  message: string;
+};
+
+/**
+ * Utente applicativo
+ */
+export type User = {
+  username: string;
+  name: string;
+  /**
+   * Ruolo utente
+   */
+  role: "admin" | "cashier";
+};
+
 export type ProductRequest = {
   /**
    * @minLength 1
@@ -27,20 +71,6 @@ export type ProductRequest = {
    * @format int64
    */
   parentId?: number;
-};
-
-export type ErrorResource = {
-  message: string;
-  /**
-   * @uniqueItems true
-   */
-  invalidValues?: InvalidValue[];
-};
-
-export type InvalidValue = {
-  field: string;
-  value?: void;
-  message: string;
 };
 
 export type Product = {
@@ -252,6 +282,68 @@ export type Course = {
    */
   id: number;
   name: string;
+};
+
+/**
+ * Dati per la creazione di un utente
+ */
+export type UserRequest = {
+  /**
+   * @minLength 1
+   */
+  username: string;
+  /**
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Ruolo assegnato all'utente
+   */
+  role: "admin" | "cashier";
+  /**
+   * @minLength 1
+   */
+  password: string;
+};
+
+/**
+ * Richiesta di cambio password per l'utente autenticato
+ */
+export type ChangePasswordRequest = {
+  /**
+   * @minLength 1
+   */
+  currentPassword: string;
+  /**
+   * @minLength 1
+   */
+  newPassword: string;
+};
+
+/**
+ * Credenziali per il login
+ */
+export type LoginRequest = {
+  /**
+   * @minLength 1
+   */
+  username: string;
+  /**
+   * @minLength 1
+   */
+  password: string;
+};
+
+/**
+ * Utente autenticato
+ */
+export type AuthenticatedUser = {
+  username: string;
+  name: string;
+  /**
+   * Ruolo utente
+   */
+  role: "admin" | "cashier";
 };
 
 export type StatsOrder = {

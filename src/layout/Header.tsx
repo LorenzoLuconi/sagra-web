@@ -2,19 +2,18 @@ import * as React from 'react'
 import {
     alpha,
     AppBar,
+    Avatar,
     Box,
     Button,
-    ButtonProps,
     Divider,
-    IconButton,
     Menu,
     MenuItem,
     MenuProps,
     Paper,
-    SelectChangeEvent,
+    Stack,
     styled,
+    Typography,
 } from "@mui/material";
-import {red} from "@mui/material/colors";
 import {useNavigate} from "react-router";
 import {Logo} from "./Logo.tsx";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -22,9 +21,12 @@ import {
     AccountCircleOutlined,
     AssessmentOutlined,
     CalculateOutlined,
+    KeyOutlined,
+    LogoutOutlined,
     FormatListNumberedOutlined,
     LibraryBooksOutlined,
     MonitorOutlined,
+    PeopleOutlined,
     ReceiptOutlined,
     RestaurantOutlined,
     SettingsOutlined,
@@ -33,14 +35,8 @@ import {
 } from "@mui/icons-material";
 import MaterialUISwitch from "../view/MaterialUISwitch.tsx";
 import {AppConf} from "../AppConf.ts";
-
-const RedButton = styled(Button)<ButtonProps>(({ theme }) => ({
-    color: theme.palette.getContrastText(red[700]),
-    backgroundColor: red[700],
-    '&:hover': {
-        backgroundColor: red[900],
-    },
-}));
+import {useAuth} from "../context/AuthStore.tsx";
+import ChangePasswordDialog from "../view/ChangePasswordDialog.tsx";
 
 const StyledMenu = styled((props: MenuProps) => (
     <Menu
@@ -92,23 +88,37 @@ interface HeaderI {
 
 const Header: React.FC<HeaderI> = (props): React.ReactElement => {
 
-    const [selection, setSelection] = React.useState(undefined);
     const navigate = useNavigate()
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
+    const {user, logout, isLogoutPending} = useAuth()
+    const isAdmin = user?.role === "admin";
+    const [adminAnchorEl, setAdminAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [userAnchorEl, setUserAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false);
+    const adminMenuOpen = Boolean(adminAnchorEl);
+    const userMenuOpen = Boolean(userAnchorEl);
+    const handleAdminClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAdminAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
-        setAnchorEl(null);
+    const handleAdminClose = () => {
+        setAdminAnchorEl(null);
+    };
+    const handleUserClick = (event: React.MouseEvent<HTMLElement>) => {
+        setUserAnchorEl(event.currentTarget);
+    };
+    const handleUserClose = () => {
+        setUserAnchorEl(null);
+    };
+    const handleNavigate = (path: string) => {
+        handleAdminClose();
+        navigate(path);
     };
 
-    const handleChange = (event: SelectChangeEvent<string>) => {
-        setSelection(event.target.value as string);
-        if (event.target.value !== undefined) {
-            navigate(event.target.value)
-        }
+    const handleLogout = async () => {
+        handleUserClose();
+        await logout();
+        navigate("/");
     };
+
     return (
         <AppBar  position={'sticky'} sx={{backgroundColor: 'transparent'}}>
             <Paper elevation={2} sx={{ display: 'flex', p: 1, alignItems: 'center'}}>
@@ -118,66 +128,113 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
                     <Button variant="text"  startIcon={<LibraryBooksOutlined />} sx={{ color: 'text.primary', marginRight: 1}} onClick={() => {navigate('/orders')}}>Elenco Ordini</Button>
 
+                    {isAdmin && (
+                        <>
+                            <Button
+                                aria-controls={adminMenuOpen ? 'admin-menu' : undefined}
+                                aria-haspopup="true"
+                                aria-expanded={adminMenuOpen ? 'true' : undefined}
+                                variant="text"
+                                disableElevation
+                                onClick={handleAdminClick}
+                                endIcon={<KeyboardArrowDownIcon/>}
+                                startIcon={<SettingsOutlined />}
+                                sx={{ color: 'text.primary', marginRight: 1}}
+                            >
+                                Admin
+                            </Button>
+                            <StyledMenu
+                                id="admin-menu"
+                                slotProps={{
+                                    list: {
+                                        'aria-labelledby': 'admin-menu-button',
+                                    },
+                                }}
+                                anchorEl={adminAnchorEl}
+                                open={adminMenuOpen}
+                                onClose={handleAdminClose}
+                            >
+                                <MenuItem onClick={() => {handleNavigate('/products')}}>
+                                    <RestaurantOutlined />
+                                    Prodotti
+                                </MenuItem>
+                                <MenuItem onClick={() => {handleNavigate('/products/updateQuantity')}}>
+                                    <WarehouseOutlined />
+                                    Giacenze Magazzino
+                                </MenuItem>
+                                <MenuItem onClick={() => {handleNavigate('/departments')}}>
+                                    <WorkspacesOutlined />
+                                    Reparti
+                                </MenuItem>
+                                <MenuItem onClick={() => {handleNavigate('/courses')}}>
+                                    <FormatListNumberedOutlined />
+                                    Portate
+                                </MenuItem>
+                                <MenuItem onClick={() => {handleNavigate('/discounts')}}>
+                                    <CalculateOutlined/>
+                                    Sconti
+                                </MenuItem>
+                                <MenuItem onClick={() => {handleNavigate('/users')}}>
+                                    <PeopleOutlined />
+                                    Utenti
+                                </MenuItem>
+                                <Divider />
+                                <MenuItem onClick={() => {handleNavigate('/stats')}}>
+                                    <AssessmentOutlined />
+                                    Statistiche
+                                </MenuItem>
+                                <Divider />
+                                <MenuItem onClick={() => {handleNavigate('/monitors')}}>
+                                    <MonitorOutlined/>
+                                    Monitor
+                                </MenuItem>
+                            </StyledMenu>
+                        </>
+                    )}
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{mr: 1}}>
+                        <Avatar sx={{width: 32, height: 32}}>
+                            <AccountCircleOutlined />
+                        </Avatar>
+                        <Box sx={{display: {xs: 'none', md: 'block'}}}>
+                            <Typography variant="body2" fontWeight={700}>
+                                {user?.name ?? user?.username ?? 'Utente'}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                {user?.role === 'admin' ? 'Admin' : 'Cassiere'}
+                            </Typography>
+                        </Box>
+                    </Stack>
                     <Button
-                        aria-controls={open ? 'demo-customized-menu' : undefined}
+                        aria-controls={userMenuOpen ? 'user-menu' : undefined}
                         aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        variant="text"
-                        disableElevation
-                        onClick={handleClick}
-                        endIcon={<KeyboardArrowDownIcon/>}
-                        startIcon={<SettingsOutlined />}
-                        sx={{ color: 'text.primary', marginRight: 1}}
+                        aria-expanded={userMenuOpen ? 'true' : undefined}
+                        variant="outlined"
+                        color="inherit"
+                        endIcon={<KeyboardArrowDownIcon />}
+                        onClick={handleUserClick}
+                        sx={{mr: 1, textTransform: 'none'}}
                     >
-                        Admin
+                        Account
                     </Button>
                     <StyledMenu
-                        id="demo-customized-menu"
-                        slotProps={{
-                            list: {
-                                'aria-labelledby': 'demo-customized-button',
-                            },
-                        }}
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
+                        id="user-menu"
+                        anchorEl={userAnchorEl}
+                        open={userMenuOpen}
+                        onClose={handleUserClose}
                     >
-                        <MenuItem onClick={() => {navigate('/products')}}>
-                            <RestaurantOutlined />
-                            Prodotti
-                        </MenuItem>
-                        <MenuItem onClick={() => {navigate('/products/updateQuantity')}}>
-                          <WarehouseOutlined />
-                          Giacenze Magazzino
-                        </MenuItem>
-                        <MenuItem onClick={() => {navigate('/departments')}}>
-                            <WorkspacesOutlined />
-                            Reparti
-                        </MenuItem>
-                        <MenuItem onClick={() => {navigate('/courses')}}>
-                            <FormatListNumberedOutlined />
-                            Portate
-                        </MenuItem>
-                        <MenuItem onClick={() => {navigate('/discounts')}}>
-                            <CalculateOutlined/>
-                            Sconti
-                        </MenuItem>
-
-
-                        <Divider />
-                        <MenuItem  onClick={() => {navigate('/stats')}}>
-                            <AssessmentOutlined />
-                            Statistiche
+                        <MenuItem onClick={() => {
+                            handleUserClose();
+                            setPasswordDialogOpen(true);
+                        }}>
+                            <KeyOutlined />
+                            Modifica password
                         </MenuItem>
                         <Divider />
-                        <MenuItem onClick={() => {navigate('/monitors')}}>
-                            <MonitorOutlined/>
-                            Monitor
+                        <MenuItem disabled={isLogoutPending} onClick={() => void handleLogout()}>
+                            <LogoutOutlined />
+                            Esci
                         </MenuItem>
                     </StyledMenu>
-                    <IconButton disabled>
-                        <AccountCircleOutlined />
-                    </IconButton>
                     <MaterialUISwitch sx={{ display: AppConf.showThemeSwitcher() ? 'flex' : 'none'}}onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
                         console.log('event: ', event)
                         console.log('checked: ', checked)
@@ -185,6 +242,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                     }}/>
                 </Box>
             </Paper>
+            <ChangePasswordDialog open={passwordDialogOpen} onClose={() => setPasswordDialogOpen(false)} />
         </AppBar>
     )
 }

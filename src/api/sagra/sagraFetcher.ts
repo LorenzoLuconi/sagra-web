@@ -39,7 +39,6 @@ export async function sagraFetch<
   TQueryParams,
   TPathParams
 >): Promise<TData> {
-  let error: ErrorWrapper<TError>;
   try {
     const requestHeaders: HeadersInit = {
       "Content-Type": "application/json",
@@ -65,13 +64,14 @@ export async function sagraFetch<
       {
         signal,
         method: method.toUpperCase(),
+        credentials: "include",
         body: body
           ? body instanceof FormData
             ? body
             : JSON.stringify(body)
           : undefined,
         headers: requestHeaders,
-      } as Request,
+      } as RequestInit,
     );
 
     if (!response.ok) {
@@ -84,6 +84,10 @@ export async function sagraFetch<
       return (await response.blob()) as unknown as TData;
     }
   } catch (e) {
+    if (e && typeof e === "object" && "status" in e) {
+      throw e;
+    }
+
     const errorObject: Error = {
       name: "unknown" as const,
       message:

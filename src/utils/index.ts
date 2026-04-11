@@ -149,9 +149,24 @@ export const testOrderProductAvailability = (product: Product, quantity: number,
 }
 
 export const manageError = (error: ErrorWrapper<unknown>) => {
-    const {status, payload} = error.stack
+    const status = typeof error === "object" && error !== null && "status" in error ? error.status : undefined;
+    const payload = typeof error === "object" && error !== null && "payload" in error ? error.payload : undefined;
     console.log('Utils ManageError: ', status, payload)
-    toast.error(`${payload.message}`)
+
+    if (payload && typeof payload === "object" && "message" in payload) {
+        const message = payload.message;
+        if (typeof message === "string" && message.length > 0) {
+            toast.error(message);
+            return;
+        }
+    }
+
+    if (typeof payload === "string" && payload.length > 0) {
+        toast.error(payload);
+        return;
+    }
+
+    toast.error("Si è verificato un errore inatteso");
 }
 
 

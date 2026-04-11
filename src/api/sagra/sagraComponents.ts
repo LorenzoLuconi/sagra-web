@@ -14,6 +14,207 @@ type QueryFnOptions = {
   signal?: AbortController["signal"];
 };
 
+export type GetUserPathParams = {
+  username: string;
+};
+
+export type GetUserError = Fetcher.ErrorWrapper<{
+  status: 404;
+  payload: Schemas.ErrorResource;
+}>;
+
+export type GetUserVariables = {
+  pathParams: GetUserPathParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchGetUser = (
+  variables: GetUserVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<Schemas.User, GetUserError, undefined, {}, {}, GetUserPathParams>({
+    url: "/v1/users/{username}",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export function getUserQuery(variables: GetUserVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<Schemas.User>;
+};
+
+export function getUserQuery(
+  variables: GetUserVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<Schemas.User>)
+    | reactQuery.SkipToken;
+};
+
+export function getUserQuery(
+  variables: GetUserVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/users/{username}",
+      operationId: "getUser",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) => fetchGetUser(variables, signal),
+  };
+}
+
+export const useSuspenseGetUser = <TData = Schemas.User,>(
+  variables: GetUserVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<Schemas.User, GetUserError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<Schemas.User, GetUserError, TData>({
+    ...getUserQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export const useGetUser = <TData = Schemas.User,>(
+  variables: GetUserVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<Schemas.User, GetUserError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<Schemas.User, GetUserError, TData>({
+    ...getUserQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export type UpdateUserPathParams = {
+  username: string;
+};
+
+export type UpdateUserError = Fetcher.ErrorWrapper<
+  | {
+      status: 400;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 404;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 409;
+      payload: Schemas.ErrorResource;
+    }
+>;
+
+export type UpdateUserVariables = {
+  body: Schemas.UserUpdateRequest;
+  pathParams: UpdateUserPathParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchUpdateUser = (
+  variables: UpdateUserVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    Schemas.User,
+    UpdateUserError,
+    Schemas.UserUpdateRequest,
+    {},
+    {},
+    UpdateUserPathParams
+  >({ url: "/v1/users/{username}", method: "put", ...variables, signal });
+
+export const useUpdateUser = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.User,
+      UpdateUserError,
+      UpdateUserVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    Schemas.User,
+    UpdateUserError,
+    UpdateUserVariables
+  >({
+    mutationFn: (variables: UpdateUserVariables) =>
+      fetchUpdateUser(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
+export type DeleteUserPathParams = {
+  username: string;
+};
+
+export type DeleteUserError = Fetcher.ErrorWrapper<
+  | {
+      status: 404;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 409;
+      payload: Schemas.ErrorResource;
+    }
+>;
+
+export type DeleteUserVariables = {
+  pathParams: DeleteUserPathParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchDeleteUser = (
+  variables: DeleteUserVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    undefined,
+    DeleteUserError,
+    undefined,
+    {},
+    {},
+    DeleteUserPathParams
+  >({ url: "/v1/users/{username}", method: "delete", ...variables, signal });
+
+export const useDeleteUser = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      undefined,
+      DeleteUserError,
+      DeleteUserVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    undefined,
+    DeleteUserError,
+    DeleteUserVariables
+  >({
+    mutationFn: (variables: DeleteUserVariables) =>
+      fetchDeleteUser(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
 export type ProductByIdPathParams = {
   /**
    * @format int64
@@ -1510,6 +1711,135 @@ export const useCourseDelete = (
   });
 };
 
+export type ListUsersError = Fetcher.ErrorWrapper<undefined>;
+
+export type ListUsersResponse = Schemas.User[];
+
+export type ListUsersVariables = SagraContext["fetcherOptions"];
+
+export const fetchListUsers = (
+  variables: ListUsersVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<ListUsersResponse, ListUsersError, undefined, {}, {}, {}>({
+    url: "/v1/users",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export function listUsersQuery(variables: ListUsersVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<ListUsersResponse>;
+};
+
+export function listUsersQuery(
+  variables: ListUsersVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<ListUsersResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function listUsersQuery(
+  variables: ListUsersVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/users",
+      operationId: "listUsers",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) => fetchListUsers(variables, signal),
+  };
+}
+
+export const useSuspenseListUsers = <TData = ListUsersResponse,>(
+  variables: ListUsersVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<ListUsersResponse, ListUsersError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<ListUsersResponse, ListUsersError, TData>({
+    ...listUsersQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export const useListUsers = <TData = ListUsersResponse,>(
+  variables: ListUsersVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<ListUsersResponse, ListUsersError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<ListUsersResponse, ListUsersError, TData>({
+    ...listUsersQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export type CreateUserError = Fetcher.ErrorWrapper<
+  | {
+      status: 400;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 409;
+      payload: Schemas.ErrorResource;
+    }
+>;
+
+export type CreateUserVariables = {
+  body: Schemas.UserRequest;
+} & SagraContext["fetcherOptions"];
+
+export const fetchCreateUser = (
+  variables: CreateUserVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<Schemas.User, CreateUserError, Schemas.UserRequest, {}, {}, {}>({
+    url: "/v1/users",
+    method: "post",
+    ...variables,
+    signal,
+  });
+
+export const useCreateUser = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.User,
+      CreateUserError,
+      CreateUserVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    Schemas.User,
+    CreateUserError,
+    CreateUserVariables
+  >({
+    mutationFn: (variables: CreateUserVariables) =>
+      fetchCreateUser(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
 export type ProductsSearchQueryParams = {
   /**
    * @format int64
@@ -2466,6 +2796,129 @@ export const useCourseCreate = (
   });
 };
 
+export type ChangePasswordError = Fetcher.ErrorWrapper<
+  | {
+      status: 400;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 409;
+      payload: Schemas.ErrorResource;
+    }
+>;
+
+export type ChangePasswordVariables = {
+  body: Schemas.ChangePasswordRequest;
+} & SagraContext["fetcherOptions"];
+
+export const fetchChangePassword = (
+  variables: ChangePasswordVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    undefined,
+    ChangePasswordError,
+    Schemas.ChangePasswordRequest,
+    {},
+    {},
+    {}
+  >({ url: "/v1/auth/password", method: "post", ...variables, signal });
+
+export const useChangePassword = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      undefined,
+      ChangePasswordError,
+      ChangePasswordVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    undefined,
+    ChangePasswordError,
+    ChangePasswordVariables
+  >({
+    mutationFn: (variables: ChangePasswordVariables) =>
+      fetchChangePassword(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
+export type LogoutError = Fetcher.ErrorWrapper<undefined>;
+
+export type LogoutVariables = SagraContext["fetcherOptions"];
+
+export const fetchLogout = (variables: LogoutVariables, signal?: AbortSignal) =>
+  sagraFetch<undefined, LogoutError, undefined, {}, {}, {}>({
+    url: "/v1/auth/logout",
+    method: "post",
+    ...variables,
+    signal,
+  });
+
+export const useLogout = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<undefined, LogoutError, LogoutVariables>,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<undefined, LogoutError, LogoutVariables>({
+    mutationFn: (variables: LogoutVariables) =>
+      fetchLogout(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
+export type LoginError = Fetcher.ErrorWrapper<
+  | {
+      status: 400;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 401;
+      payload: Schemas.ErrorResource;
+    }
+>;
+
+export type LoginVariables = {
+  body: Schemas.LoginRequest;
+} & SagraContext["fetcherOptions"];
+
+export const fetchLogin = (variables: LoginVariables, signal?: AbortSignal) =>
+  sagraFetch<
+    Schemas.AuthenticatedUser,
+    LoginError,
+    Schemas.LoginRequest,
+    {},
+    {},
+    {}
+  >({ url: "/v1/auth/login", method: "post", ...variables, signal });
+
+export const useLogin = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.AuthenticatedUser,
+      LoginError,
+      LoginVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    Schemas.AuthenticatedUser,
+    LoginError,
+    LoginVariables
+  >({
+    mutationFn: (variables: LoginVariables) =>
+      fetchLogin(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
 export type OrderStatsQueryParams = {
   /**
    * @format date
@@ -2761,6 +3214,80 @@ export const useMonitorView = <TData = Schemas.MonitorView,>(
   });
 };
 
+export type MeError = Fetcher.ErrorWrapper<undefined>;
+
+export type MeVariables = SagraContext["fetcherOptions"];
+
+export const fetchMe = (variables: MeVariables, signal?: AbortSignal) =>
+  sagraFetch<Schemas.AuthenticatedUser, MeError, undefined, {}, {}, {}>({
+    url: "/v1/auth/me",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export function meQuery(variables: MeVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<Schemas.AuthenticatedUser>;
+};
+
+export function meQuery(variables: MeVariables | reactQuery.SkipToken): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<Schemas.AuthenticatedUser>)
+    | reactQuery.SkipToken;
+};
+
+export function meQuery(variables: MeVariables | reactQuery.SkipToken) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/auth/me",
+      operationId: "me",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) => fetchMe(variables, signal),
+  };
+}
+
+export const useSuspenseMe = <TData = Schemas.AuthenticatedUser,>(
+  variables: MeVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<Schemas.AuthenticatedUser, MeError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<Schemas.AuthenticatedUser, MeError, TData>(
+    {
+      ...meQuery(deepMerge(fetcherOptions, variables)),
+      ...options,
+      ...queryOptions,
+    },
+  );
+};
+
+export const useMe = <TData = Schemas.AuthenticatedUser,>(
+  variables: MeVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<Schemas.AuthenticatedUser, MeError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<Schemas.AuthenticatedUser, MeError, TData>({
+    ...meQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
 export type DiscountDeletePathParams = {
   /**
    * @format int64
@@ -2814,6 +3341,11 @@ export const useDiscountDelete = (
 
 export type QueryOperation =
   | {
+      path: "/v1/users/{username}";
+      operationId: "getUser";
+      variables: GetUserVariables | reactQuery.SkipToken;
+    }
+  | {
       path: "/v1/products/{productId}";
       operationId: "productById";
       variables: ProductByIdVariables | reactQuery.SkipToken;
@@ -2842,6 +3374,11 @@ export type QueryOperation =
       path: "/v1/courses/{id}";
       operationId: "courseById";
       variables: CourseByIdVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/v1/users";
+      operationId: "listUsers";
+      variables: ListUsersVariables | reactQuery.SkipToken;
     }
   | {
       path: "/v1/products";
@@ -2887,4 +3424,9 @@ export type QueryOperation =
       path: "/v1/monitors/{monitorId}/view";
       operationId: "monitorView";
       variables: MonitorViewVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/v1/auth/me";
+      operationId: "me";
+      variables: MeVariables | reactQuery.SkipToken;
     };
