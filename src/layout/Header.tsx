@@ -191,37 +191,38 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             </StyledMenu>
                         </>
                     )}
-                    <Stack direction="row" spacing={1} alignItems="center" sx={{mr: 1}}>
-                        <Avatar sx={{width: 32, height: 32}}>
-                            <AccountCircleOutlined />
-                        </Avatar>
-                        <Box sx={{display: {xs: 'none', md: 'block'}}}>
-                            <Typography variant="body2" fontWeight={700}>
-                                {user?.name ?? user?.username ?? 'Utente'}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                {user?.role === 'admin' ? 'Admin' : 'Cassiere'}
-                            </Typography>
-                        </Box>
-                    </Stack>
                     <Button
+                        startIcon={<AccountCircleOutlined />}
                         aria-controls={userMenuOpen ? 'user-menu' : undefined}
                         aria-haspopup="true"
                         aria-expanded={userMenuOpen ? 'true' : undefined}
-                        variant="outlined"
+                        variant="text"
+                        disableElevation
                         color="inherit"
                         endIcon={<KeyboardArrowDownIcon />}
                         onClick={handleUserClick}
                         sx={{mr: 1, textTransform: 'none'}}
                     >
-                        Account
+                        {user?.name ?? user?.username ?? 'Utente'}
                     </Button>
+
                     <StyledMenu
                         id="user-menu"
                         anchorEl={userAnchorEl}
                         open={userMenuOpen}
                         onClose={handleUserClose}
                     >
+                        <Box sx={{ alignItems: 'center', p: 2}}>
+                            <Box>
+                                <Typography sx={{fontSize: '0.8em'}}>Username</Typography>
+                                <Typography>{user?.username}</Typography>
+                            </Box>
+                            <Box sx={{mt: 1}}>
+                                <Typography sx={{fontSize: '0.8em'}}>Ruolo</Typography>
+                                <Typography>{user?.role === 'admin' ? 'Admin' : 'Cassiere'}</Typography>
+                            </Box>
+                        </Box>
+                        <Divider/>
                         <MenuItem onClick={() => {
                             handleUserClose();
                             setPasswordDialogOpen(true);
