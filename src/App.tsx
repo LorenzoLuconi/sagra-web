@@ -47,6 +47,10 @@ const StatsContainer = React.lazy(() => import("./container/stats/StatsContainer
 const OrderListContainer = React.lazy(() => import("./container/order/OrderListContainer.tsx"))
 const MonitorView = React.lazy(() => import("./container/monitor/MonitorView.tsx"))
 
+const isPublicRoute = (pathname: string): boolean => {
+    return /^\/monitors\/[^/]+\/view\/?$/.test(pathname);
+};
+
 const AdminOnly = ({children}: React.PropsWithChildren): React.ReactElement => {
     const {user} = useAuth();
 
@@ -152,6 +156,7 @@ export default function App() {
 
     const router = useRouter()
     const {status} = useAuth()
+    const canAccessRouter = status === "authenticated" || isPublicRoute(window.location.pathname)
 
     return (
         <React.Suspense fallback={<CircularProgress/>}>
@@ -190,7 +195,7 @@ export default function App() {
                 }}
             />
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'it'}>
-                {status === "authenticated" ? <RouterProvider router={router}/> : <LoginView/>}
+                {canAccessRouter ? <RouterProvider router={router}/> : <LoginView/>}
             </LocalizationProvider>
         </React.Suspense>
     )
