@@ -2,7 +2,6 @@ import * as React from 'react'
 import {
     alpha,
     AppBar,
-    Avatar,
     Box,
     Button,
     Divider,
@@ -10,7 +9,6 @@ import {
     MenuItem,
     MenuProps,
     Paper,
-    Stack,
     styled,
     Typography,
 } from "@mui/material";
@@ -123,7 +121,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
     return (
         <AppBar  position={'sticky'} sx={{backgroundColor: 'transparent'}}>
             <Paper elevation={2} sx={{ display: 'flex', p: 1, alignItems: 'center'}}>
-                <Logo sx={{fontSize: '3rem'}} color={'text.primary'}/>
+                <Logo sx={{fontSize: '3rem', color: 'text.primary'}}/>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mr: 1}}>
                     <Button variant="text" color={'error'} startIcon={<ReceiptOutlined/>} sx={{  mr: 1}}
                             onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>

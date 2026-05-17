@@ -8,7 +8,7 @@ const svgToDataUrl = (value: string): string => {
 
 export const Logo = (props: SvgIconProps) => {
     const {logoSvg} = useAppConfiguration();
-    const {sx, ...imageProps} = props;
+    const {sx} = props;
 
     if (logoSvg) {
         return (
@@ -16,7 +16,6 @@ export const Logo = (props: SvgIconProps) => {
                 component="img"
                 alt="Logo sagra"
                 src={svgToDataUrl(logoSvg)}
-                {...imageProps}
                 sx={[
                     {
                         width: "1em",
