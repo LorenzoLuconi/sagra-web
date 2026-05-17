@@ -3,13 +3,13 @@ import dayjs, {Dayjs} from "dayjs";
 import {OrderStatsResponse} from "../../api/sagra/sagraComponents.ts";
 import {Box, Grid, Paper, SxProps, Typography} from "@mui/material";
 import {Logo} from "../../layout/Logo.tsx";
-import {AppConf} from "../../AppConf.ts";
 import * as React from "react";
 import {convertDate, currency, FULL_DATE_CONF} from "../../utils";
 import TotalTableCompare from "./TotalTableCompare.tsx";
 import DepartmentsStatsTable from "./DepartmentsStatsTable.tsx";
 import "../order/OrderPrint.css";
 import ProductsStatsTable from "./ProductsStatsTable.tsx";
+import {useEventTitle} from "../../context/AppConfigurationStore.tsx";
 
 
 const ValueStyle : SxProps = {
@@ -137,10 +137,12 @@ const StatsPrintSummary : React.FC<{summary: SummaryI, days: Dayjs[]}> = (props)
 
 
 const StatPrintLogo = () => {
+    const eventTitle = useEventTitle();
+
     return (
         <Box sx={{display: 'flex', columnGap: 5, justifyContent: 'flex-start', width: '100%'}}>
             <Logo sx={{fontSize: '6vh', color: 'text.primary', verticalAlign: 'middle'}} />
-            <Typography sx={{fontSize: '1.8em', color: 'text.primary', pt: 3}}>{AppConf.getTitle()}</Typography>
+            <Typography sx={{fontSize: '1.8em', color: 'text.primary', pt: 3}}>{eventTitle}</Typography>
         </Box>
     )
 }

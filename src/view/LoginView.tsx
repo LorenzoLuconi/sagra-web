@@ -12,11 +12,12 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import {Logo} from "../layout/Logo.tsx";
-import {AppConf} from "../AppConf.ts";
 import {useAuth} from "../context/AuthStore.tsx";
+import {useEventTitle} from "../context/AppConfigurationStore.tsx";
 
 const LoginView = (): React.ReactElement => {
     const {login, status, errorMessage, isLoginPending} = useAuth();
+    const eventTitle = useEventTitle();
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
 
@@ -47,7 +48,7 @@ const LoginView = (): React.ReactElement => {
                         <Stack spacing={1} alignItems="center">
                             <Logo sx={{fontSize: "4rem", color: "text.primary"}} />
                             <Typography variant="h5" fontWeight={700}>
-                                {AppConf.getTitle()}
+                                {eventTitle}
                             </Typography>
                             <Typography variant="body2" color="text.secondary" textAlign="center">
                                 Inserisci username e password per aprire l&apos;applicazione.

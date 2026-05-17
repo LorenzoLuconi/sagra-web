@@ -100,11 +100,23 @@ export const appConfigurationMetadata: AppConfigurationGroupMetadata[] = [
 
 export const appConfigurationGroupOrder = appConfigurationMetadata.map((metadata) => metadata.group);
 
+export const defaultEventTitle = "Sagra";
+
 export const getConfiguredValue = (
     group: string,
     key: string,
     configurations?: AppConfigurationValueByGroup,
 ) => configurations?.[group]?.[key];
+
+export const getConfiguredStringValue = (
+    group: string,
+    key: string,
+    configurations?: AppConfigurationValueByGroup,
+    fallback = "",
+): string => {
+    const value = getConfiguredValue(group, key, configurations)?.value;
+    return value && value.length > 0 ? value : fallback;
+};
 
 export type AppConfigurationValueByGroup = Record<string, Record<string, AppConfigurationValue>>;
 
