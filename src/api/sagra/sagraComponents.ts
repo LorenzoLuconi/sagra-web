@@ -1711,6 +1711,468 @@ export const useCourseDelete = (
   });
 };
 
+export type GetAllError = Fetcher.ErrorWrapper<undefined>;
+
+export type GetAllResponse = Schemas.AppConfigurationGroup[];
+
+export type GetAllVariables = SagraContext["fetcherOptions"];
+
+export const fetchGetAll = (variables: GetAllVariables, signal?: AbortSignal) =>
+  sagraFetch<GetAllResponse, GetAllError, undefined, {}, {}, {}>({
+    url: "/v1/configurations",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export function getAllQuery(variables: GetAllVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<GetAllResponse>;
+};
+
+export function getAllQuery(
+  variables: GetAllVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<GetAllResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function getAllQuery(variables: GetAllVariables | reactQuery.SkipToken) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/configurations",
+      operationId: "getAll",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) => fetchGetAll(variables, signal),
+  };
+}
+
+export const useSuspenseGetAll = <TData = GetAllResponse,>(
+  variables: GetAllVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<GetAllResponse, GetAllError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<GetAllResponse, GetAllError, TData>({
+    ...getAllQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export const useGetAll = <TData = GetAllResponse,>(
+  variables: GetAllVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<GetAllResponse, GetAllError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<GetAllResponse, GetAllError, TData>({
+    ...getAllQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export type UpdateAllError = Fetcher.ErrorWrapper<
+  | {
+      status: 400;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 404;
+      payload: Schemas.ErrorResource;
+    }
+>;
+
+export type UpdateAllResponse = Schemas.AppConfigurationGroup[];
+
+export type UpdateAllVariables = {
+  body: Schemas.AppConfigurationUpdateRequest;
+} & SagraContext["fetcherOptions"];
+
+export const fetchUpdateAll = (
+  variables: UpdateAllVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    UpdateAllResponse,
+    UpdateAllError,
+    Schemas.AppConfigurationUpdateRequest,
+    {},
+    {},
+    {}
+  >({ url: "/v1/configurations", method: "put", ...variables, signal });
+
+export const useUpdateAll = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      UpdateAllResponse,
+      UpdateAllError,
+      UpdateAllVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    UpdateAllResponse,
+    UpdateAllError,
+    UpdateAllVariables
+  >({
+    mutationFn: (variables: UpdateAllVariables) =>
+      fetchUpdateAll(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
+export type GetGroupPathParams = {
+  group: string;
+};
+
+export type GetGroupError = Fetcher.ErrorWrapper<{
+  status: 404;
+  payload: Schemas.ErrorResource;
+}>;
+
+export type GetGroupVariables = {
+  pathParams: GetGroupPathParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchGetGroup = (
+  variables: GetGroupVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    Schemas.AppConfigurationGroup,
+    GetGroupError,
+    undefined,
+    {},
+    {},
+    GetGroupPathParams
+  >({ url: "/v1/configurations/{group}", method: "get", ...variables, signal });
+
+export function getGroupQuery(variables: GetGroupVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<Schemas.AppConfigurationGroup>;
+};
+
+export function getGroupQuery(
+  variables: GetGroupVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<Schemas.AppConfigurationGroup>)
+    | reactQuery.SkipToken;
+};
+
+export function getGroupQuery(
+  variables: GetGroupVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/configurations/{group}",
+      operationId: "getGroup",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) => fetchGetGroup(variables, signal),
+  };
+}
+
+export const useSuspenseGetGroup = <TData = Schemas.AppConfigurationGroup,>(
+  variables: GetGroupVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.AppConfigurationGroup,
+      GetGroupError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<
+    Schemas.AppConfigurationGroup,
+    GetGroupError,
+    TData
+  >({
+    ...getGroupQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export const useGetGroup = <TData = Schemas.AppConfigurationGroup,>(
+  variables: GetGroupVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.AppConfigurationGroup,
+      GetGroupError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<
+    Schemas.AppConfigurationGroup,
+    GetGroupError,
+    TData
+  >({
+    ...getGroupQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export type UpdateGroupPathParams = {
+  group: string;
+};
+
+export type UpdateGroupError = Fetcher.ErrorWrapper<
+  | {
+      status: 400;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 404;
+      payload: Schemas.ErrorResource;
+    }
+>;
+
+export type UpdateGroupVariables = {
+  body: Schemas.AppConfigurationGroupValuesUpdateRequest;
+  pathParams: UpdateGroupPathParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchUpdateGroup = (
+  variables: UpdateGroupVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    Schemas.AppConfigurationGroup,
+    UpdateGroupError,
+    Schemas.AppConfigurationGroupValuesUpdateRequest,
+    {},
+    {},
+    UpdateGroupPathParams
+  >({ url: "/v1/configurations/{group}", method: "put", ...variables, signal });
+
+export const useUpdateGroup = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.AppConfigurationGroup,
+      UpdateGroupError,
+      UpdateGroupVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    Schemas.AppConfigurationGroup,
+    UpdateGroupError,
+    UpdateGroupVariables
+  >({
+    mutationFn: (variables: UpdateGroupVariables) =>
+      fetchUpdateGroup(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
+export type GetValuePathParams = {
+  group: string;
+  key: string;
+};
+
+export type GetValueError = Fetcher.ErrorWrapper<{
+  status: 404;
+  payload: Schemas.ErrorResource;
+}>;
+
+export type GetValueVariables = {
+  pathParams: GetValuePathParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchGetValue = (
+  variables: GetValueVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    Schemas.AppConfigurationValue,
+    GetValueError,
+    undefined,
+    {},
+    {},
+    GetValuePathParams
+  >({
+    url: "/v1/configurations/{group}/{key}",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export function getValueQuery(variables: GetValueVariables): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<Schemas.AppConfigurationValue>;
+};
+
+export function getValueQuery(
+  variables: GetValueVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<Schemas.AppConfigurationValue>)
+    | reactQuery.SkipToken;
+};
+
+export function getValueQuery(
+  variables: GetValueVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/v1/configurations/{group}/{key}",
+      operationId: "getValue",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) => fetchGetValue(variables, signal),
+  };
+}
+
+export const useSuspenseGetValue = <TData = Schemas.AppConfigurationValue,>(
+  variables: GetValueVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.AppConfigurationValue,
+      GetValueError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useSuspenseQuery<
+    Schemas.AppConfigurationValue,
+    GetValueError,
+    TData
+  >({
+    ...getValueQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export const useGetValue = <TData = Schemas.AppConfigurationValue,>(
+  variables: GetValueVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.AppConfigurationValue,
+      GetValueError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useSagraContext(options);
+  return reactQuery.useQuery<
+    Schemas.AppConfigurationValue,
+    GetValueError,
+    TData
+  >({
+    ...getValueQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export type UpdateValuePathParams = {
+  group: string;
+  key: string;
+};
+
+export type UpdateValueError = Fetcher.ErrorWrapper<
+  | {
+      status: 400;
+      payload: Schemas.ErrorResource;
+    }
+  | {
+      status: 404;
+      payload: Schemas.ErrorResource;
+    }
+>;
+
+export type UpdateValueVariables = {
+  body?: Schemas.AppConfigurationSingleValueUpdateRequest;
+  pathParams: UpdateValuePathParams;
+} & SagraContext["fetcherOptions"];
+
+export const fetchUpdateValue = (
+  variables: UpdateValueVariables,
+  signal?: AbortSignal,
+) =>
+  sagraFetch<
+    Schemas.AppConfigurationValue,
+    UpdateValueError,
+    Schemas.AppConfigurationSingleValueUpdateRequest,
+    {},
+    {},
+    UpdateValuePathParams
+  >({
+    url: "/v1/configurations/{group}/{key}",
+    method: "put",
+    ...variables,
+    signal,
+  });
+
+export const useUpdateValue = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.AppConfigurationValue,
+      UpdateValueError,
+      UpdateValueVariables
+    >,
+    "mutationFn"
+  >,
+) => {
+  const { fetcherOptions } = useSagraContext();
+  return reactQuery.useMutation<
+    Schemas.AppConfigurationValue,
+    UpdateValueError,
+    UpdateValueVariables
+  >({
+    mutationFn: (variables: UpdateValueVariables) =>
+      fetchUpdateValue(deepMerge(fetcherOptions, variables)),
+    ...options,
+  });
+};
+
 export type ListUsersError = Fetcher.ErrorWrapper<undefined>;
 
 export type ListUsersResponse = Schemas.User[];
@@ -3374,6 +3836,21 @@ export type QueryOperation =
       path: "/v1/courses/{id}";
       operationId: "courseById";
       variables: CourseByIdVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/v1/configurations";
+      operationId: "getAll";
+      variables: GetAllVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/v1/configurations/{group}";
+      operationId: "getGroup";
+      variables: GetGroupVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/v1/configurations/{group}/{key}";
+      operationId: "getValue";
+      variables: GetValueVariables | reactQuery.SkipToken;
     }
   | {
       path: "/v1/users";

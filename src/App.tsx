@@ -41,6 +41,7 @@ const DiscountContainer = React.lazy(() => import("./container/discount/Discount
 const ProductContainer = React.lazy(() => import('./container/product/ProductContainer.tsx'))
 const CourseContainer = React.lazy(() => import("./container/course/CourseContainer.tsx"))
 const UserContainer = React.lazy(() => import("./container/user/UserContainer.tsx"))
+const ConfigurationContainer = React.lazy(() => import("./container/configuration/ConfigurationContainer.tsx"))
 const OrderNew = React.lazy(() => import("./container/order/OrderNew.tsx"))
 const ProductQuantityUpdateContainer = React.lazy(() => import("./container/product/ProductQuantityUpdateContainer.tsx"))
 const StatsContainer = React.lazy(() => import("./container/stats/StatsContainer.tsx"))
@@ -118,6 +119,10 @@ const useRouter = () => {
                     {
                         path: '/users',
                         element: <AdminOnly><UserContainer/></AdminOnly>
+                    },
+                    {
+                        path: '/configurations',
+                        element: <AdminOnly><ConfigurationContainer/></AdminOnly>
                     },
                     {
                         path: '/departments',

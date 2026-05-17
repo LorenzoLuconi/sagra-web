@@ -30,6 +30,7 @@ import {
     ReceiptOutlined,
     RestaurantOutlined,
     SettingsOutlined,
+    TuneOutlined,
     WarehouseOutlined,
     WorkspacesOutlined
 } from "@mui/icons-material";
@@ -177,6 +178,10 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                                 <MenuItem onClick={() => {handleNavigate('/users')}}>
                                     <PeopleOutlined />
                                     Utenti
+                                </MenuItem>
+                                <MenuItem onClick={() => {handleNavigate('/configurations')}}>
+                                    <TuneOutlined />
+                                    Configurazioni
                                 </MenuItem>
                                 <Divider />
                                 <MenuItem onClick={() => {handleNavigate('/stats')}}>

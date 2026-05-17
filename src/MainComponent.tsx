@@ -4,6 +4,7 @@ import App from "./App.tsx";
 import {queryClient} from "./main.tsx";
 import { ConfirmProvider } from "material-ui-confirm";
 import AuthStore from "./context/AuthStore.tsx";
+import AppConfigurationStore from "./context/AppConfigurationStore.tsx";
 
 const MainComponent = (): React.ReactElement => {
     return (
@@ -11,7 +12,9 @@ const MainComponent = (): React.ReactElement => {
         <QueryClientProvider client={queryClient}>
             <ConfirmProvider defaultOptions={{ confirmationText: 'Si', cancellationText: 'No'}}>
                 <AuthStore>
-                    <App />
+                    <AppConfigurationStore>
+                        <App />
+                    </AppConfigurationStore>
                 </AuthStore>
             </ConfirmProvider>
         </QueryClientProvider>

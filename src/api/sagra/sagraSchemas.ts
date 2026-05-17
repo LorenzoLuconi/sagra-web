@@ -284,6 +284,61 @@ export type Course = {
   name: string;
 };
 
+export type AppConfigurationGroupUpdateRequest = {
+  /**
+   * @minLength 1
+   */
+  group: string;
+  /**
+   * @minItems 1
+   */
+  keys: AppConfigurationValueUpdateRequest[];
+};
+
+export type AppConfigurationUpdateRequest = {
+  /**
+   * @minItems 1
+   */
+  groups: AppConfigurationGroupUpdateRequest[];
+};
+
+export type AppConfigurationValueUpdateRequest = {
+  /**
+   * @minLength 1
+   */
+  key: string;
+  value?: string;
+};
+
+/**
+ * Gruppo di configurazione applicativa
+ */
+export type AppConfigurationGroup = {
+  group: string;
+  keys: AppConfigurationValue[];
+};
+
+/**
+ * Valore di configurazione applicativa
+ */
+export type AppConfigurationValue = {
+  key: string;
+  value?: string;
+  type: "STRING" | "INTEGER" | "DECIMAL" | "BOOLEAN" | "DATE";
+  allowedValues: string[];
+};
+
+export type AppConfigurationGroupValuesUpdateRequest = {
+  /**
+   * @minItems 1
+   */
+  keys: AppConfigurationValueUpdateRequest[];
+};
+
+export type AppConfigurationSingleValueUpdateRequest = {
+  value?: string;
+};
+
 /**
  * Dati per la creazione di un utente
  */

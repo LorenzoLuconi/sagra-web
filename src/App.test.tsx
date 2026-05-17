@@ -12,6 +12,7 @@ const protectedRoutes = [
     "/orders/new",
     "/orders/1",
     "/users",
+    "/configurations",
     "/departments",
     "/courses",
     "/discounts",
