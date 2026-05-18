@@ -9,6 +9,7 @@ import type {AppConfigurationGroup} from "../api/sagra/sagraSchemas.ts";
 import {useAuth} from "./AuthStore.tsx";
 import {
     defaultEventTitle,
+    getConfiguredBooleanValue,
     getConfiguredStringValue,
     indexConfigurationGroups,
 } from "../configuration/appConfigurationMetadata.ts";
@@ -22,6 +23,11 @@ interface AppConfigurationContextValue {
     canReadConfigurations: boolean;
     eventTitle: string;
     logoSvg?: string;
+    order: {
+        nameMandatory: boolean;
+        takeAwayEnabled: boolean;
+        serviceEnabled: boolean;
+    };
     reload: () => Promise<AppConfigurationGroup[]>;
 }
 
@@ -33,6 +39,11 @@ const AppConfigurationContext = React.createContext<AppConfigurationContextValue
     canReadConfigurations: false,
     eventTitle: defaultEventTitle,
     logoSvg: undefined,
+    order: {
+        nameMandatory: true,
+        takeAwayEnabled: true,
+        serviceEnabled: true,
+    },
     reload: async () => [],
 });
 
@@ -54,6 +65,11 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
     const logoSvg = React.useMemo(() => (
         getConfiguredStringValue("general", "logo-svg", valuesByGroup)
     ), [valuesByGroup]);
+    const orderConfiguration = React.useMemo(() => ({
+        nameMandatory: getConfiguredBooleanValue("order", "name-mandatory", valuesByGroup, true),
+        takeAwayEnabled: getConfiguredBooleanValue("order", "take-away-enabled", valuesByGroup, true),
+        serviceEnabled: getConfiguredBooleanValue("order", "service-enabled", valuesByGroup, true),
+    }), [valuesByGroup]);
 
     React.useEffect(() => {
         document.title = eventTitle;
@@ -84,6 +100,7 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
         canReadConfigurations,
         eventTitle,
         logoSvg: logoSvg.length > 0 ? logoSvg : undefined,
+        order: orderConfiguration,
         reload,
     }), [
         groups,
@@ -91,6 +108,7 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
         canReadConfigurations,
         eventTitle,
         logoSvg,
+        orderConfiguration,
         configurations.isPending,
         configurations.isFetching,
         reload,
@@ -108,3 +126,5 @@ export default AppConfigurationStore;
 export const useAppConfiguration = () => React.useContext(AppConfigurationContext);
 
 export const useEventTitle = () => useAppConfiguration().eventTitle;
+
+export const useOrderConfiguration = () => useAppConfiguration().order;

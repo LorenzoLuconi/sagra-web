@@ -30,11 +30,14 @@ import {queryClient} from "../../main.tsx";
 import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 import { useConfirm } from "material-ui-confirm";
 import { useReactToPrint } from "react-to-print";
+import {useOrderConfiguration} from "../../context/AppConfigurationStore.tsx";
 
 
 const OrderEditForm: React.FC = () => {
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore, isNewOrder, originalOrder} = useOrderStore();
+  const orderConfiguration = useOrderConfiguration();
+  const {nameMandatory, takeAwayEnabled, serviceEnabled} = orderConfiguration;
   const navigate = useNavigate()
   const [customer, setCustomer] = useState(order.customer);
   const [takeAway, setTakeAway] = useState(order.takeAway);
@@ -176,6 +179,20 @@ const OrderEditForm: React.FC = () => {
     }
   }, [order])
 
+  React.useEffect(() => {
+    if (!takeAwayEnabled && order.takeAway) {
+      setTakeAway(false);
+      updateOrderField('takeAway', false);
+    }
+  }, [order.takeAway, takeAwayEnabled, updateOrderField]);
+
+  React.useEffect(() => {
+    if (!serviceEnabled && order.serviceNumber !== undefined) {
+      setCoperti(undefined);
+      updateOrderField('serviceNumber', undefined);
+    }
+  }, [order.serviceNumber, serviceEnabled, updateOrderField]);
+
 
   const handleChangeCustomer =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
@@ -216,7 +233,9 @@ const OrderEditForm: React.FC = () => {
   const handleSave = () => {
     resetErrors()
     console.log('Order to save: ', order)
-    const orderErrors = checkOrderErrors(order, productsTable)
+    const normalizedTakeAway = takeAwayEnabled ? order.takeAway : false;
+    const normalizedServiceNumber = serviceEnabled ? (normalizedTakeAway ? 0 : order.serviceNumber) : 0;
+    const orderErrors = checkOrderErrors(order, productsTable, orderConfiguration)
     const errorFields = Object.keys(orderErrors)
 
     errorFields.forEach((eK: string) => {
@@ -228,8 +247,8 @@ const OrderEditForm: React.FC = () => {
 
       const orderToSend: OrderRequest = {} as OrderRequest
       orderToSend.customer = order.customer
-      orderToSend.takeAway = order.takeAway
-      orderToSend.serviceNumber = order.takeAway ? 0 : order.serviceNumber
+      orderToSend.takeAway = normalizedTakeAway
+      orderToSend.serviceNumber = normalizedServiceNumber
       orderToSend.note = order.note
       orderToSend.products = cloneDeep(order.products)
         if ( order.discountRate )
@@ -249,7 +268,8 @@ const OrderEditForm: React.FC = () => {
 
   return (
     <>
-        <TextField fullWidth required
+        <TextField fullWidth
+                   required={nameMandatory}
                    name={'customer'}
                    size='small'
                    value={customer}
@@ -258,28 +278,34 @@ const OrderEditForm: React.FC = () => {
                    onChange={handleChangeCustomer}
                    helperText={errors['customer'] !== undefined ? errors['customer'] : ''}
         />
-        <Box sx={{ display: "flex", marginTop: 2 }}>
-          <TextField size='small'
-                     value={coperti !== undefined ? coperti : ''}
-                     required
-                     type="number"
-                     name={'serviceNumber'}
-                     error={errors['serviceNumber'] !== undefined}
-                     label="Coperti"
-                     onChange={handleChangeCoperti}
-                     disabled={takeAway}
-                     slotProps={{ htmlInput: { size: 8, min: 0 } }}
-                     sx={{ ml: 0, mr: 2}}
-                     helperText={ errors['serviceNumber'] ?? ''}
-          />
+        {(serviceEnabled || takeAwayEnabled) && (
+          <Box sx={{ display: "flex", marginTop: 2 }}>
+            {serviceEnabled && (
+              <TextField size='small'
+                         value={coperti !== undefined ? coperti : ''}
+                         required
+                         type="number"
+                         name={'serviceNumber'}
+                         error={errors['serviceNumber'] !== undefined}
+                         label="Coperti"
+                         onChange={handleChangeCoperti}
+                         disabled={takeAwayEnabled && takeAway}
+                         slotProps={{ htmlInput: { size: 8, min: 0 } }}
+                         sx={{ ml: 0, mr: 2}}
+                         helperText={ errors['serviceNumber'] ?? ''}
+              />
+            )}
 
-          <FormControlLabel
-              label="Asporto"
-              control={
-                <Switch checked={takeAway} onChange={handleChangeTakeAway} />
-              }
-          />
-        </Box>
+            {takeAwayEnabled && (
+              <FormControlLabel
+                  label="Asporto"
+                  control={
+                    <Switch checked={takeAway} onChange={handleChangeTakeAway} />
+                  }
+              />
+            )}
+          </Box>
+        )}
         <Box>
           <TextField fullWidth size="small"
                      label="Note"

@@ -118,6 +118,16 @@ export const getConfiguredStringValue = (
     return value && value.length > 0 ? value : fallback;
 };
 
+export const getConfiguredBooleanValue = (
+    group: string,
+    key: string,
+    configurations?: AppConfigurationValueByGroup,
+    fallback = false,
+): boolean => {
+    const value = getConfiguredValue(group, key, configurations)?.value;
+    return value ? value.toLowerCase() === "true" : fallback;
+};
+
 export type AppConfigurationValueByGroup = Record<string, Record<string, AppConfigurationValue>>;
 
 export const indexConfigurationGroups = (

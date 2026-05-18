@@ -48,14 +48,29 @@ export const currency = (value : number) : string => {
 
 export type OrderErrorT = Record<string, string>
 
-export const checkOrderErrors = (order: Order, productsTable: Record<number, Product>): OrderErrorT => {
-    const res = {} as OrderErrorT
+interface CheckOrderErrorsOptions {
+    nameMandatory?: boolean;
+    takeAwayEnabled?: boolean;
+    serviceEnabled?: boolean;
+}
 
-    if (order.customer.length===0) {
+export const checkOrderErrors = (
+    order: Order,
+    productsTable: Record<number, Product>,
+    options: CheckOrderErrorsOptions = {},
+): OrderErrorT => {
+    const res = {} as OrderErrorT
+    const {
+        nameMandatory = true,
+        takeAwayEnabled = true,
+        serviceEnabled = true,
+    } = options;
+
+    if (nameMandatory && order.customer.length===0) {
         res['customer'] = 'Deve essere inserito il nome del cliente'
     }
 
-    if ( (order.serviceNumber === undefined || order.serviceNumber < 0) && !order.takeAway) {
+    if ( serviceEnabled && (order.serviceNumber === undefined || order.serviceNumber < 0) && !(takeAwayEnabled && order.takeAway)) {
         res['serviceNumber'] = 'Inserire il numero di coperti o selezionare asporto'
     }
 
