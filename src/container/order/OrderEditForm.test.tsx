@@ -1,4 +1,4 @@
-import {fireEvent, screen} from "@testing-library/react";
+import {fireEvent, screen, waitFor} from "@testing-library/react";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import type {Order, Product} from "../../api/sagra/sagraSchemas.ts";
 import {renderWithProviders} from "../../test/renderWithProviders.tsx";
@@ -11,24 +11,26 @@ const fetchOrderDeleteMock = vi.fn();
 const fetchOrderUpdateMock = vi.fn();
 const ordersSearchQueryMock = vi.fn();
 const productsSearchQueryMock = vi.fn();
-const invalidateQueriesMock = vi.fn(() => Promise.resolve());
+const invalidateQueriesMock = vi.fn((_args?: unknown) => Promise.resolve());
 const navigateMock = vi.fn();
+const toastErrorMock = vi.fn();
+const toastSuccessMock = vi.fn();
 
 vi.mock("../../context/AppConfigurationStore.tsx", () => ({
     useOrderConfiguration: () => useOrderConfigurationMock(),
 }));
 
 vi.mock("../../api/sagra/sagraComponents.ts", () => ({
-    fetchOrderCreate: (...args: unknown[]) => fetchOrderCreateMock(...args),
-    fetchOrderDelete: (...args: unknown[]) => fetchOrderDeleteMock(...args),
-    fetchOrderUpdate: (...args: unknown[]) => fetchOrderUpdateMock(...args),
-    ordersSearchQuery: (...args: unknown[]) => ordersSearchQueryMock(...args),
-    productsSearchQuery: (...args: unknown[]) => productsSearchQueryMock(...args),
+    fetchOrderCreate: (args: unknown) => fetchOrderCreateMock(args),
+    fetchOrderDelete: (args: unknown) => fetchOrderDeleteMock(args),
+    fetchOrderUpdate: (args: unknown) => fetchOrderUpdateMock(args),
+    ordersSearchQuery: (args: unknown) => ordersSearchQueryMock(args),
+    productsSearchQuery: (args: unknown) => productsSearchQueryMock(args),
 }));
 
 vi.mock("../../main.tsx", () => ({
     queryClient: {
-        invalidateQueries: (...args: unknown[]) => invalidateQueriesMock(...args),
+        invalidateQueries: (args: unknown) => invalidateQueriesMock(args),
     },
 }));
 
@@ -42,6 +44,13 @@ vi.mock("react-router", async (importOriginal) => {
 
 vi.mock("./OrderPrint.tsx", () => ({
     default: () => <div data-testid="order-print"/>,
+}));
+
+vi.mock("react-hot-toast", () => ({
+    default: {
+        error: (message: unknown, options?: unknown) => toastErrorMock(message, options),
+        success: (message: unknown, options?: unknown) => toastSuccessMock(message, options),
+    },
 }));
 
 const product: Product = {
@@ -93,6 +102,8 @@ describe("OrderEditForm buttons", () => {
         productsSearchQueryMock.mockReset();
         invalidateQueriesMock.mockClear();
         navigateMock.mockClear();
+        toastErrorMock.mockClear();
+        toastSuccessMock.mockClear();
 
         useOrderConfigurationMock.mockReturnValue({
             nameMandatory: true,
@@ -145,5 +156,40 @@ describe("OrderEditForm buttons", () => {
         expect(screen.getByRole("button", {name: "Annulla"})).toBeEnabled();
         expect(screen.getByRole("button", {name: "Elimina"})).toBeInTheDocument();
         expect(screen.queryByRole("button", {name: "Crea"})).not.toBeInTheDocument();
+    });
+
+    it("mostra gli invalidValues restituiti dal backend durante l'aggiornamento", async () => {
+        useOrderConfigurationMock.mockReturnValue({
+            nameMandatory: false,
+            takeAwayEnabled: false,
+            serviceEnabled: false,
+            serviceCost: 1,
+        });
+        fetchOrderUpdateMock.mockRejectedValue({
+            status: 400,
+            payload: {
+                message: "Richiesta non valida",
+                invalidValues: [
+                    {
+                        field: "serviceNumber",
+                        value: 2,
+                        message: "Coperti non abilitati",
+                    },
+                ],
+            },
+        });
+
+        renderOrderEditForm(savedOrder({serviceNumber: 2}));
+
+        fireEvent.change(screen.getByRole("textbox", {name: "Nome cliente"}), {
+            target: {value: "Luigi Bianchi"},
+        });
+        fireEvent.click(screen.getByRole("button", {name: "Aggiorna"}));
+
+        await waitFor(() => {
+            expect(toastErrorMock).toHaveBeenCalled();
+        });
+        expect(toastErrorMock.mock.calls[0][0]).toBe("Coperti non abilitati");
+        expect(screen.getByText("Coperti non abilitati")).toBeInTheDocument();
     });
 });

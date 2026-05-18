@@ -1,4 +1,5 @@
 import {
+  ErrorResource,
   ErrorResourceNotEnoughQuantity,
   Order,
   OrderRequest,
@@ -99,11 +100,26 @@ const OrderEditForm: React.FC = () => {
     const productsSearchConf = productsSearchQuery({});
 
 
+    const getErrorParts = (error: unknown): {status?: unknown; payload?: unknown} => {
+        if (error && typeof error === "object" && "payload" in error) {
+            const {status, payload} = error as ErrorWrapper<unknown> & {status?: unknown; payload?: unknown};
+            return {status, payload};
+        }
+
+        if (error && typeof error === "object" && "stack" in error) {
+            const stack = (error as Error).stack;
+            if (stack && typeof stack === "object" && "payload" in stack) {
+                const {status, payload} = stack as ErrorWrapper<unknown> & {status?: unknown; payload?: unknown};
+                return {status, payload};
+            }
+        }
+
+        return {};
+    };
+
     const manageError = (error: Error) => {
         console.log('Gestione errore ordini: ', error)
-        const errorWrapper = error as ErrorWrapper<unknown>;
-        // @ts-ignore
-        const {status, payload} = errorWrapper.stack
+        const {status, payload} = getErrorParts(error);
         console.log(`Error: status=${status}, payload=`, payload);
 
         switch (status) {
@@ -125,7 +141,16 @@ const OrderEditForm: React.FC = () => {
             }
 
             default: {
-                toast.error(`${payload.message}`)
+                const errorResource = payload as ErrorResource | undefined;
+                if (errorResource?.invalidValues && errorResource.invalidValues.length > 0) {
+                    errorResource.invalidValues.forEach((invalidValue) => {
+                        setFieldError(invalidValue.field, invalidValue.message);
+                        toast.error(invalidValue.message);
+                    });
+                    return;
+                }
+
+                toast.error(errorResource?.message ?? "Si è verificato un errore inatteso")
             }
         }
     }
