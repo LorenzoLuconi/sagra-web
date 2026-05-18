@@ -16,6 +16,8 @@ import {
 } from "../configuration/appConfigurationMetadata.ts";
 import type {AppConfigurationValueByGroup} from "../configuration/appConfigurationMetadata.ts";
 
+export type PrintSplitBy = "none" | "course" | "department";
+
 interface AppConfigurationContextValue {
     groups: AppConfigurationGroup[];
     valuesByGroup: AppConfigurationValueByGroup;
@@ -32,6 +34,7 @@ interface AppConfigurationContextValue {
     };
     print: {
         customerCopy: boolean;
+        splitBy: PrintSplitBy;
     };
     reload: () => Promise<AppConfigurationGroup[]>;
 }
@@ -52,9 +55,15 @@ const AppConfigurationContext = React.createContext<AppConfigurationContextValue
     },
     print: {
         customerCopy: true,
+        splitBy: "department",
     },
     reload: async () => [],
 });
+
+const getConfiguredPrintSplitBy = (valuesByGroup: AppConfigurationValueByGroup): PrintSplitBy => {
+    const value = getConfiguredStringValue("print", "split-by", valuesByGroup, "department");
+    return value === "none" || value === "course" || value === "department" ? value : "department";
+};
 
 const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) => {
     const queryClient = useQueryClient();
@@ -82,6 +91,7 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
     }), [valuesByGroup]);
     const printConfiguration = React.useMemo(() => ({
         customerCopy: getConfiguredBooleanValue("print", "customer-copy", valuesByGroup, true),
+        splitBy: getConfiguredPrintSplitBy(valuesByGroup),
     }), [valuesByGroup]);
 
     React.useEffect(() => {

@@ -16,6 +16,7 @@ import "./OrderPrint.css"
 import {DepartmentName} from "../department/DepartmentName.tsx";
 import * as React from "react";
 import {useEventTitle, usePrintConfiguration} from "../../context/AppConfigurationStore.tsx";
+import {CourseName} from "../course/CourseName.tsx";
 
 interface OrderPrintProps {
   order: Order
@@ -50,7 +51,7 @@ const StyledTableRow = styled(TableRow)(() => ({
 const OrderPrint = (props : OrderPrintProps ) => {
 
   const {order, products} = props;
-  const {customerCopy} = usePrintConfiguration();
+  const {customerCopy, splitBy} = usePrintConfiguration();
 
   if ( ! products || Object.keys(products).length === 0 || ! order.products || order.products.length === 0)
     return <></>
@@ -61,11 +62,11 @@ const OrderPrint = (props : OrderPrintProps ) => {
     <>
         {customerCopy && <OrderPrintPageCustomer order={order} products={products} />}
         {
-          Array.from(new Set(order.products.map( p => products[p.productId].departmentId))).map( (departmentId, index ) => {
+          getPrintGroups(order, products, splitBy).map( (group, index ) => {
             const needsPageBreak = customerCopy || index > 0;
             return (
-                <div key={departmentId} className={needsPageBreak ? "page-break" : undefined}>
-                 <OrderPrintPageDepartment order={order} departmentId={+departmentId} products={products} />
+                <div key={group.key} className={needsPageBreak ? "page-break" : undefined}>
+                 <OrderPrintPageProducts order={order} title={group.title} products={products} productsToPrint={group.products} />
                 </div>
             )
           })
@@ -73,6 +74,40 @@ const OrderPrint = (props : OrderPrintProps ) => {
     </>
   )
 }
+
+type PrintGroup = {
+  key: string;
+  title: React.ReactNode;
+  products: OrderedProduct[];
+};
+
+const getPrintGroups = (
+  order: Order,
+  products: Record<number, Product>,
+  splitBy: "none" | "course" | "department",
+): PrintGroup[] => {
+  if (splitBy === "none") {
+    return [{
+      key: "all",
+      title: "Prodotti",
+      products: order.products,
+    }];
+  }
+
+  const groupIds = Array.from(new Set(order.products.map((orderedProduct) => {
+    const product = products[orderedProduct.productId];
+    return splitBy === "course" ? product.courseId : product.departmentId;
+  })));
+
+  return groupIds.map((groupId) => ({
+    key: `${splitBy}-${groupId}`,
+    title: splitBy === "course" ? <CourseName courseId={groupId}/> : <DepartmentName departmentId={groupId}/>,
+    products: order.products.filter((orderedProduct) => {
+      const product = products[orderedProduct.productId];
+      return splitBy === "course" ? product.courseId === groupId : product.departmentId === groupId;
+    }),
+  }));
+};
 
 interface IFieldValue {
   field: string
@@ -162,28 +197,15 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
 
 }
 
-interface OrderPrintPageDepartmentProps {
+interface OrderPrintPageProductsProps {
   order: Order;
-  departmentId: number;
   products: Record<number, Product>;
+  productsToPrint: OrderedProduct[];
+  title: React.ReactNode;
 }
 
-const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
-  const {order, departmentId, products} = props;
-
-  const productForDepartment = () => {
-    const result : OrderedProduct[] = [];
-    for ( const op of order.products) {
-      const productsMapElement = products[op.productId];
-      if (productsMapElement && productsMapElement.departmentId == departmentId) {
-        result.push(op)
-      }
-    }
-
-    return result;
-  }
-
-  const productsToPrint = productForDepartment()
+const OrderPrintPageProducts =  (props: OrderPrintPageProductsProps) => {
+  const {order, title, products, productsToPrint} = props;
 
   return (
     <>
@@ -192,7 +214,7 @@ const OrderPrintPageDepartment =  (props: OrderPrintPageDepartmentProps) => {
         <OrderPrintInfo order={order} />
         <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
           <Typography sx={{fontSize: '1.8em', color: 'text.primary', textTransform: 'uppercase', fontWeight: 700}}>
-            <DepartmentName departmentId={departmentId}/>
+            {title}
           </Typography>
         </Box>
         <TableContainer sx={TableStyle}>
