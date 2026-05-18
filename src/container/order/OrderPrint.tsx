@@ -15,7 +15,7 @@ import { convertDate, currency, FULL_DATE_CONF } from "../../utils";
 import "./OrderPrint.css"
 import {DepartmentName} from "../department/DepartmentName.tsx";
 import * as React from "react";
-import {useEventTitle} from "../../context/AppConfigurationStore.tsx";
+import {useEventTitle, usePrintConfiguration} from "../../context/AppConfigurationStore.tsx";
 
 interface OrderPrintProps {
   order: Order
@@ -50,6 +50,7 @@ const StyledTableRow = styled(TableRow)(() => ({
 const OrderPrint = (props : OrderPrintProps ) => {
 
   const {order, products} = props;
+  const {customerCopy} = usePrintConfiguration();
 
   if ( ! products || Object.keys(products).length === 0 || ! order.products || order.products.length === 0)
     return <></>
@@ -58,11 +59,12 @@ const OrderPrint = (props : OrderPrintProps ) => {
 
   return (
     <>
-        <OrderPrintPageCustomer order={order} products={products} />
+        {customerCopy && <OrderPrintPageCustomer order={order} products={products} />}
         {
-          Array.from(new Set(order.products.map( p => products[p.productId].departmentId))).map( (departmentId ) => {
+          Array.from(new Set(order.products.map( p => products[p.productId].departmentId))).map( (departmentId, index ) => {
+            const needsPageBreak = customerCopy || index > 0;
             return (
-                <div key={departmentId} className="page-break">
+                <div key={departmentId} className={needsPageBreak ? "page-break" : undefined}>
                  <OrderPrintPageDepartment order={order} departmentId={+departmentId} products={products} />
                 </div>
             )

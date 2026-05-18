@@ -30,6 +30,9 @@ interface AppConfigurationContextValue {
         serviceEnabled: boolean;
         serviceCost: number;
     };
+    print: {
+        customerCopy: boolean;
+    };
     reload: () => Promise<AppConfigurationGroup[]>;
 }
 
@@ -46,6 +49,9 @@ const AppConfigurationContext = React.createContext<AppConfigurationContextValue
         takeAwayEnabled: true,
         serviceEnabled: true,
         serviceCost: 0.5,
+    },
+    print: {
+        customerCopy: true,
     },
     reload: async () => [],
 });
@@ -73,6 +79,9 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
         takeAwayEnabled: getConfiguredBooleanValue("order", "take-away-enabled", valuesByGroup, true),
         serviceEnabled: getConfiguredBooleanValue("order", "service-enabled", valuesByGroup, true),
         serviceCost: getConfiguredNumberValue("order", "service-cost", valuesByGroup, 0.5),
+    }), [valuesByGroup]);
+    const printConfiguration = React.useMemo(() => ({
+        customerCopy: getConfiguredBooleanValue("print", "customer-copy", valuesByGroup, true),
     }), [valuesByGroup]);
 
     React.useEffect(() => {
@@ -105,6 +114,7 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
         eventTitle,
         logoSvg: logoSvg.length > 0 ? logoSvg : undefined,
         order: orderConfiguration,
+        print: printConfiguration,
         reload,
     }), [
         groups,
@@ -113,6 +123,7 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
         eventTitle,
         logoSvg,
         orderConfiguration,
+        printConfiguration,
         configurations.isPending,
         configurations.isFetching,
         reload,
@@ -132,3 +143,5 @@ export const useAppConfiguration = () => React.useContext(AppConfigurationContex
 export const useEventTitle = () => useAppConfiguration().eventTitle;
 
 export const useOrderConfiguration = () => useAppConfiguration().order;
+
+export const usePrintConfiguration = () => useAppConfiguration().print;

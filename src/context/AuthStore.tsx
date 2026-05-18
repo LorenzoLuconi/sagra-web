@@ -2,6 +2,7 @@ import * as React from "react";
 import {useLogin, useLogout, useMe, meQuery} from "../api/sagra/sagraComponents.ts";
 import type {AuthenticatedUser, LoginRequest} from "../api/sagra/sagraSchemas.ts";
 import {useQueryClient} from "@tanstack/react-query";
+import {unauthorizedEventName} from "../api/sagra/sagraFetcher.ts";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated" | "error";
 
@@ -62,6 +63,7 @@ const AuthStore: React.FC<React.PropsWithChildren> = ({children}) => {
     const me = useMe({});
     const loginMutation = useLogin();
     const logoutMutation = useLogout();
+    const [sessionExpired, setSessionExpired] = React.useState(false);
 
     const user = loginMutation.data ?? me.data;
     const meStatus = getErrorStatus(me.error);
@@ -71,6 +73,10 @@ const AuthStore: React.FC<React.PropsWithChildren> = ({children}) => {
     const status: AuthStatus = React.useMemo(() => {
         if (user) {
             return "authenticated";
+        }
+
+        if (sessionExpired) {
+            return "unauthenticated";
         }
 
         if (me.isPending) {
@@ -86,7 +92,20 @@ const AuthStore: React.FC<React.PropsWithChildren> = ({children}) => {
         }
 
         return "unauthenticated";
-    }, [me.error, me.isPending, meStatus, user]);
+    }, [me.error, me.isPending, meStatus, sessionExpired, user]);
+
+    React.useEffect(() => {
+        const handleUnauthorized = () => {
+            setSessionExpired(true);
+            loginMutation.reset();
+            queryClient.removeQueries({queryKey: meQuery({}).queryKey});
+        };
+
+        window.addEventListener(unauthorizedEventName, handleUnauthorized);
+        return () => {
+            window.removeEventListener(unauthorizedEventName, handleUnauthorized);
+        };
+    }, [loginMutation, queryClient]);
 
     const refresh = React.useCallback(async () => {
         await queryClient.invalidateQueries({queryKey: meQuery({}).queryKey});
@@ -94,12 +113,14 @@ const AuthStore: React.FC<React.PropsWithChildren> = ({children}) => {
 
     const login = React.useCallback(async (credentials: LoginRequest) => {
         const authenticatedUser = await loginMutation.mutateAsync({body: credentials});
+        setSessionExpired(false);
         queryClient.setQueryData(meQuery({}).queryKey, authenticatedUser);
         await queryClient.invalidateQueries({queryKey: meQuery({}).queryKey});
     }, [loginMutation, queryClient]);
 
     const logout = React.useCallback(async () => {
         await logoutMutation.mutateAsync({});
+        setSessionExpired(true);
         loginMutation.reset();
         queryClient.removeQueries({queryKey: meQuery({}).queryKey});
     }, [loginMutation, logoutMutation, queryClient]);

@@ -3,6 +3,7 @@ import {manageErrorResponse} from "../../utils";
 import {AppConf} from "../../AppConf.ts";
 
 const baseUrl = AppConf.getApiUrl();
+export const unauthorizedEventName = "sagra:unauthorized";
 
 export type ErrorWrapper<TError> =
   | TError
@@ -84,6 +85,10 @@ export async function sagraFetch<
       return (await response.blob()) as unknown as TData;
     }
   } catch (e) {
+    if (getErrorStatus(e) === 401) {
+      window.dispatchEvent(new CustomEvent(unauthorizedEventName));
+    }
+
     if (e && typeof e === "object" && "status" in e) {
       throw e;
     }
@@ -97,6 +102,15 @@ export async function sagraFetch<
     throw errorObject;
   }
 }
+
+const getErrorStatus = (error: unknown): number | undefined => {
+  if (error && typeof error === "object" && "status" in error) {
+    const status = (error as { status?: unknown }).status;
+    return typeof status === "number" ? status : undefined;
+  }
+
+  return undefined;
+};
 
 const resolveUrl = (
   url: string,
