@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useLogin, useLogout, useMe, meQuery} from "../api/sagra/sagraComponents.ts";
 import type {AuthenticatedUser, LoginRequest} from "../api/sagra/sagraSchemas.ts";
-import {useQueryClient} from "@tanstack/react-query";
+import {skipToken, useQueryClient} from "@tanstack/react-query";
 import {unauthorizedEventName} from "../api/sagra/sagraFetcher.ts";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated" | "error";
@@ -60,10 +60,13 @@ const getErrorMessage = (error: unknown, fallback: string): string => {
 
 const AuthStore: React.FC<React.PropsWithChildren> = ({children}) => {
     const queryClient = useQueryClient();
-    const me = useMe({});
     const loginMutation = useLogin();
     const logoutMutation = useLogout();
     const [sessionExpired, setSessionExpired] = React.useState(false);
+    const me = useMe(sessionExpired ? skipToken : {}, {
+        retry: false,
+        refetchOnWindowFocus: false,
+    });
 
     const user = loginMutation.data ?? me.data;
     const meStatus = getErrorStatus(me.error);

@@ -85,7 +85,7 @@ export async function sagraFetch<
       return (await response.blob()) as unknown as TData;
     }
   } catch (e) {
-    if (getErrorStatus(e) === 401) {
+    if (getErrorStatus(e) === 401 && shouldDispatchUnauthorizedEvent(url)) {
       window.dispatchEvent(new CustomEvent(unauthorizedEventName));
     }
 
@@ -110,6 +110,10 @@ const getErrorStatus = (error: unknown): number | undefined => {
   }
 
   return undefined;
+};
+
+const shouldDispatchUnauthorizedEvent = (url: string): boolean => {
+  return url !== "/v1/auth/login";
 };
 
 const resolveUrl = (
