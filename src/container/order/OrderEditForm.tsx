@@ -47,7 +47,11 @@ const OrderEditForm: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const differences = !isEqual(originalOrder, order)
+  const newOrder = isNewOrder();
+  const differences = !isEqual(originalOrder, order);
+  const showServiceNumber = serviceEnabled || (!newOrder && order.serviceNumber !== undefined);
+  const showTakeAway = takeAwayEnabled || (!newOrder && order.takeAway);
+  const showOrderOptions = showServiceNumber || showTakeAway;
 
   const handleCancel = () => {
     resetStore()
@@ -180,18 +184,18 @@ const OrderEditForm: React.FC = () => {
   }, [order])
 
   React.useEffect(() => {
-    if (!takeAwayEnabled && order.takeAway) {
+    if (newOrder && !takeAwayEnabled && order.takeAway) {
       setTakeAway(false);
       updateOrderField('takeAway', false);
     }
-  }, [order.takeAway, takeAwayEnabled, updateOrderField]);
+  }, [newOrder, order.takeAway, takeAwayEnabled, updateOrderField]);
 
   React.useEffect(() => {
-    if (!serviceEnabled && order.serviceNumber !== undefined) {
+    if (newOrder && !serviceEnabled && order.serviceNumber !== undefined) {
       setCoperti(undefined);
       updateOrderField('serviceNumber', undefined);
     }
-  }, [order.serviceNumber, serviceEnabled, updateOrderField]);
+  }, [newOrder, order.serviceNumber, serviceEnabled, updateOrderField]);
 
 
   const handleChangeCustomer =
@@ -233,8 +237,8 @@ const OrderEditForm: React.FC = () => {
   const handleSave = () => {
     resetErrors()
     console.log('Order to save: ', order)
-    const normalizedTakeAway = takeAwayEnabled ? order.takeAway : false;
-    const normalizedServiceNumber = serviceEnabled ? (normalizedTakeAway ? 0 : order.serviceNumber) : 0;
+    const normalizedTakeAway = newOrder && !takeAwayEnabled ? false : order.takeAway;
+    const normalizedServiceNumber = newOrder && !serviceEnabled ? 0 : (normalizedTakeAway ? 0 : order.serviceNumber);
     const orderErrors = checkOrderErrors(order, productsTable, orderConfiguration)
     const errorFields = Object.keys(orderErrors)
 
@@ -256,7 +260,7 @@ const OrderEditForm: React.FC = () => {
 
         console.log('Order2Send: ', orderToSend)
 
-      if (! isNewOrder()) {
+      if (!newOrder) {
         updateOrder.mutate(orderToSend)
 
       } else {
@@ -278,9 +282,9 @@ const OrderEditForm: React.FC = () => {
                    onChange={handleChangeCustomer}
                    helperText={errors['customer'] !== undefined ? errors['customer'] : ''}
         />
-        {(serviceEnabled || takeAwayEnabled) && (
+        {showOrderOptions && (
           <Box sx={{ display: "flex", marginTop: 2 }}>
-            {serviceEnabled && (
+            {showServiceNumber && (
               <TextField size='small'
                          value={coperti !== undefined ? coperti : ''}
                          required
@@ -289,14 +293,14 @@ const OrderEditForm: React.FC = () => {
                          error={errors['serviceNumber'] !== undefined}
                          label="Coperti"
                          onChange={handleChangeCoperti}
-                         disabled={takeAwayEnabled && takeAway}
+                         disabled={showTakeAway && takeAway}
                          slotProps={{ htmlInput: { size: 8, min: 0 } }}
                          sx={{ ml: 0, mr: 2}}
                          helperText={ errors['serviceNumber'] ?? ''}
               />
             )}
 
-            {takeAwayEnabled && (
+            {showTakeAway && (
               <FormControlLabel
                   label="Asporto"
                   control={
@@ -319,42 +323,54 @@ const OrderEditForm: React.FC = () => {
         <Box sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 2,
                   p: 2
         }}>
-          <Button
-            size="small"
-              disabled={!differences}
+          {newOrder && (
+            <Button
+              size="small"
               variant="contained"
               startIcon={<SaveOutlined/>}
               onClick= {() => handleSave()}
-          >{ isNewOrder() ? 'Crea' : 'Aggiorna'}</Button>
-          <Button size="small"  color="success"
-                  disabled={differences || isNewOrder()}
-                  onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+            >Crea</Button>
+          )}
+          {!newOrder && (
             <Button
               size="small"
               disabled={!differences}
               variant="contained"
-              onClick={ () =>  {
-                confirm({
-                  title: `Annulla modifiche ordine`,
-                  description: `Le modifiche in corso dell'ordine verranno annullate, vuoi procedere?`
-                }).then((confirm) => {
-                  if (confirm.confirmed) {
-                    handleCancel()
-                  }
-                });
-              }}
-              startIcon={<CancelOutlined/>}
-            >Annulla</Button>
-
-          <Button size="small"
-                  variant="contained"
-                  disabled={ isNewOrder() }
-                  onClick={ () => handleDelete()}
-                  color="error"
-                  startIcon={<DeleteOutlined/>}
-          >Elimina</Button>
+              startIcon={<SaveOutlined/>}
+              onClick= {() => handleSave()}
+            >Aggiorna</Button>
+          )}
+          {!newOrder && (
+            <Button size="small"  color="success"
+                    disabled={differences}
+                    onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+          )}
+          <Button
+            size="small"
+            disabled={!differences}
+            variant="contained"
+            onClick={ () =>  {
+              confirm({
+                title: `Annulla modifiche ordine`,
+                description: `Le modifiche in corso dell'ordine verranno annullate, vuoi procedere?`
+              }).then((confirm) => {
+                if (confirm.confirmed) {
+                  handleCancel()
+                }
+              });
+            }}
+            startIcon={<CancelOutlined/>}
+          >Annulla</Button>
+          {!newOrder && (
+            <Button size="small"
+                    variant="contained"
+                    onClick={ () => handleDelete()}
+                    color="error"
+                    startIcon={<DeleteOutlined/>}
+            >Elimina</Button>
+          )}
         </Box>
-        { ! (differences || isNewOrder()) &&
+        { ! (differences || newOrder) &&
           <div ref={contentRef} className="printContent print-container">
             <OrderPrint order={order} products={productsTable}/>
           </div>
