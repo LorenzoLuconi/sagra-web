@@ -4,15 +4,19 @@ import {clone, cloneDeep, set} from "lodash";
 import {addOperator, OrderErrorT, setOperator, testOrderProductAvailability} from "../utils";
 import toast from "react-hot-toast";
 
+export const defaultServiceCost = 0.5;
+
 // @ts-ignore
-export const EmptyOrder: Order = {
+export const createEmptyOrder = (serviceCost = defaultServiceCost): Order => ({
   products: [] as Product[],
   serviceNumber: undefined,
-  serviceCost: 0.5,
+  serviceCost,
   customer: '',
   takeAway: false,
     id: -1
-} as Order
+} as Order)
+
+export const EmptyOrder: Order = createEmptyOrder()
 
 interface OrderContextI {
     order: Order

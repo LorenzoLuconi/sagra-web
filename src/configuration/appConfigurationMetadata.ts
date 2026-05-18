@@ -128,6 +128,21 @@ export const getConfiguredBooleanValue = (
     return value ? value.toLowerCase() === "true" : fallback;
 };
 
+export const getConfiguredNumberValue = (
+    group: string,
+    key: string,
+    configurations?: AppConfigurationValueByGroup,
+    fallback = 0,
+): number => {
+    const value = getConfiguredValue(group, key, configurations)?.value;
+    if (!value || value.length === 0) {
+        return fallback;
+    }
+
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue : fallback;
+};
+
 export type AppConfigurationValueByGroup = Record<string, Record<string, AppConfigurationValue>>;
 
 export const indexConfigurationGroups = (

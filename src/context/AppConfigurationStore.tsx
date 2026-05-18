@@ -10,6 +10,7 @@ import {useAuth} from "./AuthStore.tsx";
 import {
     defaultEventTitle,
     getConfiguredBooleanValue,
+    getConfiguredNumberValue,
     getConfiguredStringValue,
     indexConfigurationGroups,
 } from "../configuration/appConfigurationMetadata.ts";
@@ -27,6 +28,7 @@ interface AppConfigurationContextValue {
         nameMandatory: boolean;
         takeAwayEnabled: boolean;
         serviceEnabled: boolean;
+        serviceCost: number;
     };
     reload: () => Promise<AppConfigurationGroup[]>;
 }
@@ -43,6 +45,7 @@ const AppConfigurationContext = React.createContext<AppConfigurationContextValue
         nameMandatory: true,
         takeAwayEnabled: true,
         serviceEnabled: true,
+        serviceCost: 0.5,
     },
     reload: async () => [],
 });
@@ -69,6 +72,7 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
         nameMandatory: getConfiguredBooleanValue("order", "name-mandatory", valuesByGroup, true),
         takeAwayEnabled: getConfiguredBooleanValue("order", "take-away-enabled", valuesByGroup, true),
         serviceEnabled: getConfiguredBooleanValue("order", "service-enabled", valuesByGroup, true),
+        serviceCost: getConfiguredNumberValue("order", "service-cost", valuesByGroup, 0.5),
     }), [valuesByGroup]);
 
     React.useEffect(() => {
