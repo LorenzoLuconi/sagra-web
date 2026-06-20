@@ -13,12 +13,12 @@ vi.mock("../../context/AppConfigurationStore.tsx", () => ({
     usePrintConfiguration: () => usePrintConfigurationMock(),
 }));
 
-vi.mock("../department/DepartmentName.tsx", () => ({
-    DepartmentName: ({departmentId}: {departmentId: number}) => <>Reparto {departmentId}</>,
+vi.mock("../department/useDepartmentName.ts", () => ({
+    useDepartmentName: (departmentId: number) => ({data: `Reparto ${departmentId}`}),
 }));
 
-vi.mock("../course/CourseName.tsx", () => ({
-    CourseName: ({courseId}: {courseId: number}) => <>Portata {courseId}</>,
+vi.mock("../course/useCourseName.ts", () => ({
+    useCourseName: (courseId: number) => ({data: `Portata ${courseId}`}),
 }));
 
 const product = (overrides: Partial<Product> = {}): Product => ({
