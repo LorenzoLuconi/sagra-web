@@ -2,7 +2,7 @@ import {screen, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LoginView from "./LoginView.tsx";
 import {renderWithProviders} from "../test/renderWithProviders.tsx";
-import {vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 
 const useAuthMock = vi.fn();
 

@@ -1,6 +1,6 @@
 import {screen, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import {vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {renderWithProviders} from "../../test/renderWithProviders.tsx";
 import {UserEdit} from "./UserEdit.tsx";
 

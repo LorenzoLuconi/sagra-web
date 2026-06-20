@@ -1,8 +1,8 @@
-import {screen, waitFor} from "@testing-library/react";
+import {screen} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ChangePasswordDialog from "./ChangePasswordDialog.tsx";
 import {renderWithProviders} from "../test/renderWithProviders.tsx";
-import {vi} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 
 const useChangePasswordMock = vi.fn();
 
