@@ -26,6 +26,7 @@ interface OrderPrintProps {
 const TableStyle = {
   border: '1px solid #999',
   borderRadius: '4px',
+  boxSizing: 'border-box',
   width: '100%'
 }
 
@@ -146,7 +147,7 @@ interface IFieldValue {
 
 const OrderPrintContainer = ( props: React.PropsWithChildren ) => {
   return (
-    <Box sx={{ m: 3, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+    <Box sx={{ m: 3, display: 'flex', flexDirection: 'column', alignItems: 'stretch'}}>
       {props.children}
     </Box>
   )
@@ -325,7 +326,7 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
   const {order} = props
 
   return (
-    <Box sx={{display: 'inline-block', width: '100%', mt: 1, border: 1, p: 1, backgroundColor: '#FAFAFA' }}>
+    <Box sx={{display: 'inline-block', width: '100%', boxSizing: 'border-box', mt: 1, border: 1, p: 1, backgroundColor: '#FAFAFA' }}>
       <Grid container spacing={4}>
         <Grid size={7}>
           <FieldValue field="Numero" value={order.id.toString()}/>
