@@ -1,32 +1,19 @@
 import * as React from "react";
-import { courseByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import { useQuery } from "@tanstack/react-query";
+import { useCourseName } from "./useCourseName.ts";
 
 export interface ICourseName {
   courseId: number;
 }
 
 export const CourseName: React.FC<ICourseName> = (props) => {
-  const courseQuery = courseByIdQuery({
-    pathParams: { id: props.courseId },
-  });
-
-  const courseData = useQuery({
-    queryKey: courseQuery.queryKey,
-    queryFn: courseQuery.queryFn
-  });
+  const courseData = useCourseName(props.courseId);
 
   if (courseData.isFetched) {
-    const product = courseData.data;
-
-    if (product) {
-      return <>{product.name}</>;
-    }
-    return <></>;
+    return <>{courseData.data}</>;
   }
 
   if (courseData.isError) {
-    return <>Error</>;
+    return <></>;
   }
 
   return <>Loading</>;

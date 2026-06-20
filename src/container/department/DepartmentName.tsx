@@ -1,32 +1,19 @@
 import * as React from "react";
-import { departmentByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import { useQuery } from "@tanstack/react-query";
+import { useDepartmentName } from "./useDepartmentName.ts";
 
 export interface IDepartmentName {
   departmentId: number;
 }
 
 export const DepartmentName: React.FC<IDepartmentName> = (props) => {
-  const departmentQuery = departmentByIdQuery({
-    pathParams: { departmentId: props.departmentId },
-  });
-
-  const departmentData = useQuery({
-    queryKey: departmentQuery.queryKey,
-    queryFn: departmentQuery.queryFn
-  });
+  const departmentData = useDepartmentName(props.departmentId);
 
   if (departmentData.isFetched) {
-    const product = departmentData.data;
-
-    if (product) {
-      return <>{product.name}</>;
-    }
-    return <></>;
+    return <>{departmentData.data}</>;
   }
 
   if (departmentData.isError) {
-    return <>Error</>;
+    return <></>;
   }
 
   return <>Loading</>;

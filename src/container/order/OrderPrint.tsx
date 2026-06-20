@@ -13,10 +13,10 @@ import {Logo} from "../../layout/Logo.tsx";
 import {Order, OrderedProduct, Product} from "../../api/sagra/sagraSchemas.ts";
 import { convertDate, currency, FULL_DATE_CONF } from "../../utils";
 import "./OrderPrint.css"
-import {DepartmentName} from "../department/DepartmentName.tsx";
 import * as React from "react";
 import {useEventTitle, usePrintConfiguration} from "../../context/AppConfigurationStore.tsx";
-import {CourseName} from "../course/CourseName.tsx";
+import {useDepartmentName} from "../department/useDepartmentName.ts";
+import {useCourseName} from "../course/useCourseName.ts";
 
 interface OrderPrintProps {
   order: Order
@@ -61,35 +61,65 @@ const OrderPrint = (props : OrderPrintProps ) => {
   return (
     <>
         {customerCopy && <OrderPrintPageCustomer order={order} products={products} />}
-        {
-          getPrintGroups(order, products, splitBy).map( (group, index ) => {
-            const needsPageBreak = customerCopy || index > 0;
-            return (
+        {splitBy === "none"
+          ? getPrintGroups(order, products, splitBy).map((group, index) => {
+              const needsPageBreak = customerCopy || index > 0;
+              return (
                 <div key={group.key} className={needsPageBreak ? "page-break" : undefined}>
-                 <OrderPrintPageProducts order={order} title={group.title} products={products} productsToPrint={group.products} />
+                  <OrderPrintPageProducts
+                    order={order}
+                    splitBy="none"
+                    products={products}
+                    productsToPrint={group.products}
+                  />
                 </div>
-            )
-          })
-        }
+              );
+            })
+          : getPrintGroups(order, products, splitBy).map((group, index) => {
+              const needsPageBreak = customerCopy || index > 0;
+              return (
+                <div key={group.key} className={needsPageBreak ? "page-break" : undefined}>
+                  <OrderPrintPageProducts
+                    order={order}
+                    splitBy={splitBy}
+                    groupId={group.groupId}
+                    products={products}
+                    productsToPrint={group.products}
+                  />
+                </div>
+              );
+            })}
     </>
   )
 }
 
 type PrintGroup = {
   key: string;
-  title: React.ReactNode;
   products: OrderedProduct[];
 };
 
-const getPrintGroups = (
+type SplitPrintGroup = PrintGroup & {
+  groupId: number;
+};
+
+function getPrintGroups(
+  order: Order,
+  products: Record<number, Product>,
+  splitBy: "none",
+): PrintGroup[];
+function getPrintGroups(
+  order: Order,
+  products: Record<number, Product>,
+  splitBy: "course" | "department",
+): SplitPrintGroup[];
+function getPrintGroups(
   order: Order,
   products: Record<number, Product>,
   splitBy: "none" | "course" | "department",
-): PrintGroup[] => {
+): PrintGroup[] | SplitPrintGroup[] {
   if (splitBy === "none") {
     return [{
       key: "all",
-      title: "Prodotti",
       products: order.products,
     }];
   }
@@ -101,13 +131,13 @@ const getPrintGroups = (
 
   return groupIds.map((groupId) => ({
     key: `${splitBy}-${groupId}`,
-    title: splitBy === "course" ? <CourseName courseId={groupId}/> : <DepartmentName departmentId={groupId}/>,
+    groupId,
     products: order.products.filter((orderedProduct) => {
       const product = products[orderedProduct.productId];
       return splitBy === "course" ? product.courseId === groupId : product.departmentId === groupId;
     }),
   }));
-};
+}
 
 interface IFieldValue {
   field: string
@@ -197,26 +227,32 @@ const OrderPrintPageCustomer =  (props: OrderPrintPageCustomerProps) => {
 
 }
 
-interface OrderPrintPageProductsProps {
-  order: Order;
-  products: Record<number, Product>;
-  productsToPrint: OrderedProduct[];
-  title: React.ReactNode;
-}
+type OrderPrintPageProductsProps =
+  {
+    order: Order;
+    products: Record<number, Product>;
+    productsToPrint: OrderedProduct[];
+  } & (
+    | {
+        splitBy: "none";
+      }
+    | {
+        splitBy: "course" | "department";
+        groupId: number;
+      }
+  );
 
 const OrderPrintPageProducts =  (props: OrderPrintPageProductsProps) => {
-  const {order, title, products, productsToPrint} = props;
+  const {order, products, productsToPrint} = props;
 
   return (
     <>
       <OrderPrintContainer>
         <OrderPrintLogo/>
         <OrderPrintInfo order={order} />
-        <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
-          <Typography sx={{fontSize: '1.8em', color: 'text.primary', textTransform: 'uppercase', fontWeight: 700}}>
-            {title}
-          </Typography>
-        </Box>
+        {props.splitBy === "none"
+          ? <ResolvedOrderPrintTitle splitBy="none" />
+          : <ResolvedOrderPrintTitle splitBy={props.splitBy} groupId={props.groupId} />}
         <TableContainer sx={TableStyle}>
           <Table size="small">
             <TableHead>
@@ -241,6 +277,32 @@ const OrderPrintPageProducts =  (props: OrderPrintPageProductsProps) => {
     </>
   )
 
+}
+
+type ResolvedOrderPrintTitleProps =
+  | { splitBy: "none"; groupId?: undefined }
+  | { splitBy: "course" | "department"; groupId: number };
+
+const ResolvedOrderPrintTitle = (props: ResolvedOrderPrintTitleProps) => {
+  if (props.splitBy === "none") {
+    return <OrderPrintTitle title="Prodotti" />;
+  }
+
+  if (props.splitBy === "course") {
+    return <CourseOrderPrintTitle groupId={props.groupId} />;
+  }
+
+  return <DepartmentOrderPrintTitle groupId={props.groupId} />;
+}
+
+const CourseOrderPrintTitle = ({groupId}: {groupId: number}) => {
+  const courseTitle = useCourseName(groupId);
+  return <OrderPrintTitle title={courseTitle.data ?? ""} />;
+}
+
+const DepartmentOrderPrintTitle = ({groupId}: {groupId: number}) => {
+  const departmentTitle = useDepartmentName(groupId);
+  return <OrderPrintTitle title={departmentTitle.data ?? ""} />;
 }
 
 const OrderPrintLogo = () => {
