@@ -15,7 +15,7 @@ import {Product} from "../../api/sagra/sagraSchemas.ts";
 import {currency} from "../../utils";
 import {IProductsOrder} from "./IProductsOrder.tsx";
 import ProductQuantity from "./ProductQuantity.tsx";
-import {AppConf} from "../../AppConf.ts";
+import {useAppConf} from "../../AppConf.ts";
 import {productBackgroundColor, productAvailable} from "./produtils.ts";
 
 const ProductsOrderCard = (props : IProductsOrder) => {
@@ -78,7 +78,7 @@ const ProductCardContent = (props: IProductsOrderCardProps) => {
 
 const ProductCardImage = (props: IProductsOrderCardProps) => {
     const {product} = props;
-    const showImages = AppConf.showProductImages()
+    const {showProductImages} = useAppConf();
 
     const style: SxProps = {
         height: 100
@@ -87,7 +87,7 @@ const ProductCardImage = (props: IProductsOrderCardProps) => {
         style['filter'] = 'brightness(60%)';
     }
 
-    if ( showImages ) {
+    if ( showProductImages ) {
         return (
             <CardMedia
                 sx={{ ...style }}

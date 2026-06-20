@@ -1,8 +1,7 @@
 import { SagraContext } from "./sagraContext";
 import {manageErrorResponse} from "../../utils";
-import {AppConf} from "../../AppConf.ts";
+import {getAppConf} from "../../AppConf.ts";
 
-const baseUrl = AppConf.getApiUrl();
 export const unauthorizedEventName = "sagra:unauthorized";
 
 export type ErrorWrapper<TError> =
@@ -61,7 +60,7 @@ export async function sagraFetch<
     }
 
     const response = await window.fetch(
-      `${baseUrl}${resolveUrl(url, queryParams, pathParams)}`,
+      `${getAppConf().apiUrl}${resolveUrl(url, queryParams, pathParams)}`,
       {
         signal,
         method: method.toUpperCase(),

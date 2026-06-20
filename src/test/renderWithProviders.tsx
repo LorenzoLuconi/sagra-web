@@ -5,6 +5,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {MemoryRouter} from "react-router-dom";
 import {ConfirmProvider} from "material-ui-confirm";
 import {sagraTheme} from "../SagraTheme.ts";
+import {AppConfProvider} from "../AppConf.ts";
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, "wrapper"> {
     route?: string;
@@ -23,15 +24,21 @@ export const renderWithProviders = (
     });
 
     const Wrapper: React.FC<React.PropsWithChildren> = ({children}) => (
-        <MemoryRouter initialEntries={[route]}>
-            <QueryClientProvider client={queryClient}>
-                <ConfirmProvider defaultOptions={{confirmationText: "Si", cancellationText: "No"}}>
-                    <ThemeProvider theme={sagraTheme.light}>
-                        {children}
-                    </ThemeProvider>
-                </ConfirmProvider>
-            </QueryClientProvider>
-        </MemoryRouter>
+        <AppConfProvider value={{
+            apiUrl: "http://localhost:8080",
+            showProductImages: false,
+            showThemeSwitcher: true,
+        }}>
+            <MemoryRouter initialEntries={[route]}>
+                <QueryClientProvider client={queryClient}>
+                    <ConfirmProvider defaultOptions={{confirmationText: "Si", cancellationText: "No"}}>
+                        <ThemeProvider theme={sagraTheme.light}>
+                            {children}
+                        </ThemeProvider>
+                    </ConfirmProvider>
+                </QueryClientProvider>
+            </MemoryRouter>
+        </AppConfProvider>
     );
 
     return render(ui, {wrapper: Wrapper, ...options});

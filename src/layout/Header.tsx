@@ -33,7 +33,7 @@ import {
     WorkspacesOutlined
 } from "@mui/icons-material";
 import MaterialUISwitch from "../view/MaterialUISwitch.tsx";
-import {AppConf} from "../AppConf.ts";
+import {useAppConf} from "../AppConf.ts";
 import {useAuth} from "../context/AuthStore.tsx";
 import ChangePasswordDialog from "../view/ChangePasswordDialog.tsx";
 
@@ -89,6 +89,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
 
     const navigate = useNavigate()
     const {user, logout, isLogoutPending} = useAuth()
+    const {showThemeSwitcher} = useAppConf();
     const isAdmin = user?.role === "admin";
     const [adminAnchorEl, setAdminAnchorEl] = React.useState<null | HTMLElement>(null);
     const [userAnchorEl, setUserAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -239,7 +240,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                             Esci
                         </MenuItem>
                     </StyledMenu>
-                    <MaterialUISwitch sx={{ display: AppConf.showThemeSwitcher() ? 'flex' : 'none'}}onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+                    <MaterialUISwitch sx={{ display: showThemeSwitcher ? 'flex' : 'none'}}onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
                         console.log('event: ', event)
                         console.log('checked: ', checked)
                         props.changeTheme(checked?'dark': 'light')

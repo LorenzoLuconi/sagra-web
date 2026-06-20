@@ -1,59 +1,75 @@
-interface SagraWebConfI {
-    sagraStartDay: string
-    sagraEndDay: string
-    apiUrl: string
-    showProductImages: boolean
-    title: string
-    showThemeSwitcher: boolean
+import * as React from "react";
+
+export interface AppConf {
+    apiUrl: string;
+    showProductImages: boolean;
+    showThemeSwitcher: boolean;
 }
 
-export class AppConf {
-    private static instance: AppConf
-    private apiUrl: string
-    private sagraStartDay: string
-    private sagraEndDay: string
-    private title: string
-    private showProductImages: boolean
-    private showThemeSwitcher: boolean
-    private constructor()  {
-        const {sagraWeb} = window as SagraWebConfI
-        this.apiUrl = sagraWeb.apiUrl
-        this.sagraStartDay = sagraWeb.sagraStartDay
-        this.sagraEndDay = sagraWeb.sagraEndDay
-        this.showProductImages = sagraWeb.showProductImages
-        this.title = sagraWeb.title
-        this.showThemeSwitcher = sagraWeb.showThemeSwitcher
+const AppConfContext = React.createContext<AppConf | undefined>(undefined);
+
+let appConf: AppConf | undefined;
+
+export const loadAppConf = async (): Promise<AppConf> => {
+    const response = await fetch("/configuration.json", {cache: "no-store"});
+
+    if (!response.ok) {
+        throw new Error(`Cannot load application configuration: ${response.status}`);
     }
 
-    public static getInstance() {
-        if (!AppConf.instance) {
-            AppConf.instance = new AppConf()
-        }
-        return AppConf.instance
+    return parseAppConf(await response.json());
+};
+
+export const initializeAppConf = (configuration: AppConf) => {
+    appConf = configuration;
+};
+
+export const getAppConf = (): AppConf => {
+    if (!appConf) {
+        throw new Error("Application configuration has not been initialized");
     }
 
-    public static getApiUrl() {
-        return AppConf.getInstance().apiUrl
+    return appConf;
+};
+
+export const AppConfProvider: React.FC<React.PropsWithChildren<{value: AppConf}>> = ({value, children}) => {
+    initializeAppConf(value);
+
+    return React.createElement(AppConfContext.Provider, {value}, children);
+};
+
+export const useAppConf = (): AppConf => {
+    const configuration = React.useContext(AppConfContext);
+
+    if (!configuration) {
+        throw new Error("useAppConf must be used within AppConfProvider");
     }
 
-    public static getSagraStartDay() {
-        return AppConf.getInstance().sagraStartDay
+    return configuration;
+};
+
+const parseAppConf = (value: unknown): AppConf => {
+    if (!value || typeof value !== "object") {
+        throw new Error("Application configuration must be an object");
     }
 
-    public static getSagraEndDay() {
-        return AppConf.getInstance().sagraEndDay
+    const configuration = value as Record<string, unknown>;
+
+    if (typeof configuration.apiUrl !== "string") {
+        throw new Error("Application configuration apiUrl must be a string");
     }
 
-    public static showProductImages() {
-        return AppConf.getInstance().showProductImages
+    if (typeof configuration.showProductImages !== "boolean") {
+        throw new Error("Application configuration showProductImages must be a boolean");
     }
 
-    public static getTitle() {
-        return AppConf.getInstance().title
+    if (typeof configuration.showThemeSwitcher !== "boolean") {
+        throw new Error("Application configuration showThemeSwitcher must be a boolean");
     }
 
-    public static showThemeSwitcher() {
-        return AppConf.getInstance().showThemeSwitcher
-    }
-
-}
+    return {
+        apiUrl: configuration.apiUrl,
+        showProductImages: configuration.showProductImages,
+        showThemeSwitcher: configuration.showThemeSwitcher,
+    };
+};

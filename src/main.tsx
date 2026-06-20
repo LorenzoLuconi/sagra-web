@@ -31,6 +31,7 @@ import {
     departmentsSearchQuery,
     discountsSearchQuery
 } from "./api/sagra/sagraComponents.ts";
+import {AppConfProvider, loadAppConf} from "./AppConf.ts";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,11 +49,18 @@ queryClient.setQueryDefaults( departmentsSearchQuery({}).queryKey, { staleTime: 
 queryClient.setQueryDefaults( coursesSearchQuery({}).queryKey, { staleTime: defaultLongStale })
 queryClient.setQueryDefaults( discountsSearchQuery({}).queryKey, { staleTime: defaultLongStale })
 
+const bootstrap = async () => {
+  const appConf = await loadAppConf();
 
-createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <ApplicationStore initValues={{}}>
-        <MainComponent/>
-    </ApplicationStore>
-  </React.StrictMode>,
-);
+  createRoot(document.getElementById("root")!).render(
+    <React.StrictMode>
+      <AppConfProvider value={appConf}>
+          <ApplicationStore initValues={{}}>
+              <MainComponent/>
+          </ApplicationStore>
+      </AppConfProvider>
+    </React.StrictMode>,
+  );
+};
+
+void bootstrap();
