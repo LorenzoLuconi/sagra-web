@@ -17,6 +17,7 @@ import {
 import type {AppConfigurationValueByGroup} from "../configuration/appConfigurationMetadata.ts";
 
 export type PrintSplitBy = "none" | "course" | "department";
+export type PrintFormat = "A4" | "A5";
 
 interface AppConfigurationContextValue {
     groups: AppConfigurationGroup[];
@@ -35,6 +36,7 @@ interface AppConfigurationContextValue {
     print: {
         customerCopy: boolean;
         splitBy: PrintSplitBy;
+        format: PrintFormat;
     };
     reload: () => Promise<AppConfigurationGroup[]>;
 }
@@ -56,6 +58,7 @@ const AppConfigurationContext = React.createContext<AppConfigurationContextValue
     print: {
         customerCopy: true,
         splitBy: "department",
+        format: "A4",
     },
     reload: async () => [],
 });
@@ -63,6 +66,11 @@ const AppConfigurationContext = React.createContext<AppConfigurationContextValue
 const getConfiguredPrintSplitBy = (valuesByGroup: AppConfigurationValueByGroup): PrintSplitBy => {
     const value = getConfiguredStringValue("print", "split-by", valuesByGroup, "department");
     return value === "none" || value === "course" || value === "department" ? value : "department";
+};
+
+const getConfiguredPrintFormat = (valuesByGroup: AppConfigurationValueByGroup): PrintFormat => {
+    const value = getConfiguredStringValue("print", "format", valuesByGroup, "A4");
+    return value === "A4" || value === "A5" ? value : "A4";
 };
 
 const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) => {
@@ -92,6 +100,7 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
     const printConfiguration = React.useMemo(() => ({
         customerCopy: getConfiguredBooleanValue("print", "customer-copy", valuesByGroup, true),
         splitBy: getConfiguredPrintSplitBy(valuesByGroup),
+        format: getConfiguredPrintFormat(valuesByGroup),
     }), [valuesByGroup]);
 
     React.useEffect(() => {

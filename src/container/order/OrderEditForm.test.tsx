@@ -6,6 +6,8 @@ import {createEmptyOrder, OrderStore} from "../../context/OrderStore.tsx";
 import OrderEditForm from "./OrderEditForm.tsx";
 
 const useOrderConfigurationMock = vi.fn();
+const usePrintConfigurationMock = vi.fn();
+const useReactToPrintMock = vi.fn((_options: unknown) => vi.fn());
 const fetchOrderCreateMock = vi.fn();
 const fetchOrderDeleteMock = vi.fn();
 const fetchOrderUpdateMock = vi.fn();
@@ -18,6 +20,11 @@ const toastSuccessMock = vi.fn();
 
 vi.mock("../../context/AppConfigurationStore.tsx", () => ({
     useOrderConfiguration: () => useOrderConfigurationMock(),
+    usePrintConfiguration: () => usePrintConfigurationMock(),
+}));
+
+vi.mock("react-to-print", () => ({
+    useReactToPrint: (options: unknown) => useReactToPrintMock(options),
 }));
 
 vi.mock("../../api/sagra/sagraComponents.ts", () => ({
@@ -95,6 +102,8 @@ const renderOrderEditForm = (order: Order) => renderWithProviders(
 describe("OrderEditForm buttons", () => {
     beforeEach(() => {
         useOrderConfigurationMock.mockReset();
+        usePrintConfigurationMock.mockReset();
+        useReactToPrintMock.mockClear();
         fetchOrderCreateMock.mockReset();
         fetchOrderDeleteMock.mockReset();
         fetchOrderUpdateMock.mockReset();
@@ -110,6 +119,11 @@ describe("OrderEditForm buttons", () => {
             takeAwayEnabled: true,
             serviceEnabled: true,
             serviceCost: 1,
+        });
+        usePrintConfigurationMock.mockReturnValue({
+            customerCopy: true,
+            splitBy: "department",
+            format: "A4",
         });
         ordersSearchQueryMock.mockReturnValue({queryKey: ["orders"]});
         productsSearchQueryMock.mockReturnValue({queryKey: ["products"]});
@@ -191,5 +205,19 @@ describe("OrderEditForm buttons", () => {
         });
         expect(toastErrorMock.mock.calls[0][0]).toBe("Coperti non abilitati");
         expect(screen.getByText("Coperti non abilitati")).toBeInTheDocument();
+    });
+
+    it("passa il formato pagina configurato a react-to-print", () => {
+        usePrintConfigurationMock.mockReturnValue({
+            customerCopy: true,
+            splitBy: "department",
+            format: "A5",
+        });
+
+        renderOrderEditForm(savedOrder());
+
+        expect(useReactToPrintMock).toHaveBeenCalledWith(expect.objectContaining({
+            pageStyle: expect.stringContaining("size: A5"),
+        }));
     });
 });

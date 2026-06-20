@@ -31,13 +31,14 @@ import {queryClient} from "../../main.tsx";
 import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
 import { useConfirm } from "material-ui-confirm";
 import { useReactToPrint } from "react-to-print";
-import {useOrderConfiguration} from "../../context/AppConfigurationStore.tsx";
+import {useOrderConfiguration, usePrintConfiguration} from "../../context/AppConfigurationStore.tsx";
 
 
 const OrderEditForm: React.FC = () => {
 
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore, isNewOrder, originalOrder} = useOrderStore();
   const orderConfiguration = useOrderConfiguration();
+  const printConfiguration = usePrintConfiguration();
   const {nameMandatory, takeAwayEnabled, serviceEnabled} = orderConfiguration;
   const navigate = useNavigate()
   const [customer, setCustomer] = useState(order.customer);
@@ -46,7 +47,10 @@ const OrderEditForm: React.FC = () => {
   const [note, setNote] = useState(order.note ?? '');
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const reactToPrintFn = useReactToPrint({ contentRef });
+  const reactToPrintFn = useReactToPrint({
+    contentRef,
+    pageStyle: getOrderPrintPageStyle(printConfiguration.format),
+  });
 
   const newOrder = isNewOrder();
   const differences = !isEqual(originalOrder, order);
@@ -405,3 +409,19 @@ const OrderEditForm: React.FC = () => {
 }
 
 export default OrderEditForm;
+
+const getOrderPrintPageStyle = (format: "A4" | "A5") => `
+    @page {
+        size: ${format};
+        margin: 10mm;
+    }
+
+    @media print {
+        html, body {
+            height: initial !important;
+            overflow: initial !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+`;
