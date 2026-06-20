@@ -6,7 +6,7 @@ const order = (partial: Partial<Order> = {}): Order => ({
     id: -1,
     customer: "",
     takeAway: false,
-    serviceNumber: undefined,
+    serviceNumber: 0,
     serviceCost: 0,
     totalAmount: 0,
     username: "test",
