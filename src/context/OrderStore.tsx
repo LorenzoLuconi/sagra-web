@@ -6,15 +6,18 @@ import toast from "react-hot-toast";
 
 export const defaultServiceCost = 0.5;
 
-// @ts-ignore
 export const createEmptyOrder = (serviceCost = defaultServiceCost): Order => ({
-  products: [] as Product[],
-  serviceNumber: undefined,
-  serviceCost,
-  customer: '',
-  takeAway: false,
-    id: -1
-} as Order)
+    id: -1,
+    customer: '',
+    takeAway: false,
+    serviceNumber: 0,
+    serviceCost,
+    totalAmount: 0,
+    username: '',
+    created: '',
+    lastUpdate: '',
+    products: [],
+})
 
 export const EmptyOrder: Order = createEmptyOrder()
 
@@ -39,23 +42,16 @@ interface OrderContextI {
 export const OrderContext = React.createContext<OrderContextI>({
     order : EmptyOrder,
     originalOrder : EmptyOrder,
-    products: [],
+    products: {},
     errors: {},
 
     resetStore: () => {},
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setProduct: (product: Product, quantity: number) => {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    deleteProduct: (product: Product) => {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    addProduct: (product: Product, quantity: number) => {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    updateOrder: (order: Order) => {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    updateOrderField: (field: string, value: unknown) => {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setFieldError: (field: string, message: string) => {},
+    setProduct: () => {},
+    deleteProduct: () => {},
+    addProduct: () => {},
+    updateOrder: () => {},
+    updateOrderField: () => {},
+    setFieldError: () => {},
     resetErrors: () => {},
     isNewOrder: (): boolean => {return false}
 })
@@ -89,18 +85,15 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
     const deleteProductHandler = (product: Product) => {
             setStoredOrder((prev) => {
-                let _order = undefined
-                if (prev !== undefined) {
-                    _order = cloneDeep(prev)
-                    const {products} = _order
-                    const idx = products.findIndex((p) => {
-                        return p.productId === product.id
-                    })
-                    console.log('DELETE Products: ', products, idx)
-                    if (idx > -1) {
-                        const res = products.splice(idx, 1)
-                        console.log('Cancellato: ', res)
-                    }
+                const _order = cloneDeep(prev)
+                const {products} = _order
+                const idx = products.findIndex((p) => {
+                    return p.productId === product.id
+                })
+                console.log('DELETE Products: ', products, idx)
+                if (idx > -1) {
+                    const res = products.splice(idx, 1)
+                    console.log('Cancellato: ', res)
                 }
                 return _order
             })
@@ -108,12 +101,12 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
 
     const setProductHandler = (product: Product, quantity: number) => {
-        const _order = cloneDeep(storedOrder ?? {products: []} as Order)
+        const _order = cloneDeep(storedOrder)
         const _storedProducts = cloneDeep(storedProducts)
 
         resetErrorsHandler()
 
-        const canSet = testOrderProductAvailability(product, quantity, order??EmptyOrder, _order, setOperator)
+        const canSet = testOrderProductAvailability(product, quantity, order, _order, setOperator)
         /*
 
         const {products} = _order
@@ -163,12 +156,12 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
 
 
     const addProductHandler = (product: Product, quantity: number) => {
-        const _order = cloneDeep(storedOrder ?? {products: []} as Order)
+        const _order = cloneDeep(storedOrder)
 
         const _storedProducts = cloneDeep(storedProducts)
         resetErrorsHandler()
 
-        const canAdd = testOrderProductAvailability(product, quantity, order??EmptyOrder, _order, addOperator)
+        const canAdd = testOrderProductAvailability(product, quantity, order, _order, addOperator)
 /*
 
         const {products} = _order
@@ -232,13 +225,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
     const updateOrderFieldHandler = (field: string, value: unknown) => {
 
         setStoredOrder((prev) => {
-
-            let _order = cloneDeep(prev)
-
-            if (_order === undefined) {
-                _order = EmptyOrder as Order
-            }
-
+            const _order = cloneDeep(prev)
             set(_order, field,  value)
 
             console.log('PRIMA: ', storedOrder, _order)
@@ -287,7 +274,7 @@ export const OrderStore: React.FC<OrderStoreI> = (props) => {
             value={{
                 order: storedOrder,
                 originalOrder: originalOrder,
-                products: storedProducts??[],
+                products: storedProducts,
                 errors: storedErrors,
                 resetStore: resetStoreHandler,
                 addProduct: addProductHandler,

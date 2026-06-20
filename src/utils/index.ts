@@ -157,7 +157,7 @@ export const testOrderProductAvailability = (product: Product, quantity: number,
         }
 
         const originalQuantity = _originalOrderProduct?.quantity ?? 0
-        const orderQuantity = _orderProduct?.quantity ?? 0
+        const orderQuantity = selectedOrderProduct?.quantity ?? 0
 
         const diff = orderQuantity - originalQuantity
         return (diff <= product.availableQuantity)
