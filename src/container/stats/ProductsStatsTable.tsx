@@ -18,7 +18,7 @@ import {orderBy} from "lodash";
 import {currency} from "../../utils";
 import {StatsOrderedProducts} from "../../api/sagra/sagraSchemas.ts";
 import {SparkLineChart} from "@mui/x-charts";
-import {DailyProductStatI} from "./Summary.ts";
+import {DailyProductStatI, DailyProductStatsI} from "./Summary.ts";
 import dayjs from "dayjs";
 
 
@@ -28,7 +28,7 @@ enum OrderDirection {
 }
 
 interface ProductsTableStatsProps {
-    productsInOrder: Record<number, StatsOrderedProducts>
+    productsInOrder: Record<number, StatsOrderedProducts & DailyProductStatsI>
     days: string[]
     isPrint?: boolean
 }
