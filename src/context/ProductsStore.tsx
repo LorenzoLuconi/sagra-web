@@ -1,7 +1,5 @@
 import * as React from 'react'
 import {Product} from "../api/sagra/sagraSchemas.ts";
-import {productByIdQuery, productsSearchQuery} from "../api/sagra/sagraComponents.ts";
-import {useQuery} from "@tanstack/react-query";
 
 interface ProductsContextI {
     products: Record<number, Product>

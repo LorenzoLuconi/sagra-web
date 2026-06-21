@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {useOrderStore} from "../context/OrderStore.tsx";
 import {Alert, Box} from "@mui/material";
 const ErrorInfo = () => {
