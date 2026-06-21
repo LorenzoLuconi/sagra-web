@@ -103,15 +103,15 @@ const ProductEdit = (props: IProductEdit) => {
     }, [setPrice],
   );
 
-  const handleChangeDepartment = (event: SelectChangeEvent) => {
+  const handleChangeDepartment = (event: SelectChangeEvent<number>) => {
     setDepartmentId(+event.target.value);
   };
 
-  const handleChangeCourse = (event: SelectChangeEvent) => {
+  const handleChangeCourse = (event: SelectChangeEvent<number>) => {
     setCourseId(+event.target.value);
   };
 
-  const handleChangeProduct = (event: SelectChangeEvent) => {
+  const handleChangeProduct = (event: SelectChangeEvent<number>) => {
     setParentId(+event.target.value);
   };
 

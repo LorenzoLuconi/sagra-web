@@ -1,10 +1,18 @@
 import * as React from "react";
-import { orderByIdQuery } from "../../api/sagra/sagraComponents.ts";
+import { OrderByIdError, orderByIdQuery } from "../../api/sagra/sagraComponents.ts";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { Alert, CircularProgress } from "@mui/material";
 import OrderEditContainer from "./OrderEditContainer.tsx";
-import { ErrorWrapper } from "../../api/sagra/sagraFetcher.ts";
+
+const isOrderByIdError = (error: unknown): error is OrderByIdError => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    (error as { status?: unknown }).status === 404
+  );
+};
 
 const OrderEdit = (): React.ReactElement => {
   const params = useParams();
@@ -21,9 +29,9 @@ const OrderEdit = (): React.ReactElement => {
   });
 
   if (orderData.isError) {
-    const error = orderData.error as ErrorWrapper<unknown>;
+    const error = orderData.error;
     console.log(error);
-    if (error.stack.status === 404) {
+    if (isOrderByIdError(error)) {
       return (
         <Alert severity="error">
           Ordine con id {params.orderId} non trovato

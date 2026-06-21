@@ -12,7 +12,6 @@ import {
     CircularProgress,
     IconButton,
     MenuItem,
-    SelectChangeEvent,
     Table,
     TableBody,
     TableCell,
@@ -114,7 +113,7 @@ const UsersList = (): React.ReactElement => {
         }));
     };
 
-    const handleRoleChange = (event: SelectChangeEvent<User["role"]>) => {
+    const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setEditState((prev) => ({
             ...prev,
             role: event.target.value as User["role"],

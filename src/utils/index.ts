@@ -3,18 +3,28 @@ import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
 import toast from "react-hot-toast";
 
-export const getQueryObj = (searchParams: URLSearchParams, queryConf: Record<string, string>) => {
-    const res: any = {}
+type QueryParamType = "string" | "number";
+type QueryParamValue<TType extends QueryParamType> = TType extends "number" ? number : string;
+type QueryObj<TQueryConf extends Record<string, QueryParamType>> = Partial<{
+    [TKey in keyof TQueryConf]: QueryParamValue<TQueryConf[TKey]>
+}>;
+
+export const getQueryObj = <TQueryConf extends Record<string, QueryParamType>>(
+    searchParams: URLSearchParams,
+    queryConf: TQueryConf,
+): QueryObj<TQueryConf> => {
+    const res: Partial<Record<keyof TQueryConf, string | number>> = {}
     // console.log('SearchParams: ', searchParams)
-    const qKeys = Object.keys(queryConf);
+    const qKeys = Object.keys(queryConf) as Array<keyof TQueryConf>;
     for (let k=0; k<qKeys.length; k++) {
-        const qq = searchParams.getAll(qKeys[k]);
+        const key = qKeys[k];
+        const qq = searchParams.get(key as string);
           console.log('SeachValue: ', qKeys[k], qq);
-        if (qq !== undefined && qq.length > 0) {
-            res[qKeys[k]] = qq;
+        if (qq !== null && qq.length > 0) {
+            res[key] = queryConf[key] === "number" ? Number(qq) : qq;
         }
     }
-    return res;
+    return res as QueryObj<TQueryConf>;
 }
 
 export const FULL_DATE_CONF: Intl.DateTimeFormatOptions = {
@@ -56,7 +66,7 @@ interface CheckOrderErrorsOptions {
 
 export const checkOrderErrors = (
     order: Order,
-    productsTable: Record<number, Product>,
+    _productsTable: Record<number, Product>,
     options: CheckOrderErrorsOptions = {},
 ): OrderErrorT => {
     const res = {} as OrderErrorT
@@ -109,7 +119,7 @@ export  async function  manageErrorResponse<TError>(response: Response)  {
             payload: await response.json()
         } as ErrorWrapper<TError>
 
-    } catch (e: Error) {
+    } catch (e: unknown) {
         console.log('Catch: ', e)
         eW =  {
             status: status as unknown,
@@ -127,7 +137,7 @@ export const addOperator = (oldQuantity: number, newQuantity: number): number =>
     return oldQuantity+newQuantity
 }
 
-export const setOperator = (oldQuantity: number, newQuantity: number): number => {
+export const setOperator = (_oldQuantity: number, newQuantity: number): number => {
     return newQuantity
 }
 

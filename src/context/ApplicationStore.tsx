@@ -9,10 +9,8 @@ interface ApplicicationContextI {
 }
 
 export const ApplicationContext = React.createContext<ApplicicationContextI>({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    set: (key: string, value: ApplicationType) => {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    get: (key: string) => undefined
+    set: () => {},
+    get: () => undefined
 })
 
 
@@ -53,7 +51,7 @@ const ApplicationStore: React.FC<ApplicationStoreI> = (props) => {
 
 
 export default ApplicationStore
-export const useApplicationStore = () => {
-    const appContext = React.useContext(ApplicationContext)
-    return appContext
-}
+// export const useApplicationStore = () => {
+//     const appContext = React.useContext(ApplicationContext)
+//     return appContext
+// }

@@ -4,7 +4,7 @@ import {fetchCreateUser, listUsersQuery} from "../../api/sagra/sagraComponents.t
 import {UserRequest} from "../../api/sagra/sagraSchemas.ts";
 import {queryClient} from "../../main.tsx";
 import toast from "react-hot-toast";
-import {Box, Button, MenuItem, SelectChangeEvent, TextField} from "@mui/material";
+import {Box, Button, MenuItem, TextField} from "@mui/material";
 import {AddCircle} from "@mui/icons-material";
 import {manageError} from "../../utils";
 import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
@@ -45,7 +45,7 @@ export const UserEdit = (): React.ReactElement => {
         }));
     };
 
-    const handleRoleChange = (event: SelectChangeEvent<UserRequest["role"]>) => {
+    const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData((prev) => ({
             ...prev,
             role: event.target.value as UserRequest["role"],

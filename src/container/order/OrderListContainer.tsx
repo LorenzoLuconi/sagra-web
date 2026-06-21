@@ -6,7 +6,6 @@ import * as React from "react";
 import {useState} from "react";
 import {useLocation, useNavigate} from "react-router";
 import {getQueryObj} from "../../utils";
-import {OrdersSearchQueryParams} from "../../api/sagra/sagraComponents.ts";
 import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {cloneDeep, set} from "lodash";
@@ -19,17 +18,6 @@ export interface SearchParamsI {
   size: number
 }
 export const rowsPerPageOptions = [10, 20, 50]
-const createSearchParam = (searchByCreated?: string, searchByCustomer?: string) => {
-
-  const params = {
-    size: rowsPerPageOptions[0] // TODO per il momento niente paginazione
-  } as OrdersSearchQueryParams;
-
-  Object.assign(params, searchByCustomer ? { customer: searchByCustomer } : null)
-  Object.assign(params, searchByCreated ? { created: searchByCreated } : null)
-
-  return params;
-}
 
 const initialStateDate = () => {
   return dayjs().format('YYYY-MM-DD');
@@ -74,7 +62,12 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
   const handleClickSearch = () => {
 
 
-    const res: SearchParamsI = cloneDeep(searchObj)
+    const res: SearchParamsI = cloneDeep({
+      page: searchObj.page ?? 0,
+      size: searchObj.size ?? rowsPerPageOptions[0],
+      customer: searchObj.customer,
+      created: searchObj.created,
+    })
     set(res, 'created', searchByCreated)
     set(res, 'customer', searchByCustomer)
 
@@ -152,13 +145,13 @@ const OrderListContainer = () => {
       searchQuery.set('created', initialStateDate())
     }
     if (page!==undefined) {
-      searchQuery.set('page', page)
+      searchQuery.set('page', String(page))
     }
     if (customer !== undefined) {
       searchQuery.set('customer', customer)
     }
     if (size !== undefined) {
-      searchQuery.set('size', size)
+      searchQuery.set('size', String(size))
     }
       navigate(`/orders?${searchQuery.toString()}`)
 
@@ -193,7 +186,7 @@ const OrderListContainer = () => {
               searchQuery.set('customer', customer)
             }
             searchQuery.set('page', '0')
-            searchQuery.set('size', searchObj['size'] ?? rowsPerPageOptions[0])
+            searchQuery.set('size', String(searchObj['size'] ?? rowsPerPageOptions[0]))
 
             navigate(`/orders?${searchQuery.toString()}`)
 

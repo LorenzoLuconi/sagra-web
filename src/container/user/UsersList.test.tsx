@@ -7,7 +7,7 @@ import {renderWithProviders} from "../../test/renderWithProviders.tsx";
 const fetchDeleteUserMock = vi.fn();
 const fetchUpdateUserMock = vi.fn();
 const listUsersQueryMock = vi.fn();
-const invalidateQueriesMock = vi.fn(() => Promise.resolve());
+const invalidateQueriesMock = vi.fn((..._args: unknown[]) => Promise.resolve());
 const confirmMock = vi.fn();
 const useAuthMock = vi.fn();
 
