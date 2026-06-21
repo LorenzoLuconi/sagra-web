@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {Paper, Typography} from "@mui/material";
 import {useLocation} from "react-router";
 
