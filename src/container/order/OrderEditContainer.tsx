@@ -1,14 +1,14 @@
 import * as React from "react";
 import { useQueries } from "@tanstack/react-query";
 import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import {Box, CircularProgress, Grid, Paper, Typography, useTheme} from "@mui/material";
+import {Alert, Box, CircularProgress, Grid, Paper, Typography, useTheme} from "@mui/material";
 import {OrderStore, useOrderStore} from "../../context/OrderStore.tsx";
 import ProductsToOrder from "./ProductsToOrder.tsx";
 import ErrorInfo from "../../view/ErrorInfo.tsx";
 import OrderEditTotal from "./OrderEditTotal.tsx";
 import OrderEditProducts from "./OrderEditProducts.tsx";
 import OrderEditForm from "./OrderEditForm.tsx";
-import { Order } from "../../api/sagra/sagraSchemas.ts";
+import { Order, Product } from "../../api/sagra/sagraSchemas.ts";
 import {convertDate, TIME_CONF} from "../../utils";
 import OrderEditRest from "./OrderEditRest.tsx";
 import {isEqual} from "lodash";
@@ -31,12 +31,18 @@ const OrderEditContainer :React.FC<OrderEditContainerProps> = (props: OrderEditC
             };
         }),
         combine: (results) => {
+            const products = results.map((result) => result.data);
             return {
-                data: results.map((result) => result.data),
-                pending: results.some((result) => result.isPending)
+                data: products.every((product): product is Product => product !== undefined) ? products : undefined,
+                pending: results.some((result) => result.isPending),
+                error: results.some((result) => result.isError)
             };
         }
     });
+
+    if (combinedQueries.error) {
+        return <Alert severity="error">Si è verificato un errore prelevando i prodotti dell'ordine</Alert>;
+    }
 
     if (combinedQueries.pending) {
         return <CircularProgress />;
