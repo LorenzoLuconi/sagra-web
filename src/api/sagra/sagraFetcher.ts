@@ -1,4 +1,4 @@
-import { SagraContext } from "./sagraContext";
+import { FetcherQueryParam, SagraContext } from "./sagraContext";
 import {manageErrorResponse} from "../../utils";
 import {getAppConf} from "../../AppConf.ts";
 
@@ -117,10 +117,18 @@ const shouldDispatchUnauthorizedEvent = (url: string): boolean => {
 
 const resolveUrl = (
   url: string,
-  queryParams: Record<string, string> = {},
+  queryParams: Record<string, FetcherQueryParam> = {},
   pathParams: Record<string, string> = {},
 ) => {
-  let query = new URLSearchParams(queryParams).toString();
+  const normalizedQueryParams = new URLSearchParams();
+  Object.entries(queryParams).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => normalizedQueryParams.append(key, String(item)));
+    } else if (value !== undefined && value !== null) {
+      normalizedQueryParams.append(key, String(value));
+    }
+  });
+  let query = normalizedQueryParams.toString();
   if (query) query = `?${query}`;
   return (
     url.replace(/\{\w*\}/g, (key) => pathParams[key.slice(1, -1)] ?? "") + query

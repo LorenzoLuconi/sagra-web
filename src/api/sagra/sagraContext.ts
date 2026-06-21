@@ -7,21 +7,30 @@ import {
 } from "@tanstack/react-query";
 import { QueryOperation } from "./sagraComponents";
 
+type FetcherHeaders = Record<string, string>;
+export type FetcherQueryParam =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Array<string | number | boolean>;
+type FetcherQueryParams = Record<string, FetcherQueryParam>;
+
 export type SagraContext<
   TQueryFnData = unknown,
   TError = DefaultError,
-  TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
 > = {
   fetcherOptions: {
     /**
      * Headers to inject in the fetcher
      */
-    headers?: {};
+    headers?: FetcherHeaders;
     /**
      * Query params to inject in the fetcher
      */
-    queryParams?: {};
+    queryParams?: FetcherQueryParams;
   };
   queryOptions: {
     /**
@@ -47,7 +56,7 @@ export function useSagraContext<
     UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
     "queryKey" | "queryFn"
   >,
-): SagraContext<TQueryFnData, TError, TData, TQueryKey> {
+): SagraContext<TQueryFnData, TError, TQueryKey> {
   return {
     fetcherOptions: {},
     queryOptions: {},

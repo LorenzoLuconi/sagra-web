@@ -51,9 +51,11 @@ const ProductsToOrder = () => {
 
   const handlePreferences = (
       _event: React.MouseEvent<HTMLElement>,
-      newPreference: string | null,
+      newPreference: ProductViewT | null,
   ) => {
-    setUserPreferences({productView: newPreference});
+    if (newPreference !== null) {
+      setUserPreferences({productView: newPreference});
+    }
   };
 
     return (

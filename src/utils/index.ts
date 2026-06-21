@@ -207,16 +207,23 @@ export const headerFromToken = (token?: string) => {
     }
 }
 
-const getStorageValue = (key: string, defaultValue?: unknown) => {
+const getStorageValue = <TValue,>(key: string, defaultValue?: TValue): TValue | undefined => {
     // getting stored value
     const saved = localStorage.getItem(key) ?? undefined;
     console.log('GetStorageValue: ', typeof saved, (saved !== undefined))
-    const initial = (saved !== undefined && saved !== 'undefined') ? JSON.parse(saved) : undefined;
+    const initial = (saved !== undefined && saved !== 'undefined') ? JSON.parse(saved) as TValue : undefined;
     return initial ?? defaultValue;
 }
 
-export const useLocalStorage = (key: string, defaultValue?: unknown) => {
-    const [value, setValue] = React.useState(() => {
+export function useLocalStorage<TValue>(
+    key: string,
+    defaultValue: TValue,
+): [TValue, React.Dispatch<React.SetStateAction<TValue>>];
+export function useLocalStorage<TValue>(
+    key: string,
+): [TValue | undefined, React.Dispatch<React.SetStateAction<TValue | undefined>>];
+export function useLocalStorage<TValue>(key: string, defaultValue?: TValue) {
+    const [value, setValue] = React.useState<TValue | undefined>(() => {
         return getStorageValue(key, defaultValue);
     });
 
@@ -228,4 +235,4 @@ export const useLocalStorage = (key: string, defaultValue?: unknown) => {
     }, [key, value]);
 
     return [value, setValue];
-};
+}
