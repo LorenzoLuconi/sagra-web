@@ -2,6 +2,7 @@ import * as React from 'react'
 import {Order, OrderedProduct, Product} from "../api/sagra/sagraSchemas.ts";
 import {ErrorWrapper} from "../api/sagra/sagraFetcher.ts";
 import toast from "react-hot-toast";
+import dayjs from "dayjs";
 
 type QueryParamType = "string" | "number";
 type QueryParamValue<TType extends QueryParamType> = TType extends "number" ? number : string;
@@ -26,6 +27,8 @@ export const getQueryObj = <TQueryConf extends Record<string, QueryParamType>>(
     }
     return res as QueryObj<TQueryConf>;
 }
+
+export const getTodayDateParam = () => dayjs().format("YYYY-MM-DD");
 
 export const FULL_DATE_CONF: Intl.DateTimeFormatOptions = {
     dateStyle: 'medium',

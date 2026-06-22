@@ -36,6 +36,7 @@ import MaterialUISwitch from "../view/MaterialUISwitch.tsx";
 import {useAppConf} from "../AppConf.ts";
 import {useAuth} from "../context/AuthStore.tsx";
 import ChangePasswordDialog from "../view/ChangePasswordDialog.tsx";
+import {getTodayDateParam} from "../utils";
 
 const StyledMenu = styled((props: MenuProps) => (
     <Menu
@@ -126,7 +127,7 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mr: 1}}>
                     <Button variant="text" color={'error'} startIcon={<ReceiptOutlined/>} sx={{  mr: 1}}
                             onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
-                    <Button variant="text"  startIcon={<LibraryBooksOutlined />} sx={{ color: 'text.primary', marginRight: 1}} onClick={() => {navigate('/orders')}}>Elenco Ordini</Button>
+                    <Button variant="text"  startIcon={<LibraryBooksOutlined />} sx={{ color: 'text.primary', marginRight: 1}} onClick={() => {navigate(`/orders?created=${getTodayDateParam()}`)}}>Elenco Ordini</Button>
 
                     {isAdmin && (
                         <>
