@@ -1,14 +1,12 @@
 import {Close, LibraryBooksOutlined} from "@mui/icons-material";
 import {Divider, FormControlLabel, IconButton, InputBase, Paper, Switch, useTheme} from "@mui/material";
 import OrderList from "./OrderList.tsx";
-import SearchIcon from '@mui/icons-material/Search';
 import * as React from "react";
 import {useState} from "react";
 import {useLocation, useNavigate} from "react-router";
 import {getQueryObj} from "../../utils";
 import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import {cloneDeep, set} from "lodash";
 import PageTitle from "../../view/PageTitle.tsx";
 import {useAuth} from "../../context/AuthStore.tsx";
 
@@ -20,10 +18,6 @@ export interface SearchParamsI {
   size: number
 }
 export const rowsPerPageOptions = [10, 20, 50]
-
-const initialStateDate = () => {
-  return dayjs().format('YYYY-MM-DD');
-}
 
 interface OrderListSearchI {
   currentUsername?: string
@@ -40,6 +34,8 @@ export const orderQuery = (search: URLSearchParams) =>  getQueryObj(search, {
   size: "number"
 });
 
+const customerSearchDebounceMs = 400;
+
 const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
 
   const location = useLocation();
@@ -48,7 +44,7 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
   const searchObj = orderQuery(search)
 
   const customer = search.get('customer') ?? ''
-  const created = search.get('created') ?? initialStateDate()
+  const created = search.get('created') ?? ''
 
 
   const [searchByCustomer, setSearchByCustomer] = useState<string>(customer);
@@ -62,38 +58,40 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
     setSearchByCreated(created)
   }, [created])
 
-
-
-  const handleClickSearch = () => {
-
-
-    const res: SearchParamsI = cloneDeep({
+  const handleSearchChange = React.useCallback((updates: Partial<Pick<SearchParamsI, "created" | "customer">>) => {
+    props.handleUpdate({
       page: searchObj.page ?? 0,
       size: searchObj.size ?? rowsPerPageOptions[0],
       customer: searchObj.customer,
       created: searchObj.created,
       username: props.onlyCurrentUserOrders ? props.currentUsername : undefined,
+      ...updates,
     })
-    set(res, 'created', searchByCreated)
-    set(res, 'customer', searchByCustomer)
+  }, [props, searchObj.created, searchObj.customer, searchObj.page, searchObj.size])
 
-    props.handleUpdate(res);
+  React.useEffect(() => {
+    if (searchByCustomer === customer) {
+      return;
+    }
 
-  }
+    const timeoutId = window.setTimeout(() => {
+      handleSearchChange({customer: searchByCustomer});
+    }, customerSearchDebounceMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [customer, handleSearchChange, searchByCustomer]);
 
   const handleChangeCustomer =
       React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-            setSearchByCustomer(event.currentTarget.value);
+            const value = event.currentTarget.value;
+            setSearchByCustomer(value);
           }, [setSearchByCustomer]
       );
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if ( event.key == 'Enter' ) {
-      handleClickSearch()
-    }
-
     if ( event.key == 'Escape' ) {
       setSearchByCustomer('')
+      handleSearchChange({customer: ''})
     }
   };
 
@@ -111,12 +109,23 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
             inputProps={{ 'aria-label': 'search by customer' }}
 
         />
-        <IconButton sx={{ p: '10px' }} aria-label="menu" onClick={() => setSearchByCustomer('')}>
+        <IconButton
+            sx={{ p: '10px' }}
+            aria-label="menu"
+            onClick={() => {
+              setSearchByCustomer('')
+              handleSearchChange({customer: ''})
+            }}
+        >
           <Close />
         </IconButton>
         <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-        <DatePicker value={dayjs(searchByCreated)}
-                    onChange={ (v) => setSearchByCreated(v ? v.format( 'YYYY-MM-DD') : '')}
+        <DatePicker value={searchByCreated ? dayjs(searchByCreated) : null}
+                    onChange={ (v) => {
+                      const value = v ? v.format( 'YYYY-MM-DD') : '';
+                      setSearchByCreated(value)
+                      handleSearchChange({created: value})
+                    }}
                     slotProps={{
                       field: { clearable: true },
                     }}
@@ -131,10 +140,6 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
             }
             label="Solo ordini utente"
         />
-        <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-        <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleClickSearch}>
-          <SearchIcon />
-        </IconButton>
 
       </Paper>
   )
@@ -157,11 +162,6 @@ const OrderListContainer = () => {
   React.useEffect(() => {
     const searchQuery = new URLSearchParams(location.search)
     let changed = false;
-
-    if (!searchQuery.has('created')) {
-      searchQuery.set('created', initialStateDate())
-      changed = true;
-    }
 
     if (onlyCurrentUserOrders && currentUsername && searchQuery.get('username') !== currentUsername) {
       searchQuery.set('username', currentUsername)
