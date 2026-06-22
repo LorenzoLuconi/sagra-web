@@ -9,6 +9,11 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       output: {
+        minify: {
+          compress: {
+            dropConsole: true,
+          },
+        },
         codeSplitting: {
           groups: [
             {
