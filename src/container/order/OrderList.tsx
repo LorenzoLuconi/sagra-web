@@ -68,7 +68,7 @@ const OrderRow: React.FC<OrderRowI> = (props) => {
         <TableCell sx={{ width: "30px" }}>
           {order.takeAway ? <TakeAwayIcon color={"info"} /> : <></>}
         </TableCell>
-        <TableCell align="right">{order.username}</TableCell>
+        <TableCell align="center">{order.username}</TableCell>
         <TableCell align="center">
           <IconButton onClick={() => navigate("/orders/" + order.id)}>
             <EditOutlined />
@@ -258,7 +258,7 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
             <TableCell align="center">Sconto</TableCell>
             <TableCell align="right">Totale</TableCell>
             <TableCell></TableCell>
-            <TableCell align="right">Utente</TableCell>
+            <TableCell align="center">Utente</TableCell>
             <TableCell align="center">
               <SettingsOutlined />
             </TableCell>
