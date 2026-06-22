@@ -194,21 +194,21 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
     queryFn: ordersCountConf.queryFn,
   });
 
-  const searchQueryParamsString = () => {
-    if ( searchQuery.created || searchQuery.customer ) {
-      let result = " con parametri di ricerca: "
-
-      if ( searchQuery.created )
-        result = result  + `data creazione = '${searchQuery.created}'`;
-
-      if ( searchQuery)
-        result = result  + `${searchQuery.created?',' : ''} nome cliente = '${searchQuery.customer}'`;
-
-      return result;
-    }
-
-    return '';
-  }
+  // const searchQueryParamsString = () => {
+  //   if ( searchQuery.created || searchQuery.customer ) {
+  //     let result = " con parametri di ricerca: "
+  //
+  //     if ( searchQuery.created )
+  //       result = result  + `data creazione = '${searchQuery.created}'`;
+  //
+  //     if ( searchQuery)
+  //       result = result  + `${searchQuery.created?',' : ''} nome cliente = '${searchQuery.customer}'`;
+  //
+  //     return result;
+  //   }
+  //
+  //   return '';
+  // }
 
   if ( ordersData.isPending || ordersCountData.isPending )
     return (
@@ -227,7 +227,7 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
   if ( ! orders || orders.length == 0) {
     return (
         <Paper variant='outlined' sx={{p: 1}}>
-          <Typography sx={{p: 1}}>{`Nessun ordine trovato ${searchQueryParamsString()}`}</Typography>
+          <Typography sx={{p: 1}}>{`Nessun ordine trovato}`}</Typography>
         </Paper>
     )
   }
@@ -240,7 +240,7 @@ const OrderList = (props: OrderListProps): React.ReactElement => {
   return (
     <>
       <Paper variant='outlined' sx={{p: 1, mb: 2, display: "flex", justifyContent: "space-between", gap: 2 }}>
-        <Typography component="div" sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini ${searchQueryParamsString()}`}</Typography>
+        <Typography component="div" sx={{p: 1}}>{`Sono stati trovati n. ${orders.length} ordini`}</Typography>
         <IconButton sx={{ width: '40px'}} onClick={handleRefresh}>
           <CachedOutlined  />
         </IconButton>

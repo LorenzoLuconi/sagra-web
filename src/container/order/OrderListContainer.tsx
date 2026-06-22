@@ -10,10 +10,12 @@ import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {cloneDeep, set} from "lodash";
 import PageTitle from "../../view/PageTitle.tsx";
+import {useAuth} from "../../context/AuthStore.tsx";
 
 export interface SearchParamsI {
   created?: string
   customer?: string
+  username?: string
   page: number
   size: number
 }
@@ -24,7 +26,10 @@ const initialStateDate = () => {
 }
 
 interface OrderListSearchI {
+  currentUsername?: string
   handleUpdate: (searchParams: SearchParamsI) => void
+  onOnlyCurrentUserOrdersChange: (checked: boolean) => void
+  onlyCurrentUserOrders: boolean
 }
 
 export const orderQuery = (search: URLSearchParams) =>  getQueryObj(search, {
@@ -67,6 +72,7 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
       size: searchObj.size ?? rowsPerPageOptions[0],
       customer: searchObj.customer,
       created: searchObj.created,
+      username: props.onlyCurrentUserOrders ? props.currentUsername : undefined,
     })
     set(res, 'created', searchByCreated)
     set(res, 'customer', searchByCustomer)
@@ -115,8 +121,16 @@ const OrderListSearch: React.FC<OrderListSearchI> = (props) => {
                       field: { clearable: true },
                     }}
         />
-        <Divider sx={{ display: 'none', height: 28, m: 0.5 }} orientation="vertical" />
-        <FormControlLabel sx={{ display: 'none'}} control={<Switch defaultChecked />} label="Solo ordini utente" />
+        <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+        <FormControlLabel
+            control={
+              <Switch
+                  checked={props.onlyCurrentUserOrders}
+                  onChange={(_event, checked) => props.onOnlyCurrentUserOrdersChange(checked)}
+              />
+            }
+            label="Solo ordini utente"
+        />
         <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
         <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleClickSearch}>
           <SearchIcon />
@@ -134,28 +148,45 @@ const OrderListContainer = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryString = new URLSearchParams(location.search)
+  const {user} = useAuth()
+  const currentUsername = user?.username
+  const [onlyCurrentUserOrders, setOnlyCurrentUserOrders] = React.useState(true)
 
   const searchObj = orderQuery(queryString)
 
   React.useEffect(() => {
-    // devo settare la prima
-    const searchQuery = new URLSearchParams()
-    const {created, page, customer, size} = searchObj
-    if (created === null || created === undefined) {
-      searchQuery.set('created', initialStateDate())
-    }
-    if (page!==undefined) {
-      searchQuery.set('page', String(page))
-    }
-    if (customer !== undefined) {
-      searchQuery.set('customer', customer)
-    }
-    if (size !== undefined) {
-      searchQuery.set('size', String(size))
-    }
-      navigate(`/orders?${searchQuery.toString()}`)
+    const searchQuery = new URLSearchParams(location.search)
+    let changed = false;
 
-  }, [])
+    if (!searchQuery.has('created')) {
+      searchQuery.set('created', initialStateDate())
+      changed = true;
+    }
+
+    if (onlyCurrentUserOrders && currentUsername && searchQuery.get('username') !== currentUsername) {
+      searchQuery.set('username', currentUsername)
+      changed = true;
+    }
+
+    if (changed) {
+      navigate(`/orders?${searchQuery.toString()}`, {replace: true})
+    }
+
+  }, [currentUsername, location.search, navigate, onlyCurrentUserOrders])
+
+  const handleOnlyCurrentUserOrdersChange = React.useCallback((checked: boolean) => {
+    setOnlyCurrentUserOrders(checked)
+
+    const searchQuery = new URLSearchParams(location.search)
+    if (checked && currentUsername) {
+      searchQuery.set('username', currentUsername)
+    } else {
+      searchQuery.delete('username')
+    }
+    searchQuery.set('page', '0')
+
+    navigate(`/orders?${searchQuery.toString()}`)
+  }, [currentUsername, location.search, navigate])
 
 
   const pageSize = queryString.get('size') ?? rowsPerPageOptions[0]
@@ -169,9 +200,13 @@ const OrderListContainer = () => {
                sx={{p: 2, display: 'flex', justifyContent: 'center', backgroundColor: theme.sagra.panelBackground }}
                className="paper-top">
 
-          <OrderListSearch handleUpdate={(searchParams: SearchParamsI) => {
+          <OrderListSearch
+              currentUsername={currentUsername}
+              onlyCurrentUserOrders={onlyCurrentUserOrders}
+              onOnlyCurrentUserOrdersChange={handleOnlyCurrentUserOrdersChange}
+              handleUpdate={(searchParams: SearchParamsI) => {
 
-            const {created, customer} = searchParams
+            const {created, customer, username} = searchParams
 
             console.log('SEARCH: ', searchParams)
 
@@ -184,6 +219,9 @@ const OrderListContainer = () => {
             }
             if (customer !== undefined && customer.length > 0) {
               searchQuery.set('customer', customer)
+            }
+            if (username !== undefined && username.length > 0) {
+              searchQuery.set('username', username)
             }
             searchQuery.set('page', '0')
             searchQuery.set('size', String(searchObj['size'] ?? rowsPerPageOptions[0]))
