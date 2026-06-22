@@ -7,13 +7,19 @@ import OrderEditForm from "./OrderEditForm.tsx";
 
 const useOrderConfigurationMock = vi.fn();
 const usePrintConfigurationMock = vi.fn();
-const useReactToPrintMock = vi.fn((_options: unknown) => vi.fn());
+const useReactToPrintMock = vi.fn((options: unknown) => {
+    void options;
+    return vi.fn();
+});
 const fetchOrderCreateMock = vi.fn();
 const fetchOrderDeleteMock = vi.fn();
 const fetchOrderUpdateMock = vi.fn();
 const ordersSearchQueryMock = vi.fn();
 const productsSearchQueryMock = vi.fn();
-const invalidateQueriesMock = vi.fn((_args?: unknown) => Promise.resolve());
+const invalidateQueriesMock = vi.fn((args?: unknown) => {
+    void args;
+    return Promise.resolve();
+});
 const navigateMock = vi.fn();
 const toastErrorMock = vi.fn();
 const toastSuccessMock = vi.fn();

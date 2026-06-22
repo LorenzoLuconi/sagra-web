@@ -295,7 +295,7 @@ const ProductQuantityInfo = (props : IProductQuantityInfo) => {
 
 interface IFieldValue {
   field: string
-  value: any
+  value: React.ReactNode
 }
 
 const FieldValue = (props: IFieldValue) => {

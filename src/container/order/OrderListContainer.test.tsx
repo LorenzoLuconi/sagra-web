@@ -15,7 +15,7 @@ vi.mock("../../context/AuthStore.tsx", () => ({
 }));
 
 vi.mock("./OrderList.tsx", () => ({
-  default: () => {
+  default: function MockOrderList() {
     const location = useLocation();
     return <div data-testid="orders-query">{location.search}</div>;
   },

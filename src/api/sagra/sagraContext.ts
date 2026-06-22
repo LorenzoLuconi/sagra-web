@@ -52,11 +52,13 @@ export function useSagraContext<
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
 >(
-  _queryOptions?: Omit<
+  queryOptions?: Omit<
     UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
     "queryKey" | "queryFn"
   >,
 ): SagraContext<TQueryFnData, TError, TQueryKey> {
+  void queryOptions;
+
   return {
     fetcherOptions: {},
     queryOptions: {},

@@ -6,7 +6,10 @@ import {UserEdit} from "./UserEdit.tsx";
 
 const fetchCreateUserMock = vi.fn();
 const listUsersQueryMock = vi.fn();
-const invalidateQueriesMock = vi.fn((..._args: unknown[]) => Promise.resolve());
+const invalidateQueriesMock = vi.fn((...args: unknown[]) => {
+    void args;
+    return Promise.resolve();
+});
 
 vi.mock("../../api/sagra/sagraComponents.ts", () => ({
     fetchCreateUser: (...args: unknown[]) => fetchCreateUserMock(...args),

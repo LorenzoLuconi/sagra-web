@@ -21,10 +21,10 @@ export type SagraFetcherOptions<TBody, THeaders, TQueryParams, TPathParams> = {
 export async function sagraFetch<
   TData,
   TError,
-  TBody extends {} | FormData | undefined | null,
-  THeaders extends {},
-  TQueryParams extends {},
-  TPathParams extends {},
+  TBody extends object | FormData | undefined | null,
+  THeaders extends object,
+  TQueryParams extends object,
+  TPathParams extends Record<string, string | number>,
 >({
   url,
   method,
@@ -118,7 +118,7 @@ const shouldDispatchUnauthorizedEvent = (url: string): boolean => {
 const resolveUrl = (
   url: string,
   queryParams: Record<string, FetcherQueryParam> = {},
-  pathParams: Record<string, string> = {},
+  pathParams: Record<string, string | number> = {},
 ) => {
   const normalizedQueryParams = new URLSearchParams();
   Object.entries(queryParams).forEach(([key, value]) => {
@@ -131,6 +131,6 @@ const resolveUrl = (
   let query = normalizedQueryParams.toString();
   if (query) query = `?${query}`;
   return (
-    url.replace(/\{\w*\}/g, (key) => pathParams[key.slice(1, -1)] ?? "") + query
+    url.replace(/\{\w*\}/g, (key) => String(pathParams[key.slice(1, -1)] ?? "")) + query
   );
 };

@@ -25,4 +25,10 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ["src/api/sagra/sagraComponents.ts"],
+    rules: {
+      "@typescript-eslint/no-empty-object-type": "off",
+    },
+  },
 );

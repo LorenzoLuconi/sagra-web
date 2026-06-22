@@ -271,7 +271,7 @@ const TotalInfo: React.FC<TotalInfoProps> = (props) => {
         const rows = buildProductsData(summary.productsTable, products, addInitial)
         const data = [HEADER, ...rows];
 
-        // @ts-ignore
+        // @ts-expect-error write-excel-file types do not accept the local cell style shape.
         writeXlsxFile(data, {
             columns: [{ width: 50}],
             fileName: "statistiche_sagra.xlsx",

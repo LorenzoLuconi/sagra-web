@@ -167,7 +167,6 @@ const OrderEditForm: React.FC = () => {
       onError: (error: Error) => {
           manageError(error)
       },
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
 
           queryClient.invalidateQueries({queryKey: ordersSearchConf.queryKey}).then(() => {
@@ -185,12 +184,10 @@ const OrderEditForm: React.FC = () => {
       mutationFn: (data: OrderRequest) => {
               return fetchOrderCreate({body: data})
       },
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onError: (error: Error) => {
           //console.log('Order Create error: ', error, error as ErrorWrapper<unknown>)
           manageError(error)
       },
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onSuccess: (order: Order) => {
 
           queryClient.invalidateQueries({queryKey: ordersSearchConf.queryKey}).then(() => {

@@ -44,7 +44,7 @@ const ProductSearchForm : React.FC<ProductSearchFormProps> = (props: ProductSear
         );
 
     const handleResetName =
-        React.useCallback<React.MouseEventHandler>((_event) => {
+        React.useCallback<React.MouseEventHandler>(() => {
             setCourseSelected(undefined)
             setName('');
             setSearchParam({})
