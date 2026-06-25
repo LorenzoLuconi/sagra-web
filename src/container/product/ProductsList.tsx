@@ -1,10 +1,19 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { fetchProductDelete, productsSearchQuery, ProductsSearchQueryParams } from "../../api/sagra/sagraComponents.ts";
+import {
+  departmentsSearchQuery,
+  fetchProductDelete,
+  productsSearchQuery,
+  ProductsSearchQueryParams
+} from "../../api/sagra/sagraComponents.ts";
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
+  Divider,
   IconButton,
+  Menu,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -12,8 +21,8 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
-import { Product } from "../../api/sagra/sagraSchemas.ts";
-import {DeleteOutlined, EditOutlined, LinkOutlined, SettingsOutlined} from "@mui/icons-material";
+import { Department, Product } from "../../api/sagra/sagraSchemas.ts";
+import {DeleteOutlined, EditOutlined, LinkOutlined, PrintOutlined, SettingsOutlined} from "@mui/icons-material";
 import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
 import { useConfirm } from "material-ui-confirm";
@@ -22,6 +31,10 @@ import { ProductName } from "./ProductName.tsx";
 import { DepartmentName } from "../department/DepartmentName.tsx";
 import { CourseName } from "../course/CourseName.tsx";
 import {ErrorWrapper} from "../../api/sagra/sagraFetcher.ts";
+import * as React from "react";
+import {useReactToPrint} from "react-to-print";
+import "./ProductsPrint.css";
+import {flushSync} from "react-dom";
 
 
 interface IProductList {
@@ -32,6 +45,9 @@ interface IProductList {
 
 
 const ProductsList = (props : IProductList) => {
+  const printContentRef = React.useRef<HTMLDivElement>(null);
+  const [printMenuAnchor, setPrintMenuAnchor] = React.useState<null | HTMLElement>(null);
+  const [selectedPrintDepartmentId, setSelectedPrintDepartmentId] = React.useState<number | undefined>(undefined);
 
   const productsSearchConf = productsSearchQuery({
     queryParams: props.searchParam
@@ -41,6 +57,49 @@ const ProductsList = (props : IProductList) => {
     queryKey: productsSearchConf.queryKey,
     queryFn: productsSearchConf.queryFn,
   });
+
+  const printProductsSearchConf = productsSearchQuery({});
+  const printProductsQuery = useQuery({
+    queryKey: printProductsSearchConf.queryKey,
+    queryFn: printProductsSearchConf.queryFn,
+  });
+
+  const departmentsSearchConf = departmentsSearchQuery({});
+  const departmentsQuery = useQuery({
+    queryKey: departmentsSearchConf.queryKey,
+    queryFn: departmentsSearchConf.queryFn,
+  });
+
+  const reactToPrintFn = useReactToPrint({
+    contentRef: printContentRef,
+    documentTitle: "Elenco prodotti",
+  });
+
+  const sortedDepartments = (departmentsQuery.data ?? [])
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name, "it"));
+
+  const printDisabled =
+    printProductsQuery.isLoading ||
+    printProductsQuery.isError ||
+    departmentsQuery.isLoading ||
+    departmentsQuery.isError;
+
+  const handleOpenPrintMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setPrintMenuAnchor(event.currentTarget);
+  };
+
+  const handleClosePrintMenu = () => {
+    setPrintMenuAnchor(null);
+  };
+
+  const handlePrint = (departmentId?: number) => {
+    flushSync(() => {
+      setSelectedPrintDepartmentId(departmentId);
+      setPrintMenuAnchor(null);
+    });
+    reactToPrintFn();
+  };
 
   const productDelete = useMutation({
     mutationFn: (productId: number) => {
@@ -95,6 +154,37 @@ const ProductsList = (props : IProductList) => {
     }
 
     return (
+      <>
+        <Box sx={{display: "flex", justifyContent: "flex-end", mb: 1}}>
+          <Button
+            variant="outlined"
+            startIcon={<PrintOutlined />}
+            onClick={handleOpenPrintMenu}
+            disabled={printDisabled}
+          >
+            Stampa
+          </Button>
+          <Menu
+            anchorEl={printMenuAnchor}
+            open={Boolean(printMenuAnchor)}
+            onClose={handleClosePrintMenu}
+          >
+            <MenuItem onClick={() => handlePrint()}>Tutti i reparti</MenuItem>
+            <Divider />
+            {sortedDepartments.map((department) => (
+              <MenuItem key={department.id} onClick={() => handlePrint(department.id)}>
+                {department.name}
+              </MenuItem>
+            ))}
+          </Menu>
+        </Box>
+        <div ref={printContentRef} className="printContent products-print">
+          <ProductsPrint
+            products={printProductsQuery.data ?? []}
+            departments={departmentsQuery.data ?? []}
+            departmentId={selectedPrintDepartmentId}
+          />
+        </div>
         <Table>
           <TableHead sx={{ backgroundColor: 'background.default' }}>
             <TableRow>
@@ -138,9 +228,66 @@ const ProductsList = (props : IProductList) => {
             })}
           </TableBody>
         </Table>
+      </>
     );
   }
 }
+
+interface ProductsPrintProps {
+  products: Product[];
+  departments: Department[];
+  departmentId?: number;
+}
+
+const ProductsPrint = (props: ProductsPrintProps) => {
+  const departmentsById = props.departments.reduce<Record<number, Department>>((acc, department) => {
+    acc[department.id] = department;
+    return acc;
+  }, {});
+
+  const productsToPrint = props.departmentId === undefined
+    ? props.products
+    : props.products.filter((product) => product.departmentId === props.departmentId);
+
+  const groups = productsToPrint.reduce<Record<number, Product[]>>((acc, product) => {
+    acc[product.departmentId] = [...(acc[product.departmentId] ?? []), product];
+    return acc;
+  }, {});
+
+  const departmentIds = Object.keys(groups)
+    .map(Number)
+    .sort((a, b) => {
+      const departmentA = departmentsById[a]?.name ?? `Reparto ${a}`;
+      const departmentB = departmentsById[b]?.name ?? `Reparto ${b}`;
+      return departmentA.localeCompare(departmentB, "it");
+    });
+
+  return (
+    <Box>
+      <Typography className="products-print-title">Elenco prodotti</Typography>
+      {departmentIds.map((departmentId) => (
+        <Box key={departmentId} className="products-print-section">
+          <Typography className="products-print-department">
+            {departmentsById[departmentId]?.name ?? `Reparto ${departmentId}`}
+          </Typography>
+          <Table size="small" className="products-print-table">
+            <TableBody>
+              {groups[departmentId]
+                .slice()
+                .sort((a, b) => a.name.localeCompare(b.name, "it"))
+                .map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell align="right">{currency(product.price)}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </Box>
+      ))}
+    </Box>
+  );
+};
 
 
 

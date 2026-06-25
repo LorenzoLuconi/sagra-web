@@ -1,0 +1,47 @@
+.products-print {
+    display: none;
+    color: #111;
+    font-family: Roboto, Arial, sans-serif;
+}
+
+.products-print-title {
+    font-size: 20pt;
+    font-weight: 700;
+    margin-bottom: 8mm;
+}
+
+.products-print-section {
+    break-inside: avoid;
+    margin-bottom: 6mm;
+}
+
+.products-print-department {
+    border-bottom: 1px solid #555;
+    font-size: 14pt;
+    font-weight: 700;
+    margin-bottom: 2mm;
+    padding-bottom: 1mm;
+}
+
+.products-print-table td {
+    border-bottom: 1px solid #ddd;
+    font-size: 12pt;
+    padding: 2mm 0;
+}
+
+.products-print-table td:last-child {
+    font-weight: 500;
+    white-space: nowrap;
+    width: 28mm;
+}
+
+@media print {
+    .products-print {
+        display: block;
+        padding: 0;
+    }
+}
+
+@page {
+    margin: 12mm;
+}
