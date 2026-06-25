@@ -53,10 +53,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/sagra-web:${{ github.ref_name }}
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/sagra-web
           tags: |
-            type=semver,pattern={{version}}
-            type=sha,prefix=sha-
+            type=raw,value=${{ github.ref_name }}
 
       - name: Build e Push su DockerHub
         uses: docker/build-push-action@v7
