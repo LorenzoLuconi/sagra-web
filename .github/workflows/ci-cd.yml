@@ -32,6 +32,14 @@ jobs:
       - name: Build dell'applicazione
         run: yarn build
 
+      - name: Upload build artifact
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagra-web-dist
+          path: dist
+          if-no-files-found: error
+
   docker-build-push:
     needs: build-and-test
     runs-on: ubuntu-latest
@@ -39,6 +47,12 @@ jobs:
     steps:
       - name: Checkout del codice
         uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sagra-web-dist
+          path: dist
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v4
