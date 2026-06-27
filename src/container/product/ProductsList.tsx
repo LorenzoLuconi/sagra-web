@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  departmentsSearchQuery,
+  coursesSearchQuery,
   fetchProductDelete,
   productsSearchQuery,
   ProductsSearchQueryParams
@@ -21,7 +21,7 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
-import { Department, Product } from "../../api/sagra/sagraSchemas.ts";
+import { Course, Product } from "../../api/sagra/sagraSchemas.ts";
 import {AddCircle, DeleteOutlined, EditOutlined, LinkOutlined, PrintOutlined, SettingsOutlined} from "@mui/icons-material";
 import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
@@ -53,7 +53,7 @@ interface IProductList {
 const ProductsList = (props : IProductList) => {
   const printContentRef = React.useRef<HTMLDivElement>(null);
   const [printMenuAnchor, setPrintMenuAnchor] = React.useState<null | HTMLElement>(null);
-  const [selectedPrintDepartmentId, setSelectedPrintDepartmentId] = React.useState<number | undefined>(undefined);
+  const [selectedPrintCourseId, setSelectedPrintCourseId] = React.useState<number | undefined>(undefined);
 
   const productsSearchConf = productsSearchQuery({
     queryParams: props.searchParam
@@ -70,10 +70,10 @@ const ProductsList = (props : IProductList) => {
     queryFn: printProductsSearchConf.queryFn,
   });
 
-  const departmentsSearchConf = departmentsSearchQuery({});
-  const departmentsQuery = useQuery({
-    queryKey: departmentsSearchConf.queryKey,
-    queryFn: departmentsSearchConf.queryFn,
+  const coursesSearchConf = coursesSearchQuery({});
+  const coursesQuery = useQuery({
+    queryKey: coursesSearchConf.queryKey,
+    queryFn: coursesSearchConf.queryFn,
   });
 
   const reactToPrintFn = useReactToPrint({
@@ -81,15 +81,15 @@ const ProductsList = (props : IProductList) => {
     documentTitle: "Elenco prodotti",
   });
 
-  const sortedDepartments = (departmentsQuery.data ?? [])
+  const sortedCourses = (coursesQuery.data ?? [])
     .slice()
-    .sort((a, b) => a.name.localeCompare(b.name, "it"));
+    .sort((a, b) => a.id - b.id);
 
   const printDisabled =
     printProductsQuery.isLoading ||
     printProductsQuery.isError ||
-    departmentsQuery.isLoading ||
-    departmentsQuery.isError;
+    coursesQuery.isLoading ||
+    coursesQuery.isError;
 
   const handleOpenPrintMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setPrintMenuAnchor(event.currentTarget);
@@ -99,9 +99,9 @@ const ProductsList = (props : IProductList) => {
     setPrintMenuAnchor(null);
   };
 
-  const handlePrint = (departmentId?: number) => {
+  const handlePrint = (courseId?: number) => {
     flushSync(() => {
-      setSelectedPrintDepartmentId(departmentId);
+      setSelectedPrintCourseId(courseId);
       setPrintMenuAnchor(null);
     });
     reactToPrintFn();
@@ -179,11 +179,11 @@ const ProductsList = (props : IProductList) => {
             open={Boolean(printMenuAnchor)}
             onClose={handleClosePrintMenu}
           >
-            <MenuItem onClick={() => handlePrint()}>Tutti i reparti</MenuItem>
+            <MenuItem onClick={() => handlePrint()}>Tutte le portate</MenuItem>
             <Divider />
-            {sortedDepartments.map((department) => (
-              <MenuItem key={department.id} onClick={() => handlePrint(department.id)}>
-                {department.name}
+            {sortedCourses.map((course) => (
+              <MenuItem key={course.id} onClick={() => handlePrint(course.id)}>
+                {course.name}
               </MenuItem>
             ))}
           </Menu>
@@ -191,8 +191,8 @@ const ProductsList = (props : IProductList) => {
         <div ref={printContentRef} className="printContent products-print">
           <ProductsPrint
             products={printProductsQuery.data ?? []}
-            departments={departmentsQuery.data ?? []}
-            departmentId={selectedPrintDepartmentId}
+            courses={coursesQuery.data ?? []}
+            courseId={selectedPrintCourseId}
           />
         </div>
         <Table>
@@ -245,48 +245,44 @@ const ProductsList = (props : IProductList) => {
 
 interface ProductsPrintProps {
   products: Product[];
-  departments: Department[];
-  departmentId?: number;
+  courses: Course[];
+  courseId?: number;
 }
 
 const ProductsPrint = (props: ProductsPrintProps) => {
   const eventTitle = useEventTitle();
 
-  const departmentsById = props.departments.reduce<Record<number, Department>>((acc, department) => {
-    acc[department.id] = department;
+  const coursesById = props.courses.reduce<Record<number, Course>>((acc, course) => {
+    acc[course.id] = course;
     return acc;
   }, {});
 
   const unlinkedProducts = props.products.filter((product) => !product.parentId);
 
-  const productsToPrint = props.departmentId === undefined
+  const productsToPrint = props.courseId === undefined
     ? unlinkedProducts
-    : unlinkedProducts.filter((product) => product.departmentId === props.departmentId);
+    : unlinkedProducts.filter((product) => product.courseId === props.courseId);
 
   const groups = productsToPrint.reduce<Record<number, Product[]>>((acc, product) => {
-    acc[product.departmentId] = [...(acc[product.departmentId] ?? []), product];
+    acc[product.courseId] = [...(acc[product.courseId] ?? []), product];
     return acc;
   }, {});
 
-  const departmentIds = Object.keys(groups)
+  const courseIds = Object.keys(groups)
     .map(Number)
-    .sort((a, b) => {
-      const departmentA = departmentsById[a]?.name ?? `Reparto ${a}`;
-      const departmentB = departmentsById[b]?.name ?? `Reparto ${b}`;
-      return departmentA.localeCompare(departmentB, "it");
-    });
+    .sort((a, b) => a - b);
 
   return (
     <Box>
       <Typography className="products-print-title">{eventTitle}</Typography>
-      {departmentIds.map((departmentId) => (
-        <Box key={departmentId} className="products-print-section">
+      {courseIds.map((courseId) => (
+        <Box key={courseId} className="products-print-section">
           <Typography className="products-print-department">
-            {departmentsById[departmentId]?.name ?? `Reparto ${departmentId}`}
+            {coursesById[courseId]?.name ?? `Portata ${courseId}`}
           </Typography>
           <Table size="small" className="products-print-table">
             <TableBody>
-              {groups[departmentId]
+              {groups[courseId]
                 .slice()
                 .sort((a, b) => a.name.localeCompare(b.name, "it"))
                 .map((product) => (
