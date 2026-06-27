@@ -63,6 +63,8 @@ const AppConfigurationContext = React.createContext<AppConfigurationContextValue
     reload: async () => [],
 });
 
+const emptyConfigurationGroups: AppConfigurationGroup[] = [];
+
 const getConfiguredPrintSplitBy = (valuesByGroup: AppConfigurationValueByGroup): PrintSplitBy => {
     const value = getConfiguredStringValue("print", "split-by", valuesByGroup, "department");
     return value === "none" || value === "course" || value === "department" ? value : "department";
@@ -83,7 +85,7 @@ const AppConfigurationStore: React.FC<React.PropsWithChildren> = ({children}) =>
         staleTime: 1000 * 60 * 5,
     });
 
-    const groups = configurations.data ?? [];
+    const groups = configurations.data ?? emptyConfigurationGroups;
     const valuesByGroup = React.useMemo(() => indexConfigurationGroups(groups), [groups]);
     const eventTitle = React.useMemo(() => (
         getConfiguredStringValue("general", "event-title", valuesByGroup, defaultEventTitle)

@@ -37,7 +37,7 @@ const ProductContainer: React.FC = () => {
         setProductDialogOpen(false);
     };
 
-    const handleProductEditClose = (_product: Product | undefined) => {
+    const handleProductEditClose = () => {
         handleCloseProductDialog();
     };
 
