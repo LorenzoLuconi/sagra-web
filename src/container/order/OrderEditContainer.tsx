@@ -1,7 +1,19 @@
 import * as React from "react";
 import { useQueries } from "@tanstack/react-query";
 import { productByIdQuery } from "../../api/sagra/sagraComponents.ts";
-import {Alert, Box, CircularProgress, Grid, Paper, Typography, useTheme} from "@mui/material";
+import {
+    Alert,
+    Badge,
+    Box,
+    CircularProgress,
+    Drawer,
+    Fab,
+    Grid,
+    Paper,
+    Typography,
+    useMediaQuery,
+    useTheme
+} from "@mui/material";
 import {OrderStore, useOrderStore} from "../../context/OrderStore.tsx";
 import ProductsToOrder from "./ProductsToOrder.tsx";
 import ErrorInfo from "../../view/ErrorInfo.tsx";
@@ -12,6 +24,7 @@ import { Order, Product } from "../../api/sagra/sagraSchemas.ts";
 import {convertDate, TIME_CONF} from "../../utils";
 import OrderEditRest from "./OrderEditRest.tsx";
 import {isEqual} from "lodash";
+import {ShoppingCartOutlined} from "@mui/icons-material";
 
 interface OrderEditContainerProps {
   order: Order;
@@ -60,6 +73,65 @@ const OrderEditContainer :React.FC<OrderEditContainerProps> = (props: OrderEditC
 
 const OrderEditInnerContainer: React.FC = () => {
     const theme = useTheme();
+    const isCompact = useMediaQuery(theme.breakpoints.down('md'));
+    const {order} = useOrderStore();
+    const [orderDrawerOpen, setOrderDrawerOpen] = React.useState(false);
+    const orderedProductsCount = order.products.reduce((total, product) => total + product.quantity, 0);
+
+    return (
+        <>
+            <Grid container spacing={2}>
+                <Grid size={{xs: 12, md: 7}}>
+                    <ProductsToOrder/>
+                </Grid>
+                {!isCompact && (
+                    <Grid size={{xs: 12, md: 5}}>
+                        <Box sx={{ position: 'sticky', top: '70px' }}>
+                            <OrderPanel />
+                        </Box>
+                    </Grid>
+                )}
+            </Grid>
+
+            {isCompact && (
+                <>
+                    <Fab
+                        color="primary"
+                        aria-label={orderDrawerOpen ? "Chiudi ordine" : "Apri ordine"}
+                        onClick={() => setOrderDrawerOpen((open) => !open)}
+                        sx={{
+                            bottom: 16,
+                            position: 'fixed',
+                            right: 16,
+                            zIndex: (theme) => theme.zIndex.drawer + 1,
+                        }}
+                    >
+                        <Badge badgeContent={orderedProductsCount} color="error">
+                            <ShoppingCartOutlined />
+                        </Badge>
+                    </Fab>
+                    <Drawer
+                        anchor="right"
+                        open={orderDrawerOpen}
+                        onClose={() => setOrderDrawerOpen(false)}
+                        PaperProps={{
+                            sx: {
+                                maxWidth: '420px',
+                                p: 1,
+                                width: '92vw',
+                            },
+                        }}
+                    >
+                        <OrderPanel />
+                    </Drawer>
+                </>
+            )}
+        </>
+    )
+}
+
+const OrderPanel: React.FC = () => {
+    const theme = useTheme();
     const {order, originalOrder, isNewOrder} = useOrderStore();
 
     const isOrderChanged = !isEqual(originalOrder, order)
@@ -69,63 +141,55 @@ const OrderEditInnerContainer: React.FC = () => {
     }
 
     return (
-        <Grid container spacing={2}>
-            <Grid size={7}>
-                <ProductsToOrder/>
-            </Grid>
-            <Grid size={5} sx={{minWidth: '400px'}}>
-                <Box sx={{ position: 'sticky', top: '70px' }}>
-                    <ErrorInfo/>
+        <>
+            <ErrorInfo/>
 
-                    {
-                        ! isNewOrder() &&
-                        <Paper variant="outlined"
-                               sx={{
-                                   p: 0.5,
-                                   textAlign: 'center',
-                                   backgroundColor: theme.sagra.panelBackground,
-                                   filter: 'brightness(85%)'
-                               }}
-                               className="paper-top">
-                            <Typography sx={{fontWeight: 500, fontSize: '1.1em'}}>Ordine
-                                n. {order.id} del {convertDate('it', new Date(order.created))} ore {convertDate('it', new Date(order.created), TIME_CONF)}</Typography>
-                        </Paper>
-                    }
+            {
+                ! isNewOrder() &&
+                <Paper variant="outlined"
+                       sx={{
+                           p: 0.5,
+                           textAlign: 'center',
+                           backgroundColor: theme.sagra.panelBackground,
+                           filter: 'brightness(85%)'
+                       }}
+                       className="paper-top">
+                    <Typography sx={{fontWeight: 500, fontSize: '1.1em'}}>Ordine
+                        n. {order.id} del {convertDate('it', new Date(order.created))} ore {convertDate('it', new Date(order.created), TIME_CONF)}</Typography>
+                </Paper>
+            }
 
-                    <Paper variant="outlined"
-                           sx={{p: 0.5, backgroundColor: theme.sagra.panelBackground}}
-                           className={ isNewOrder() ? "paper-top" : "paper-middle"}>
-                        <OrderEditTotal/>
-                    </Paper>
+            <Paper variant="outlined"
+                   sx={{p: 0.5, backgroundColor: theme.sagra.panelBackground}}
+                   className={ isNewOrder() ? "paper-top" : "paper-middle"}>
+                <OrderEditTotal/>
+            </Paper>
 
-                    <Paper variant="outlined"
-                           sx={{p: 0.5, backgroundColor: theme.sagra.panelBackground}}
-                           className="paper-middle">
-                        <OrderEditProducts/>
-                    </Paper>
+            <Paper variant="outlined"
+                   sx={{p: 0.5, backgroundColor: theme.sagra.panelBackground}}
+                   className="paper-middle">
+                <OrderEditProducts/>
+            </Paper>
 
-                    <Paper
-                        variant="outlined"
-                        sx={{padding: 2, backgroundColor: theme.sagra.panelBackground}}
-                        className={ showCalc() ? 'paper-middle' : 'paper-bottom'}
-                    >
-                        <OrderEditForm/>
-                    </Paper>
+            <Paper
+                variant="outlined"
+                sx={{padding: 2, backgroundColor: theme.sagra.panelBackground}}
+                className={ showCalc() ? 'paper-middle' : 'paper-bottom'}
+            >
+                <OrderEditForm/>
+            </Paper>
 
-                    { showCalc() &&
-                        <Paper
-                            variant="outlined"
-                            sx={{padding: 2, backgroundColor: theme.sagra.panelBackground}}
-                            className="paper-bottom"
-                        >
-                            <OrderEditRest/>
-                        </Paper>
-                    }
-                </Box>
-            </Grid>
-
-        </Grid>
-    )
+            { showCalc() &&
+                <Paper
+                    variant="outlined"
+                    sx={{padding: 2, backgroundColor: theme.sagra.panelBackground}}
+                    className="paper-bottom"
+                >
+                    <OrderEditRest/>
+                </Paper>
+            }
+        </>
+    );
 }
 
 export default OrderEditContainer;

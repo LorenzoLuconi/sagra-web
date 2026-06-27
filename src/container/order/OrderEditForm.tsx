@@ -12,6 +12,8 @@ import {
   FormControlLabel,
   Switch,
   TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { CancelOutlined, DeleteOutlined, PrintOutlined, SaveOutlined } from "@mui/icons-material";
 import {useOrderStore} from "../../context/OrderStore.tsx";
@@ -21,9 +23,7 @@ import { cloneDeep, isEqual } from "lodash";
 import {useMutation} from "@tanstack/react-query";
 import {
   fetchOrderCreate, fetchOrderDelete,
-  fetchOrderUpdate,
-  ordersSearchQuery,
-  productsSearchQuery
+  fetchOrderUpdate
 } from "../../api/sagra/sagraComponents.ts";
 import {useNavigate} from "react-router";
 import OrderPrint from "./OrderPrint.tsx";
@@ -36,6 +36,8 @@ import {useOrderConfiguration, usePrintConfiguration} from "../../context/AppCon
 
 const OrderEditForm: React.FC = () => {
 
+  const theme = useTheme();
+  const iconOnlyActions = useMediaQuery(theme.breakpoints.down("lg"));
   const {order, updateOrderField, products: productsTable, errors, setFieldError, resetErrors, resetStore, isNewOrder, originalOrder} = useOrderStore();
   const orderConfiguration = useOrderConfiguration();
   const printConfiguration = usePrintConfiguration();
@@ -66,7 +68,18 @@ const OrderEditForm: React.FC = () => {
     setTakeAway(originalOrder.takeAway);
   }
 
-  const ordersSearchConf = ordersSearchQuery({});
+  const invalidateOrders = () => {
+    void queryClient.invalidateQueries({ queryKey: ["v1", "orders"] });
+  };
+
+  const invalidateProducts = () => {
+    void queryClient.invalidateQueries({ queryKey: ["v1", "products"] });
+  };
+
+  const invalidateOrderDependencies = () => {
+    invalidateOrders();
+    invalidateProducts();
+  };
 
   const orderDelete = useMutation({
     mutationFn: (orderId: number) => {
@@ -75,11 +88,9 @@ const OrderEditForm: React.FC = () => {
       });
     },
     onSuccess: () => {
-        queryClient.invalidateQueries({queryKey: ordersSearchConf.queryKey}).then(() => {
-            queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
-                toast.success(`L'ordine n. ${order.id} è stato rimosso`);
-            })
-        })
+        toast.success(`L'ordine n. ${order.id} è stato rimosso`);
+        invalidateOrderDependencies();
+        navigate("/orders/new")
     },
     onError: (error: Error) => {
         manageError(error)
@@ -95,13 +106,9 @@ const OrderEditForm: React.FC = () => {
     }).then((confirm) => {
       if (confirm.confirmed) {
         orderDelete.mutate(order.id)
-        navigate("/orders/new")
       }
     });
   }
-
-
-    const productsSearchConf = productsSearchQuery({});
 
 
     const getErrorParts = (error: unknown): {status?: unknown; payload?: unknown} => {
@@ -135,11 +142,7 @@ const OrderEditForm: React.FC = () => {
                     toast.error(`Ordine non registrato per quantità prodotto non sufficiente per '${productsTable[invalidProduct.productId].name}'`)
                 })
 
-                queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
-                    //toast.success("Quantità dei prodotti aggiornata")
-                }).catch((e: Error) => {
-                    console.log('Errore: ', e)
-                })
+                invalidateProducts();
 
                 break;
             }
@@ -168,14 +171,9 @@ const OrderEditForm: React.FC = () => {
           manageError(error)
       },
       onSuccess: (order: Order) => {
-
-          queryClient.invalidateQueries({queryKey: ordersSearchConf.queryKey}).then(() => {
-            queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
-              toast.success(`L'ordine n. ${order.id} è stato aggiornato`)
-              navigate(`/orders/${order.id}`)
-            })
-          })
-
+          toast.success(`L'ordine n. ${order.id} è stato aggiornato`)
+          invalidateOrderDependencies();
+          navigate(`/orders/${order.id}`)
       }
   })
 
@@ -189,15 +187,9 @@ const OrderEditForm: React.FC = () => {
           manageError(error)
       },
       onSuccess: (order: Order) => {
-
-          queryClient.invalidateQueries({queryKey: ordersSearchConf.queryKey}).then(() => {
-              queryClient.invalidateQueries({queryKey: productsSearchConf.queryKey}).then(() => {
-                  toast.success(`Ordine per cliente '${order.customer}' creato con n. ${order.id}`)
-                  navigate(`/orders/${order.id}`)
-              })
-          }).catch((e: Error)=> {
-              manageError(e)
-          })
+          toast.success(`Ordine per cliente '${order.customer}' creato con n. ${order.id}`)
+          invalidateOrderDependencies();
+          navigate(`/orders/${order.id}`)
       }
   })
 
@@ -346,35 +338,45 @@ const OrderEditForm: React.FC = () => {
                      onChange={handleChangeNote}
                      />
         </Box>
-        <Box sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 2,
-                  p: 2
+        <Box sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 1, flexWrap: "nowrap",
+                  overflowX: "auto", p: 2
         }}>
           {newOrder && (
             <Button
               size="small"
               variant="contained"
-              startIcon={<SaveOutlined/>}
+              aria-label="Crea"
+              startIcon={iconOnlyActions ? undefined : <SaveOutlined/>}
               onClick= {() => handleSave()}
-            >Crea</Button>
+              sx={iconOnlyActions ? {minWidth: 40, px: 1} : {whiteSpace: "nowrap"}}
+            >{iconOnlyActions ? <SaveOutlined/> : "Crea"}</Button>
           )}
           {!newOrder && (
             <Button
               size="small"
               disabled={!differences}
               variant="contained"
-              startIcon={<SaveOutlined/>}
+              aria-label="Aggiorna"
+              startIcon={iconOnlyActions ? undefined : <SaveOutlined/>}
               onClick= {() => handleSave()}
-            >Aggiorna</Button>
+              sx={iconOnlyActions ? {minWidth: 40, px: 1} : {whiteSpace: "nowrap"}}
+            >{iconOnlyActions ? <SaveOutlined/> : "Aggiorna"}</Button>
           )}
           {!newOrder && (
             <Button size="small"  color="success"
                     disabled={differences}
-                    onClick={reactToPrintFn} variant="contained" startIcon={<PrintOutlined/>}>Stampa</Button>
+                    aria-label="Stampa"
+                    onClick={reactToPrintFn}
+                    variant="contained"
+                    startIcon={iconOnlyActions ? undefined : <PrintOutlined/>}
+                    sx={iconOnlyActions ? {minWidth: 40, px: 1} : {whiteSpace: "nowrap"}}
+            >{iconOnlyActions ? <PrintOutlined/> : "Stampa"}</Button>
           )}
           <Button
             size="small"
             disabled={!differences}
             variant="contained"
+            aria-label="Annulla"
             onClick={ () =>  {
               confirm({
                 title: `Annulla modifiche ordine`,
@@ -385,15 +387,18 @@ const OrderEditForm: React.FC = () => {
                 }
               });
             }}
-            startIcon={<CancelOutlined/>}
-          >Annulla</Button>
+            startIcon={iconOnlyActions ? undefined : <CancelOutlined/>}
+            sx={iconOnlyActions ? {minWidth: 40, px: 1} : {whiteSpace: "nowrap"}}
+          >{iconOnlyActions ? <CancelOutlined/> : "Annulla"}</Button>
           {!newOrder && (
             <Button size="small"
                     variant="contained"
                     onClick={ () => handleDelete()}
                     color="error"
-                    startIcon={<DeleteOutlined/>}
-            >Elimina</Button>
+                    aria-label="Elimina"
+                    startIcon={iconOnlyActions ? undefined : <DeleteOutlined/>}
+                    sx={iconOnlyActions ? {minWidth: 40, px: 1} : {whiteSpace: "nowrap"}}
+            >{iconOnlyActions ? <DeleteOutlined/> : "Elimina"}</Button>
           )}
         </Box>
         { ! (differences || newOrder) &&
