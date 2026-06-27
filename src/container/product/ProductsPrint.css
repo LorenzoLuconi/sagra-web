@@ -26,7 +26,7 @@
 .products-print-table td {
     border-bottom: 1px solid #ddd;
     font-size: 12pt;
-    padding: 2mm 0;
+    padding: 1mm 0;
 }
 
 .products-print-table tr {
@@ -38,7 +38,7 @@
     font-size: 9pt;
     font-style: italic;
     margin-left: 0.5mm;
-    margin-top: 0.2mm;
+    margin-top: 0.1mm;
 }
 
 .products-print-table td:last-child {
