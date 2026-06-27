@@ -43,11 +43,16 @@ const ProductsOrder : React.FC<ProductsOrderProps> = (props: ProductsOrderProps)
         return <Alert severity="warning">Nessuno prodotto presente</Alert>
     }
 
+    const orderableProducts = productsQuery.data.filter((product) => !product.sellLocked);
+
+    if (orderableProducts.length < 1) {
+        return <Alert severity="warning">Nessuno prodotto ordinabile presente</Alert>
+    }
 
     if ( props.type === 'card')
-        return <ProductsOrderCard addToOrder={addToOrder} products={productsQuery.data}/>
+        return <ProductsOrderCard addToOrder={addToOrder} products={orderableProducts}/>
     else
-        return <ProductsOrderList addToOrder={addToOrder} products={productsQuery.data}/>
+        return <ProductsOrderList addToOrder={addToOrder} products={orderableProducts}/>
 }
 
 export default ProductsOrder
