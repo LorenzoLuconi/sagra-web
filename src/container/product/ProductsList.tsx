@@ -35,6 +35,7 @@ import * as React from "react";
 import {useReactToPrint} from "react-to-print";
 import "./ProductsPrint.css";
 import {flushSync} from "react-dom";
+import {useEventTitle} from "../../context/AppConfigurationStore.tsx";
 
 
 interface IProductList {
@@ -240,6 +241,8 @@ interface ProductsPrintProps {
 }
 
 const ProductsPrint = (props: ProductsPrintProps) => {
+  const eventTitle = useEventTitle();
+
   const departmentsById = props.departments.reduce<Record<number, Department>>((acc, department) => {
     acc[department.id] = department;
     return acc;
@@ -266,7 +269,7 @@ const ProductsPrint = (props: ProductsPrintProps) => {
 
   return (
     <Box>
-      <Typography className="products-print-title">Elenco prodotti</Typography>
+      <Typography className="products-print-title">{eventTitle}</Typography>
       {departmentIds.map((departmentId) => (
         <Box key={departmentId} className="products-print-section">
           <Typography className="products-print-department">
