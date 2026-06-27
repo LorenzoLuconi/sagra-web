@@ -40,6 +40,10 @@ interface ErrorMessages {
   course?: string;
 }
 
+const invalidateProducts = () => {
+  void queryClient.invalidateQueries({ queryKey: ["v1", "products"] });
+};
+
 const ProductEdit = (props: IProductEdit) => {
   const [name, setName] = React.useState(props.selected?.name ?? "");
   const [note, setNote] = React.useState(props.selected?.note ?? "");
@@ -142,14 +146,9 @@ const ProductEdit = (props: IProductEdit) => {
       return fetchProductCreate({ body: request });
     },
     onSuccess: (data) => {
-      const discountSearchConf = productsSearchQuery({});
+      toast.success(`Prodotto '${data.name}' creato con successo`);
+      invalidateProducts();
       resetState();
-      queryClient
-        .invalidateQueries({ queryKey: discountSearchConf.queryKey })
-        .then(() => {
-          toast.success(`Prodotto '${data.name}' creato con successo`);
-          resetState();
-        });
     },
     onError: (error: Error) => {
       manageError(error as ErrorWrapper<unknown>)
@@ -170,14 +169,9 @@ const ProductEdit = (props: IProductEdit) => {
       });
     },
     onSuccess: (data) => {
-      const productSearchConf = productsSearchQuery({});
+      toast.success(`Prodotto '${data.name}' modificato con successo`);
+      invalidateProducts();
       resetState();
-      queryClient
-        .invalidateQueries({ queryKey: productSearchConf.queryKey })
-        .then(() => {
-          toast.success(`Prodotto '${data.name}' modificato con successo`);
-          resetState();
-        });
     },
     onError: (error: Error) => {
       manageError(error as ErrorWrapper<unknown>)

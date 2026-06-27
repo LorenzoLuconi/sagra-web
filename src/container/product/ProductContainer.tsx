@@ -1,4 +1,4 @@
-import {Paper, useTheme} from "@mui/material";
+import {Dialog, DialogContent, DialogTitle, Paper, useTheme} from "@mui/material";
 import {RestaurantOutlined} from "@mui/icons-material";
 import {useState} from "react";
 import ProductEdit from "./ProductEdit.tsx";
@@ -13,28 +13,56 @@ const ProductContainer: React.FC = () => {
     const theme = useTheme();
 
     const [selected, setSelected] = useState<Product | undefined>(undefined);
+    const [productDialogOpen, setProductDialogOpen] = useState(false);
     const [searchParam, setSearchParam] = useState<ProductsSearchQueryParams>({});
 
     const selectProduct = (product: Product | undefined) => {
         setSelected(product);
+        if (product) {
+            setProductDialogOpen(true);
+        }
     };
 
     const handleChangeSearchParam = (searchParam: ProductsSearchQueryParams) => {
         setSearchParam(searchParam)
     }
 
+    const handleCreateProduct = () => {
+        setSelected(undefined);
+        setProductDialogOpen(true);
+    };
+
+    const handleCloseProductDialog = () => {
+        setSelected(undefined);
+        setProductDialogOpen(false);
+    };
+
+    const handleProductEditClose = (_product: Product | undefined) => {
+        handleCloseProductDialog();
+    };
+
+
     return (
         <>
             <PageTitle title="Prodotti" icon={<RestaurantOutlined/>}/>
 
-            <Paper variant="outlined" sx={{padding: 2, mb: 1, backgroundColor: theme.sagra.panelBackground}}
-                   className="paper-round">
-                <ProductEdit
-                    key={selected?.id}
-                    selected={selected}
-                    setSelected={selectProduct}
-                />
-            </Paper>
+            <Dialog
+                open={productDialogOpen}
+                onClose={handleCloseProductDialog}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>
+                    {selected ? "Modifica prodotto" : "Nuovo prodotto"}
+                </DialogTitle>
+                <DialogContent>
+                    <ProductEdit
+                        key={selected?.id ?? "new"}
+                        selected={selected}
+                        setSelected={handleProductEditClose}
+                    />
+                </DialogContent>
+            </Dialog>
 
             <Paper variant="outlined" sx={{padding: 2, backgroundColor: theme.sagra.panelBackground}}
                    className="paper-top">
@@ -47,6 +75,7 @@ const ProductContainer: React.FC = () => {
                     selected={selected}
                     setSelected={selectProduct}
                     searchParam={searchParam}
+                    onCreateProduct={handleCreateProduct}
                 />
             </Paper>
         </>

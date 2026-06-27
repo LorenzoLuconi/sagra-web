@@ -22,7 +22,7 @@ import {
   Typography
 } from "@mui/material";
 import { Department, Product } from "../../api/sagra/sagraSchemas.ts";
-import {DeleteOutlined, EditOutlined, LinkOutlined, PrintOutlined, SettingsOutlined} from "@mui/icons-material";
+import {AddCircle, DeleteOutlined, EditOutlined, LinkOutlined, PrintOutlined, SettingsOutlined} from "@mui/icons-material";
 import { queryClient } from "../../main.tsx";
 import toast from "react-hot-toast";
 import { useConfirm } from "material-ui-confirm";
@@ -38,10 +38,15 @@ import {flushSync} from "react-dom";
 import {useEventTitle} from "../../context/AppConfigurationStore.tsx";
 
 
+const invalidateProducts = () => {
+  void queryClient.invalidateQueries({ queryKey: ["v1", "products"] });
+};
+
 interface IProductList {
   selected: Product | undefined
   setSelected(product: Product | undefined) : void
   searchParam : ProductsSearchQueryParams
+  onCreateProduct(): void
 }
 
 
@@ -109,11 +114,8 @@ const ProductsList = (props : IProductList) => {
       });
     },
     onSuccess: () => {
-      queryClient
-        .invalidateQueries({ queryKey: productsSearchConf.queryKey })
-        .then(() => {
-          toast.success("Prodotto rimosso");
-        });
+      toast.success("Prodotto rimosso");
+      invalidateProducts();
     },
     onError: (error: Error) => {
       manageError(error as ErrorWrapper<unknown>)
@@ -156,7 +158,14 @@ const ProductsList = (props : IProductList) => {
 
     return (
       <>
-        <Box sx={{display: "flex", justifyContent: "flex-end", mb: 1}}>
+        <Box sx={{display: "flex", justifyContent: "flex-end", gap: 1, mb: 1}}>
+          <Button
+            variant="contained"
+            startIcon={<AddCircle />}
+            onClick={props.onCreateProduct}
+          >
+            Nuovo prodotto
+          </Button>
           <Button
             variant="outlined"
             startIcon={<PrintOutlined />}
