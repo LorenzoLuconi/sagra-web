@@ -245,9 +245,11 @@ const ProductsPrint = (props: ProductsPrintProps) => {
     return acc;
   }, {});
 
+  const unlinkedProducts = props.products.filter((product) => !product.parentId);
+
   const productsToPrint = props.departmentId === undefined
-    ? props.products
-    : props.products.filter((product) => product.departmentId === props.departmentId);
+    ? unlinkedProducts
+    : unlinkedProducts.filter((product) => product.departmentId === props.departmentId);
 
   const groups = productsToPrint.reduce<Record<number, Product[]>>((acc, product) => {
     acc[product.departmentId] = [...(acc[product.departmentId] ?? []), product];
@@ -277,7 +279,14 @@ const ProductsPrint = (props: ProductsPrintProps) => {
                 .sort((a, b) => a.name.localeCompare(b.name, "it"))
                 .map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell>{product.name}</TableCell>
+                    <TableCell>
+                      <Typography component="div">{product.name}</Typography>
+                      {product.note?.trim() && (
+                        <Typography component="div" className="products-print-note">
+                          {product.note}
+                        </Typography>
+                      )}
+                    </TableCell>
                     <TableCell align="right">{currency(product.price)}</TableCell>
                   </TableRow>
                 ))}

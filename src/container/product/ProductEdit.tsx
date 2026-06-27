@@ -42,6 +42,7 @@ interface ErrorMessages {
 
 const ProductEdit = (props: IProductEdit) => {
   const [name, setName] = React.useState(props.selected?.name ?? "");
+  const [note, setNote] = React.useState(props.selected?.note ?? "");
   const [price, setPrice] = React.useState<number|undefined>(props.selected?.price);
   const [departmentId, setDepartmentId] = React.useState<number>(
     props.selected?.departmentId ?? 0,
@@ -56,6 +57,7 @@ const ProductEdit = (props: IProductEdit) => {
 
   const resetState = () => {
     setName("");
+    setNote("");
     setPrice( undefined );
     setDepartmentId(0);
     setCourseId(0);
@@ -91,6 +93,15 @@ const ProductEdit = (props: IProductEdit) => {
     [setName],
   );
 
+  const handleChangeNote = React.useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >(
+    (event) => {
+      setNote(event.currentTarget.value);
+    },
+    [setNote],
+  );
+
   const handleChangePrice =
     React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
       const value = Number.parseFloat(event.target.value)
@@ -118,6 +129,7 @@ const ProductEdit = (props: IProductEdit) => {
   const createProductRequest = () => {
     return {
       name,
+      note: note.trim() ? note.trim() : undefined,
       price,
       departmentId,
       courseId,
@@ -336,6 +348,28 @@ const ProductEdit = (props: IProductEdit) => {
               })()}
             </FormControl>
           </Box>
+
+          <TextField
+            size="small"
+            value={note}
+            label="Descrizione"
+            multiline
+            minRows={2}
+            slotProps={{
+              input: {
+                sx: { width: "100%" },
+              },
+              htmlInput: { maxLength: 255 },
+            }}
+            sx={{
+              width: "39em",
+              maxWidth: "100%",
+              "& .MuiInputBase-root": {
+                width: "100%",
+              },
+            }}
+            onChange={handleChangeNote}
+          />
 
           <Box sx={{ display: "block", mb: 2 }}>
             <LinkOutlined sx={{ mr: 1 }} />

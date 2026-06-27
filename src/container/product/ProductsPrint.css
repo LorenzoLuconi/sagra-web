@@ -29,6 +29,14 @@
     padding: 2mm 0;
 }
 
+.products-print-note {
+    color: #555;
+    font-size: 9pt;
+    font-style: italic;
+    margin-left: 0.5mm;
+    margin-top: 0.4mm;
+}
+
 .products-print-table td:last-child {
     font-weight: 500;
     white-space: nowrap;
