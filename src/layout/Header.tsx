@@ -5,12 +5,15 @@ import {
     Box,
     Button,
     Divider,
+    IconButton,
     Menu,
     MenuItem,
     MenuProps,
     Paper,
     styled,
     Typography,
+    useMediaQuery,
+    useTheme,
 } from "@mui/material";
 import {useNavigate} from "react-router";
 import {Logo} from "./Logo.tsx";
@@ -89,9 +92,11 @@ interface HeaderI {
 const Header: React.FC<HeaderI> = (props): React.ReactElement => {
 
     const navigate = useNavigate()
+    const theme = useTheme();
     const {user, logout, isLogoutPending} = useAuth()
     const {showThemeSwitcher} = useAppConf();
     const isAdmin = user?.role === "admin";
+    const collapseNavigation = useMediaQuery(theme.breakpoints.down('md'));
     const [adminAnchorEl, setAdminAnchorEl] = React.useState<null | HTMLElement>(null);
     const [userAnchorEl, setUserAnchorEl] = React.useState<null | HTMLElement>(null);
     const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false);
@@ -120,96 +125,148 @@ const Header: React.FC<HeaderI> = (props): React.ReactElement => {
         navigate("/");
     };
 
+    const adminMenu = (
+        <StyledMenu
+            id="admin-menu"
+            slotProps={{
+                list: {
+                    'aria-labelledby': 'admin-menu-button',
+                },
+            }}
+            anchorEl={adminAnchorEl}
+            open={adminMenuOpen}
+            onClose={handleAdminClose}
+        >
+            <MenuItem onClick={() => {handleNavigate('/products')}}>
+                <RestaurantOutlined />
+                Prodotti
+            </MenuItem>
+            <MenuItem onClick={() => {handleNavigate('/products/updateQuantity')}}>
+                <WarehouseOutlined />
+                Giacenze Magazzino
+            </MenuItem>
+            <MenuItem onClick={() => {handleNavigate('/departments')}}>
+                <WorkspacesOutlined />
+                Reparti
+            </MenuItem>
+            <MenuItem onClick={() => {handleNavigate('/courses')}}>
+                <FormatListNumberedOutlined />
+                Portate
+            </MenuItem>
+            <MenuItem onClick={() => {handleNavigate('/discounts')}}>
+                <CalculateOutlined/>
+                Sconti
+            </MenuItem>
+            <MenuItem onClick={() => {handleNavigate('/users')}}>
+                <PeopleOutlined />
+                Utenti
+            </MenuItem>
+            <MenuItem onClick={() => {handleNavigate('/configurations')}}>
+                <TuneOutlined />
+                Configurazioni
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={() => {handleNavigate('/stats')}}>
+                <AssessmentOutlined />
+                Statistiche
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={() => {handleNavigate('/monitors')}}>
+                <MonitorOutlined/>
+                Monitor
+            </MenuItem>
+        </StyledMenu>
+    );
+
     return (
         <AppBar  position={'sticky'} sx={{backgroundColor: 'transparent'}}>
             <Paper elevation={2} sx={{ display: 'flex', p: 1, alignItems: 'center'}}>
                 <Logo sx={{fontSize: '3rem', color: 'text.primary'}}/>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mr: 1}}>
-                    <Button variant="text" color={'error'} startIcon={<ReceiptOutlined/>} sx={{  mr: 1}}
-                            onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
-                    <Button variant="text"  startIcon={<LibraryBooksOutlined />} sx={{ color: 'text.primary', marginRight: 1}} onClick={() => {navigate(`/orders?created=${getTodayDateParam()}`)}}>Elenco Ordini</Button>
-
-                    {isAdmin && (
+                    {collapseNavigation ? (
                         <>
-                            <Button
-                                aria-controls={adminMenuOpen ? 'admin-menu' : undefined}
-                                aria-haspopup="true"
-                                aria-expanded={adminMenuOpen ? 'true' : undefined}
-                                variant="text"
-                                disableElevation
-                                onClick={handleAdminClick}
-                                endIcon={<KeyboardArrowDownIcon/>}
-                                startIcon={<SettingsOutlined />}
-                                sx={{ color: 'text.primary', marginRight: 1}}
+                            <IconButton
+                                aria-label="Nuovo Ordine"
+                                color="error"
+                                onClick={() => {navigate('/orders/new')}}
+                                sx={{mr: 1}}
                             >
-                                Admin
-                            </Button>
-                            <StyledMenu
-                                id="admin-menu"
-                                slotProps={{
-                                    list: {
-                                        'aria-labelledby': 'admin-menu-button',
-                                    },
-                                }}
-                                anchorEl={adminAnchorEl}
-                                open={adminMenuOpen}
-                                onClose={handleAdminClose}
+                                <ReceiptOutlined />
+                            </IconButton>
+                            <IconButton
+                                aria-label="Elenco Ordini"
+                                onClick={() => {navigate(`/orders?created=${getTodayDateParam()}`)}}
+                                sx={{color: 'text.primary', mr: 1}}
                             >
-                                <MenuItem onClick={() => {handleNavigate('/products')}}>
-                                    <RestaurantOutlined />
-                                    Prodotti
-                                </MenuItem>
-                                <MenuItem onClick={() => {handleNavigate('/products/updateQuantity')}}>
-                                    <WarehouseOutlined />
-                                    Giacenze Magazzino
-                                </MenuItem>
-                                <MenuItem onClick={() => {handleNavigate('/departments')}}>
-                                    <WorkspacesOutlined />
-                                    Reparti
-                                </MenuItem>
-                                <MenuItem onClick={() => {handleNavigate('/courses')}}>
-                                    <FormatListNumberedOutlined />
-                                    Portate
-                                </MenuItem>
-                                <MenuItem onClick={() => {handleNavigate('/discounts')}}>
-                                    <CalculateOutlined/>
-                                    Sconti
-                                </MenuItem>
-                                <MenuItem onClick={() => {handleNavigate('/users')}}>
-                                    <PeopleOutlined />
-                                    Utenti
-                                </MenuItem>
-                                <MenuItem onClick={() => {handleNavigate('/configurations')}}>
-                                    <TuneOutlined />
-                                    Configurazioni
-                                </MenuItem>
-                                <Divider />
-                                <MenuItem onClick={() => {handleNavigate('/stats')}}>
-                                    <AssessmentOutlined />
-                                    Statistiche
-                                </MenuItem>
-                                <Divider />
-                                <MenuItem onClick={() => {handleNavigate('/monitors')}}>
-                                    <MonitorOutlined/>
-                                    Monitor
-                                </MenuItem>
-                            </StyledMenu>
+                                <LibraryBooksOutlined />
+                            </IconButton>
+                            {isAdmin && (
+                                <IconButton
+                                    aria-controls={adminMenuOpen ? 'admin-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={adminMenuOpen ? 'true' : undefined}
+                                    aria-label="Admin"
+                                    onClick={handleAdminClick}
+                                    sx={{color: 'text.primary', mr: 1}}
+                                >
+                                    <SettingsOutlined />
+                                </IconButton>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="text" color={'error'} startIcon={<ReceiptOutlined/>} sx={{  mr: 1}}
+                                    onClick={() => {navigate('/orders/new')}}>Nuovo Ordine</Button>
+                            <Button variant="text"  startIcon={<LibraryBooksOutlined />} sx={{ color: 'text.primary', marginRight: 1}} onClick={() => {navigate(`/orders?created=${getTodayDateParam()}`)}}>Elenco Ordini</Button>
+
+                            {isAdmin && (
+                                <>
+                                    <Button
+                                        aria-controls={adminMenuOpen ? 'admin-menu' : undefined}
+                                        aria-haspopup="true"
+                                        aria-expanded={adminMenuOpen ? 'true' : undefined}
+                                        variant="text"
+                                        disableElevation
+                                        onClick={handleAdminClick}
+                                        endIcon={<KeyboardArrowDownIcon/>}
+                                        startIcon={<SettingsOutlined />}
+                                        sx={{ color: 'text.primary', marginRight: 1}}
+                                    >
+                                        Admin
+                                    </Button>
+                                </>
+                            )}
                         </>
                     )}
-                    <Button
-                        startIcon={<AccountCircleOutlined />}
-                        aria-controls={userMenuOpen ? 'user-menu' : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={userMenuOpen ? 'true' : undefined}
-                        variant="text"
-                        disableElevation
-                        color="inherit"
-                        endIcon={<KeyboardArrowDownIcon />}
-                        onClick={handleUserClick}
-                        sx={{mr: 1, textTransform: 'none'}}
-                    >
-                        {user?.name ?? user?.username ?? 'Utente'}
-                    </Button>
+                    {isAdmin && adminMenu}
+                    {collapseNavigation ? (
+                        <IconButton
+                            aria-controls={userMenuOpen ? 'user-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={userMenuOpen ? 'true' : undefined}
+                            aria-label={user?.name ?? user?.username ?? 'Utente'}
+                            color="inherit"
+                            onClick={handleUserClick}
+                            sx={{mr: 1}}
+                        >
+                            <AccountCircleOutlined />
+                        </IconButton>
+                    ) : (
+                        <Button
+                            startIcon={<AccountCircleOutlined />}
+                            aria-controls={userMenuOpen ? 'user-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={userMenuOpen ? 'true' : undefined}
+                            variant="text"
+                            disableElevation
+                            color="inherit"
+                            endIcon={<KeyboardArrowDownIcon />}
+                            onClick={handleUserClick}
+                            sx={{mr: 1, textTransform: 'none'}}
+                        >
+                            {user?.name ?? user?.username ?? 'Utente'}
+                        </Button>
+                    )}
 
                     <StyledMenu
                         id="user-menu"
