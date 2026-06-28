@@ -24,12 +24,20 @@ const ProductsOrderCard = (props : IProductsOrder) => {
     const {products, addToOrder} = props;
 
     return (
-          <Box sx={{display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: 2, rowGap: 2, mt: 2 }} >
+          <Box
+              sx={{
+                  display: "grid",
+                  gap: 2,
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(min(180px, 100%), 1fr))',
+                  mt: 2,
+                  width: '100%',
+              }}
+          >
             <>
               {
                 products.map( (product: Product) =>
                     <Card key={product.id}
-                          sx={{ minWidth: 200, maxWidth: 200,
+                          sx={{ minWidth: 0,
                               backgroundColor: productBackgroundColor(product, theme)
                           }}
                           onClick={(event) => {

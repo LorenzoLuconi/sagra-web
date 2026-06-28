@@ -8,7 +8,6 @@ import {
     CircularProgress,
     Drawer,
     Fab,
-    Grid,
     Paper,
     Typography,
     useMediaQuery,
@@ -80,18 +79,29 @@ const OrderEditInnerContainer: React.FC = () => {
 
     return (
         <>
-            <Grid container spacing={2}>
-                <Grid size={{xs: 12, md: 7}}>
+            <Box
+                sx={{
+                    alignItems: 'start',
+                    display: 'grid',
+                    gap: 2,
+                    gridTemplateColumns: {
+                        xs: 'minmax(0, 1fr)',
+                        md: 'minmax(0, 7fr) minmax(320px, 5fr)',
+                    },
+                    width: '100%',
+                }}
+            >
+                <Box sx={{ minWidth: 0 }}>
                     <ProductsToOrder/>
-                </Grid>
+                </Box>
                 {!isCompact && (
-                    <Grid size={{xs: 12, md: 5}}>
+                    <Box sx={{ minWidth: 0 }}>
                         <Box sx={{ position: 'sticky', top: '70px' }}>
                             <OrderPanel />
                         </Box>
-                    </Grid>
+                    </Box>
                 )}
-            </Grid>
+            </Box>
 
             {isCompact && (
                 <>
@@ -116,6 +126,7 @@ const OrderEditInnerContainer: React.FC = () => {
                         onClose={() => setOrderDrawerOpen(false)}
                         PaperProps={{
                             sx: {
+                                boxSizing: 'border-box',
                                 maxWidth: '420px',
                                 p: 1,
                                 width: '92vw',

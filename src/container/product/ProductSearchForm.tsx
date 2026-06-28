@@ -72,10 +72,17 @@ const ProductSearchForm : React.FC<ProductSearchFormProps> = (props: ProductSear
 
             <Paper
                 component="div"
-                sx={{  mt: 1, p: '2px 4px', display: 'flex', alignItems: 'center', width: '50%', minWidth: '320px' }}
+                sx={{
+                    alignItems: 'center',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    mt: 1,
+                    p: '2px 4px',
+                    width: {xs: '100%', sm: '50%'},
+                }}
             >
                 <InputBase
-                    sx={{ m: 1, flex: 1 }}
+                    sx={{ flex: 1, m: 1, minWidth: 0 }}
                     placeholder="Nome prodotto da ricercare"
                     value={name}
                     onChange={handleChangeName}

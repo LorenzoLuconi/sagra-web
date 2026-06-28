@@ -15,7 +15,7 @@ const ProductQuantity = (props: ProductQuantityProps) => {
       return <LockOutlined sx={(theme) => ({
         cursor: "pointer",
         color: theme.palette.error.light,
-        ml: 1, verticalAlign: "middle"
+        mr: 1, verticalAlign: "middle"
       })}
       />;
     }
@@ -24,7 +24,7 @@ const ProductQuantity = (props: ProductQuantityProps) => {
       return <ErrorOutlined sx={(theme) => ({
         cursor: "pointer",
         color: theme.palette.error.light,
-        ml: 1, verticalAlign: "middle"
+        verticalAlign: "middle"
       })}
       />;
 
@@ -32,7 +32,7 @@ const ProductQuantity = (props: ProductQuantityProps) => {
       return <WarningOutlined sx={(theme) => ({
         cursor: "pointer",
         color: theme.palette.warning.light,
-        ml: 1, verticalAlign: "middle"
+        mr: 1, verticalAlign: "middle"
       })}
       />;
 
@@ -40,13 +40,12 @@ const ProductQuantity = (props: ProductQuantityProps) => {
   };
 
   return (
-      <Box sx={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+      <Box sx={{display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end', minWidth: 0}}>
+          <>{alertIcon()}</>
         <Typography >
           {product.availableQuantity}
         </Typography>
-          <Typography>
-            <>{alertIcon()}</>
-          </Typography>
+
       </Box>
   );
 };

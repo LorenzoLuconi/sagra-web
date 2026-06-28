@@ -2,6 +2,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TableRow,
 } from "@mui/material";
@@ -15,14 +16,15 @@ const ProductsOrderList = (props: IProductsOrder) => {
     const {products, addToOrder} = props;
 
     return (
-        <Table size={'medium'}>
+      <TableContainer>
+        <Table size={'medium'} sx={{ tableLayout: 'fixed', width: '100%' }}>
           <TableHead>
             <TableRow>
-              <TableCell>Nome Prodotto</TableCell>
-              <TableCell sx={{ width: 100 }} align="right">
+              <TableCell sx={{ width: 'auto' }}>Nome Prodotto</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap', width: '4.75rem' }} align="right">
                 Prezzo
               </TableCell>
-              <TableCell sx={{ width: 100 }}>Quantità</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap', width: '4.75rem' }} align="right">Quantità</TableCell>
             </TableRow>
           </TableHead>
           <TableBody className="divide-y">
@@ -32,7 +34,6 @@ const ProductsOrderList = (props: IProductsOrder) => {
                 <TableRow hover={productAvailable(product)}
                   key={product.id}
                   sx={(theme) => ({
-                    minWidth: 200,
                     cursor: productAvailable(product) ? 'pointer' : 'default',
                     backgroundColor: productBackgroundColor(product, theme)
                   })}
@@ -41,13 +42,13 @@ const ProductsOrderList = (props: IProductsOrder) => {
                       addToOrder(product)
                   }}
                 >
-                  <TableCell sx={{ fontSize: "1.0em" }}>
+                  <TableCell sx={{ fontSize: "1.0em", overflowWrap: 'anywhere' }}>
                     {product.name}
                   </TableCell>
-                  <TableCell align="right" sx={{ fontSize: "1.0em" }}>
+                  <TableCell align="right" sx={{ fontSize: "1.0em", whiteSpace: 'nowrap' }}>
                     {currency(product.price)}
                   </TableCell>
-                  <TableCell sx={{ fontSize: "1.0em" }}>
+                  <TableCell align="right" sx={{ fontSize: "1.0em", whiteSpace: 'nowrap' }}>
                     <ProductQuantity product={product} />
                   </TableCell>
                 </TableRow>
@@ -56,6 +57,7 @@ const ProductsOrderList = (props: IProductsOrder) => {
             </>
           </TableBody>
         </Table>
+      </TableContainer>
     );
 }
 

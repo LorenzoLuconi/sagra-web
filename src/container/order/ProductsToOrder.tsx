@@ -59,7 +59,7 @@ const ProductsToOrder = () => {
   };
 
     return (
-      <Box>
+      <Box sx={{ minWidth: 0, width: '100%' }}>
         <Paper variant="outlined" sx={{ p: 2, backgroundColor: theme.sagra.panelBackground }}
             className="paper-round">
           <ProductSearchForm setSearchParam={handleChangeSearchParam} />
@@ -88,7 +88,7 @@ const ProductsToOrder = () => {
           </IconButton>
         </Paper>
         <Paper variant="outlined" className="paper-bottom"
-               sx={{ p: 1, pb: 2, backgroundColor: theme.sagra.panelBackground}}>
+               sx={{ minWidth: 0, overflow: 'hidden', p: 1, pb: 2, backgroundColor: theme.sagra.panelBackground}}>
           <>
           {ProductLayoutMapping[userPreferences.productView] === 0 ? (
             <ProductsOrder

@@ -13,9 +13,9 @@ const MainLayout: React.FC<MainLayoutI> = (props) => {
 
         <ThemeProvider theme={props.theme}>
 
-        <Box sx={{ m: 1, minWidth: '600px', backgroundColor: 'background.default', height: '100%' }}>
+        <Box sx={{ backgroundColor: 'background.default', height: '100%', m: 1, minWidth: 0 }}>
             {props.header}
-            <Box sx={{ margin: '20px 10px', height: '100%' }}>
+            <Box sx={{ height: '100%', m: { xs: '12px 0', sm: '20px 10px' }, minWidth: 0 }}>
                 {props.body}
             </Box>
         </Box>
