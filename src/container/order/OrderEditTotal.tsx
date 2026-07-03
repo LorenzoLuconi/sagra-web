@@ -28,7 +28,7 @@ const OrderEditTotal = () => {
     queryFn: discountsSearchConf.queryFn,
   });
 
-  const total = () => {
+  const originalTotal = () => {
     let t = 0;
     if (order.serviceNumber && ! order.takeAway) {
       t = order.serviceCost * order.serviceNumber;
@@ -38,19 +38,41 @@ const OrderEditTotal = () => {
       t = t + p.quantity * p.price;
     });
 
+    return t;
+  };
+
+  const total = () => {
+    const t = originalTotal();
+
     if ( order.discountRate )
-      t = t * ( 100  - order.discountRate)/100;
+      return t * ( 100  - order.discountRate)/100;
 
     return t;
   };
 
 
   if (discountsQuery.isFetched) {
+    const totalAmount = total();
+    const originalTotalAmount = originalTotal();
+
     return (
         <>
           <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <Typography
-                sx={{fontWeight: 700, fontSize: '2.0em', justifyContent: 'center'}}>{currency(total())}</Typography>
+            <Box sx={{display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 1, flexWrap: 'wrap'}}>
+              <Typography
+                  sx={{fontWeight: 700, fontSize: '2.0em', justifyContent: 'center'}}>{currency(totalAmount)}</Typography>
+              {order.discountRate &&
+                  <Typography
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: '0.9em',
+                        textDecoration: 'line-through',
+                      }}
+                  >
+                    {currency(originalTotalAmount)}
+                  </Typography>
+              }
+            </Box>
             <Box sx={{ml: 2}}>
               <Button size="small" variant="outlined" startIcon={<EuroOutlined/>}
                       onClick={handleClick}

@@ -17,7 +17,7 @@ export interface SearchParamsI {
   page: number
   size: number
 }
-export const rowsPerPageOptions = [10, 20, 50]
+export const rowsPerPageOptions = [20, 50, 100]
 
 interface OrderListSearchI {
   currentUsername?: string

@@ -142,7 +142,7 @@ function getPrintGroups(
 
 interface IFieldValue {
   field: string
-  value: string
+  value: React.ReactNode
 }
 
 const OrderPrintContainer = ( props: React.PropsWithChildren ) => {
@@ -161,7 +161,9 @@ const FieldValue = (props: IFieldValue) => {
         <Typography sx={{fontSize: '0.9em', textTransform: 'uppercase'}}>{props.field}:</Typography>
       </Box>
       <Box>
-        <Typography sx={{fontSize: '1.0em', fontWeight: 500}}>{props.value}</Typography>
+        {typeof props.value === "string"
+          ? <Typography sx={{fontSize: '1.0em', fontWeight: 500}}>{props.value}</Typography>
+          : props.value}
       </Box>
     </Box>
   )
@@ -324,6 +326,28 @@ interface OrderPrintInfoProps {
 
 const OrderPrintInfo = (props: OrderPrintInfoProps) => {
   const {order} = props
+  const originalTotalAmount = order.products.reduce(
+    (total, product) => total + (product.quantity * product.price),
+    order.serviceNumber && !order.takeAway ? order.serviceNumber * order.serviceCost : 0,
+  );
+  const totalValue = order.discountRate
+    ? (
+      <Box sx={{display: 'flex', alignItems: 'baseline', gap: 1, flexWrap: 'wrap'}}>
+        <Typography sx={{fontSize: '1.0em', fontWeight: 500}}>
+          {currency(order.totalAmount)} (sconto {order.discountRate}%)
+        </Typography>
+        <Typography
+          sx={{
+            color: 'text.secondary',
+            fontSize: '0.85em',
+            textDecoration: 'line-through',
+          }}
+        >
+          {currency(originalTotalAmount)}
+        </Typography>
+      </Box>
+    )
+    : currency(order.totalAmount);
 
   return (
     <Box sx={{display: 'inline-block', width: '100%', boxSizing: 'border-box', mt: 1, border: 1, p: 1, backgroundColor: '#FAFAFA' }}>
@@ -335,7 +359,7 @@ const OrderPrintInfo = (props: OrderPrintInfoProps) => {
           <FieldValue field="Note" value={order.note ?? '-'}/>
         </Grid>
         <Grid size={5}>
-          <FieldValue field="Totale" value={ order.discountRate ? `${currency(order.totalAmount)} (sconto ${order.discountRate}%)` : currency(order.totalAmount)}/>
+          <FieldValue field="Totale" value={totalValue}/>
             <>
           {
             order.takeAway ?

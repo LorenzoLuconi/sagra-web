@@ -37,7 +37,7 @@ const product = (overrides: Partial<Product> = {}): Product => ({
 const panino = product();
 const pasta = product({id: 2, name: "Pasta", departmentId: 2, courseId: 2});
 
-const order = (products: Product[] = [panino]): Order => ({
+const order = (products: Product[] = [panino], overrides: Partial<Order> = {}): Order => ({
     id: 12,
     customer: "Mario Rossi",
     takeAway: false,
@@ -54,12 +54,16 @@ const order = (products: Product[] = [panino]): Order => ({
             price: product.price,
         }
     )),
+    ...overrides,
 });
 
-const renderOrderPrint = (orderedProducts: Product[] = [panino]) => render(
+const renderOrderPrint = (
+    orderedProducts: Product[] = [panino],
+    orderOverrides: Partial<Order> = {},
+) => render(
     <ThemeProvider theme={sagraTheme.light}>
         <OrderPrint
-            order={order(orderedProducts)}
+            order={order(orderedProducts, orderOverrides)}
             products={orderedProducts.reduce<Record<number, Product>>((acc, product) => {
                 acc[product.id] = product;
                 return acc;
@@ -123,5 +127,14 @@ describe("OrderPrint", () => {
         expect(screen.queryByText("Portata 1")).not.toBeInTheDocument();
         expect(screen.queryByText("Portata 2")).not.toBeInTheDocument();
         expect(container.querySelectorAll(".page-break")).toHaveLength(1);
+    });
+
+    it("mostra il totale originale quando l'ordine ha uno sconto", () => {
+        usePrintConfigurationMock.mockReturnValue({customerCopy: false, splitBy: "none"});
+
+        renderOrderPrint([panino], {discountRate: 10, totalAmount: 10.8});
+
+        expect(screen.getByText("10,80 € (sconto 10%)")).toBeInTheDocument();
+        expect(screen.getByText("12,00 €")).toBeInTheDocument();
     });
 });
