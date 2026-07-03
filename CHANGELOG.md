@@ -1,3 +1,7 @@
+## 1.1.1
+
+ - Visualizzato l'importo originale negli ordini scontati
+
 ## 1.1
 
  - Aggiunto supporto per configurazione via REST
