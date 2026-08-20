@@ -46,7 +46,10 @@ const ProductsQuantityUpdateList = (props: IProductsQuantityUpdateListProps) => 
     }
 
     const productsSearchConf = productsSearchQuery({
-        queryParams: searchParam
+        queryParams: {
+            ...searchParam,
+            excludeLinked: true
+        }
     });
 
     const productsQuery = useQuery({

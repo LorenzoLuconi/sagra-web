@@ -1,3 +1,7 @@
+## 1.1.2
+
+ - Esclusi i prodotti linked nella gestione delle giacenze
+
 ## 1.1.1
 
  - Visualizzato l'importo originale negli ordini scontati
